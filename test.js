@@ -1,5 +1,3 @@
-const { connect } = require('http2');
-
 const MongoConnector = require('./MongoConnector').MongoConnector;
 
 const connector = new MongoConnector();

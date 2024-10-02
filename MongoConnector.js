@@ -42,7 +42,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.Comment = this.mongoose.model('Comment', commentSchema);
     }
 
-    async dropDatabase() {
+    async dropDatabase() { //be careful intended for debugging
         await this.mongoose.connection.dropDatabase();
     }
 
