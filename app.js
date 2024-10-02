@@ -34,7 +34,8 @@ app.use(session({
 const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
-app.use('/', require('./routes')(db));
+app.use('/', require('./routes/base')(db));
+app.use('/api', require('./routes/api')(db));
 
 //start server
 app.listen(port, () => {
