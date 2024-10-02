@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "mongoose": "^8.7.0"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "start": "node app.js"
+  }
+}
