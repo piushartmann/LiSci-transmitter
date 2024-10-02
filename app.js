@@ -33,11 +33,8 @@ app.use(session({
 //connect to db
 const db = new MongoConnector("transmitter", connectionString);
 
-//routes
-app.get('/', (req, res) => {
-    req.session.views = (req.session.views || 0) + 1;
-    res.send('Hello World!');
-});
+//use routes
+app.use('/', require('./routes')(db));
 
 //start server
 app.listen(port, () => {
