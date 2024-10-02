@@ -32,10 +32,10 @@ const userSchema = new Schema({
 });
 
 module.exports.MongoConnector = class MongoConnector {
-    constructor(url = "mongodb://localhost:27017/transmitter") {
+    constructor(url = "mongodb://localhost:27017") {
         this.mongoose = mongoose;
         this.url = url;
-        this.mongoose.connect(this.url);
+        this.mongoose.connect(this.url, {dbName: "transmitter"});
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);

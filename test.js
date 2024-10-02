@@ -1,6 +1,8 @@
 const MongoConnector = require('./MongoConnector').MongoConnector;
 
-const connector = new MongoConnector();
+connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
+
+const connector = new MongoConnector(connectionString);
 connector.dropDatabase().then(() => { console.log("Database dropped"); });
 
 async function test() {
