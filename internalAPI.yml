@@ -1,0 +1,161 @@
+openapi: '3.0.3'
+info:
+  title: transmitter internal API
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+    description: Local server
+  - url: https://liscitransmitter.live
+    description: Production server
+paths:
+  /:
+    get:
+      summary: Root endpoint
+      responses:
+        '200':
+          description: Successful response
+  /login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+        '401':
+          description: Invalid Username or Password
+  /logout:
+    get:
+      summary: User logout
+      responses:
+        '200':
+          description: Successful logout
+  /checkLogin:
+    get:
+      summary: Check if user is logged in (testing)
+      responses:
+        '200':
+          description: User is logged in
+        '401':
+          description: Not logged in
+  /createPost:
+    post:
+      summary: Create a new post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                type:
+                  type: string
+                permissions:
+                  type: string
+      responses:
+        '200':
+          description: Post created successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+  /upload:
+    post:
+      summary: Upload a file
+      responses:
+        '200':
+          description: File uploaded successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '500':
+          description: File upload error
+  /createTextPost:
+    post:
+      summary: Create a new text post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                teachersafe:
+                  type: boolean
+      responses:
+        '200':
+          description: Post created successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+  /createFilePost:
+    post:
+      summary: Create a new file post
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                teachersafe:
+                  type: boolean
+                upload:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Post created successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: Forbidden
+        '500':
+          description: File upload error
+  /getPost/{postID}:
+    get:
+      summary: Get a post by ID
+      parameters:
+        - name: postID
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+  /getPosts:
+    get:
+      summary: Get all posts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Not logged in
