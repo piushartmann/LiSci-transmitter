@@ -138,7 +138,7 @@ module.exports = (db, s3Client) => {
         return res.status(200).redirect('/');
     });
 
-    router.post('/createPDFPost', async (req, res) => {
+    router.post('/createFilePost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
 
@@ -149,26 +149,11 @@ module.exports = (db, s3Client) => {
             return res.status(500).send(error.message);
         }
         const { title, teachersafe } = req.body;
+        const fileExtension = filename.split('.').pop().toLowerCase();
 
-        const post = await db.createPost(req.session.userID, title, filename, "pdf", teachersafe ? "Teachersafe" : "classmatesonly");
+        const post = await db.createPost(req.session.userID, title, filename, fileExtension, teachersafe ? "Teachersafe" : "classmatesonly");
         return res.status(200).redirect('/');
     });
-
-    router.post('/createImagePost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
-
-        let filename;
-        try {
-            filename = await uploadFile(req, res, "posts", ["png", "jpg", "jpeg", "gif", "webp"]);
-        } catch (error) {
-            return res.status(500).send(error.message);
-        }
-        const { title, teachersafe } = req.body;
-
-        const post = await db.createPost(req.session.userID, title, filename, "img", teachersafe ? "Teachersafe" : "classmatesonly");
-        return res.status(200).redirect('/');
-    })
 
     router.get('/getPost/:postID', async (req, res) => {
         const post = await db.getPost(req.params.postID);

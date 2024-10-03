@@ -44,16 +44,8 @@
 
     <br>
 
-    <form method="post" enctype="multipart/form-data" action="internal/createPDFPost">
-        <label for="title">PDF</label>
-        <input type="text" name="title" required>
-        <input type="file" name="upload">
-        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
-        <input type="submit" value="Create Post" class="button">
-    </form>
-
-    <form method="post" enctype="multipart/form-data" action="internal/createImagePost">
-        <label for="title">Image</label>
+    <form method="post" enctype="multipart/form-data" action="internal/createFilePost">
+        <label for="title">Images/PDF</label>
         <input type="text" name="title" required>
         <input type="file" name="upload">
         <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
