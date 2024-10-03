@@ -13,12 +13,6 @@
     </h1>
     <p>You viewed this page <%= views %> times.</p>
 
-    <form method="post" enctype="multipart/form-data" action="api/upload">
-        <label for="file">Upload a file</label>
-        <input type="file" name="upload">
-        <input type="submit" class="button">
-    </form>
-
     <form method="post" action="internal/login">
         <label for="username">Username</label>
         <input type="text" name="username">
@@ -47,7 +41,7 @@
     <form method="post" enctype="multipart/form-data" action="internal/createFilePost">
         <label for="title">Images/PDF</label>
         <input type="text" name="title" required>
-        <input type="file" name="upload">
+        <input type="file" name="upload" accept=".pdf,image/*">
         <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
         <input type="submit" value="Create Post" class="button">
     </form>

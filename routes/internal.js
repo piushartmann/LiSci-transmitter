@@ -144,14 +144,22 @@ module.exports = (db, s3Client) => {
 
         let filename;
         try {
-            filename = await uploadFile(req, res, "posts", ["pdf"]);
+            filename = await uploadFile(req, res, "posts", ["pdf", "jpg", "jpeg", "png", "webp", "heic"]);
         } catch (error) {
             return res.status(500).send(error.message);
         }
         const { title, teachersafe } = req.body;
         const fileExtension = filename.split('.').pop().toLowerCase();
 
-        const post = await db.createPost(req.session.userID, title, filename, fileExtension, teachersafe ? "Teachersafe" : "classmatesonly");
+        const imgFormats = ["jpg", "jpeg", "png", "webp", "heic"];
+        const pdfFormats = ["pdf"];
+
+        let type = "file";
+        type = imgFormats.includes(fileExtension) ? "img" : type;
+        type = pdfFormats.includes(fileExtension) ? "pdf" : type;
+
+
+        const post = await db.createPost(req.session.userID, title, filename, type, teachersafe ? "Teachersafe" : "classmatesonly");
         return res.status(200).redirect('/');
     });
 
