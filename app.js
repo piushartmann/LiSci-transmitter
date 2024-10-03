@@ -43,8 +43,8 @@ const s3Client = new S3Client({
     region: "fra1",
     endpoint: "https://fra1.digitaloceanspaces.com",
     credentials: {
-        accessKeyId: "DO00DV8XZXLL4P7AKC33",
-        secretAccessKey: "mwN9SrCW06Cp56Hvi87hq+FpwgKR7i1600hlh23dXgc",
+        accessKeyId: env.process.AWS_ACCESS_KEY_ID,
+        secretAccessKey: env.process.AWS_SECRET_ACCESS_KEY,
     },
     forcePathStyle: false,
 });

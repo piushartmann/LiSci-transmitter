@@ -50,21 +50,16 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) {
             return res.status(401).send("Not logged in");
         }
-        res.status(200).send("Logged in");
+        return res.status(200).send("Logged in");
     });
 
     router.post('/createPost', async (req, res) => {
-        if (req.session.userID) {
-            if (req.session.type !== "admin" && req.session.type !== "writer") {
-                return res.status(403).send("You can not create a post");
-            }
-            const { title, content, type, permissions } = req.body;
-            const post = await db.createPost(req.session.userID, title, content, type, permissions);
-            res.status(200).send(post);
-        }
-        else {
-            res.status(401).send("Not logged in");
-        }
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
+
+        const { title, content, type, permissions } = req.body;
+        const post = await db.createPost(req.session.userID, title, content, type, permissions);
+        return res.status(200).send(post);
     });
 
     function uploadFile(req, res, directory = "") {
@@ -79,18 +74,18 @@ module.exports = (db, s3Client) => {
                     key: function (request, file, cb) {
                         const fileExtension = file.originalname.split('.').pop();
                         let newFilename;
-    
+
                         if (directory !== "") {
                             newFilename = `${directory}/${filename}.${fileExtension}`;
                         } else {
                             newFilename = `${filename}.${fileExtension}`;
                         }
-    
+
                         cb(null, newFilename);
                     },
                 }),
             }).array("upload", 1);
-    
+
             s3upload(req, res, function (error) {
                 if (error) {
                     console.error(error);
@@ -106,12 +101,12 @@ module.exports = (db, s3Client) => {
             });
         });
     }
-    
+
 
 
     router.post("/upload", async function (req, res) {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You can not upload a file");
+        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot upload a file");
 
         const filename = await uploadFile(req, res, "test");
         console.log(`new filename: ${filename}`);
