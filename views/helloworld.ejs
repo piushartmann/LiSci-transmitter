@@ -5,19 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello World</title>
+    <script src="/js/helloworld.js"></script>
 </head>
 
 <body>
-    <h1>Hello, <%= typeof username !== 'undefined' ? username : 'World' %> </h1>
+    <h1>Hello, <%= typeof username !=='undefined' ? username : 'World' %>
+    </h1>
     <p>You viewed this page <%= views %> times.</p>
 
     <form method="post" enctype="multipart/form-data" action="api/upload">
         <label for="file">Upload a file</label>
         <input type="file" name="upload">
         <input type="submit" class="button">
-      </form>
+    </form>
 
-    <form method="post" action="api/login">
+    <form method="post" action="internal/login">
         <label for="username">Username</label>
         <input type="text" name="username">
         <label for="password">Password</label>
@@ -25,9 +27,45 @@
         <input type="submit" class="button">
     </form>
 
-    <form method="get" action="api/logout">
+    <form method="get" action="internal/logout">
         <input type="submit" value="Logout" class="button">
     </form>
+
+    <br>
+
+    <form method="post" action="internal/createTextPost">
+        <label for="title">Text</label>
+        <input type="text" name="title" required>
+        <label for="content">Content</label>
+        <textarea name="content" rows="4" required></textarea>
+        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
+        <input type="submit" value="Create Post" class="button">
+    </form>
+
+    <br>
+
+    <form method="post" enctype="multipart/form-data" action="internal/createPDFPost">
+        <label for="title">PDF</label>
+        <input type="text" name="title" required>
+        <input type="file" name="upload">
+        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
+        <input type="submit" value="Create Post" class="button">
+    </form>
+
+    <form method="post" enctype="multipart/form-data" action="internal/createImagePost">
+        <label for="title">Image</label>
+        <input type="text" name="title" required>
+        <input type="file" name="upload">
+        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
+        <input type="submit" value="Create Post" class="button">
+    </form>
+
+    <br><br>
+
+    <div style="border: 1px solid #ccc; overflow-y: auto; padding: 10px; height: calc(100vh - 400px);" id="postBox">
+        
+    </div>
+
 </body>
 
 </html>

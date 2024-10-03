@@ -5,6 +5,8 @@ const fs = require('fs');
 const MongoDBStore = require('connect-mongo')
 const { S3Client } = require("@aws-sdk/client-s3");
 bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+
 const oneDay = 24 * 3600 * 1000
 
 const MongoConnector = require('./MongoConnector').MongoConnector;
@@ -19,6 +21,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 //use db to store session
 app.use(session({
@@ -54,7 +58,7 @@ const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
 app.use('/', require('./routes/base')(db));
-app.use('/api', require('./routes/api')(db, s3Client));
+app.use('/internal', require('./routes/internal')(db, s3Client));
 
 //start server
 app.listen(port, () => {

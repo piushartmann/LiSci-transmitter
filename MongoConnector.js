@@ -140,4 +140,14 @@ module.exports.MongoConnector = class MongoConnector {
             return false;
         }
     }
+
+    async getPosts(isTeacher, limit = 10, offset = 0) {
+        const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+        return await this.Post.find(query)
+            .populate('userID', 'username profilePic')
+            .sort({ timestamp: -1 })
+            .skip(offset)
+            .limit(limit);
+
+    }
 };
