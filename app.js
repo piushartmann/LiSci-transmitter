@@ -1,7 +1,11 @@
 const express = require('express');
 const session = require('express-session')
 const path = require('path');
+const fs = require('fs');
 const MongoDBStore = require('connect-mongo')
+const { S3Client } = require("@aws-sdk/client-s3");
+bodyParser = require('body-parser');
+const oneDay = 24 * 3600 * 1000
 
 const MongoConnector = require('./MongoConnector').MongoConnector;
 
@@ -10,17 +14,22 @@ const port = 8080;
 
 //create express app
 const app = express();
-app.use(express.json());
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true })); 
 
 //use db to store session
 app.use(session({
     secret: 'transmitter secret',
     httpOnly: true,
+    cookie: {
+        maxAge: oneDay * 30,
+        sameSite: true,
+        secure: false
+    },
     secure: true,
-    maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
     resave: false,
     saveUninitialized: true,
     store: MongoDBStore.create({
@@ -30,12 +39,22 @@ app.use(session({
     })
 }));
 
+const s3Client = new S3Client({
+    region: "fra1",
+    endpoint: "https://fra1.digitaloceanspaces.com",
+    credentials: {
+        accessKeyId: "DO00DV8XZXLL4P7AKC33",
+        secretAccessKey: "mwN9SrCW06Cp56Hvi87hq+FpwgKR7i1600hlh23dXgc",
+    },
+    forcePathStyle: false,
+});
+
 //connect to db
 const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
 app.use('/', require('./routes/base')(db));
-app.use('/api', require('./routes/api')(db));
+app.use('/api', require('./routes/api')(db, s3Client));
 
 //start server
 app.listen(port, () => {

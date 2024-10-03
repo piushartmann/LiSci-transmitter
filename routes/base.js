@@ -10,7 +10,7 @@ const router = Router();
 module.exports = (db) => {
     router.get('/', (req, res) => {
         req.session.views = (req.session.views || 0) + 1;
-        res.render('helloworld', { views: req.session.views });
+        res.render('helloworld', { views: req.session.views, username: req.session.username });
     });
 
     return router;

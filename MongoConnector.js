@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 
@@ -31,11 +32,17 @@ const userSchema = new Schema({
     type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] }
 });
 
+function hashPassword(password) {
+    const hash = crypto.createHash('sha256');
+    hash.update(password);
+    return hash.digest('hex');
+}
+
 module.exports.MongoConnector = class MongoConnector {
     constructor(database, url = "mongodb://localhost:27017") {
         this.mongoose = mongoose;
         this.url = url;
-        this.mongoose.connect(this.url, {dbName: database});
+        this.mongoose.connect(this.url, { dbName: database });
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
@@ -70,10 +77,27 @@ module.exports.MongoConnector = class MongoConnector {
         return await post.save();
     }
 
-    async createUser(username, passHash, type) {
+    async createUser(username, password, type) {
+        const passHash = hashPassword(password);
         const user = new this.User({ username, passHash, email: "", type });
         return await user.save();
     }
+
+    async setUserData(userID, key, value) {
+        const user = await this.User.findById(userID);
+        user[key] = value;
+        return await user.save();
+    }
+
+    async getUserData(userID, key) {
+        const user = await this.User.findById(userID);
+        return user[key];
+    }
+
+    async getUserData(userID) {
+        return await this.User.findById(userID);
+    }
+
 
     async getUser(username) {
         return await this.User.findOne({ username });
@@ -101,5 +125,19 @@ module.exports.MongoConnector = class MongoConnector {
         const post = await this.Post.findById(postID)
             .populate('likes.userID', 'username profilePic');
         return post.likes;
+    }
+
+    async checkLogin(username, password) {
+        const user = await this.User.findOne({ username });
+        if (!user) {
+            return false;
+        }
+        const passHash = hashPassword(password);
+        if (user.passHash === passHash) {
+            return user;
+        }
+        else {
+            return false;
+        }
     }
 };
