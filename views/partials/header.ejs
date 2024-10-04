@@ -15,13 +15,24 @@
 
 
     </nav>
-    <div class="header-button">
-        <% if (loggedIn) { %>
-            <button onclick="logout()">Logout</button>
+
+
+    <nav class="header-nav">
+        <% if (usertype=="writer" || usertype=="admin" ) { %>
+            <div class="header-button right-button">
+                <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
+            </div>
+        <% } %>
+        <div class="header-button right-button">
+            <% if (loggedIn) { %>
+                <!-- will change to profile picture later -->
+                <button onclick="logout()">Logout</button> 
             <% } else { %>
                 <button onclick="showLoginPopup()">Login</button>
-                <% } %>
-    </div>
+            <% } %>
+        </div>
+    </nav>
+
 </header>
 
 <div class="login-popup" id="loginPopup">

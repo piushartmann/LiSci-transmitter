@@ -12,3 +12,15 @@ body {
     padding: 0 10% 0 10%;
 }
 
+.page-selection {
+    margin: 0 5px;
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+
+.page-current {
+    background-color: #f0f0f0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}

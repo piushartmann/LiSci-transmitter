@@ -170,10 +170,16 @@ module.exports = (db, s3Client, pageSize) => {
     })
 
     router.get('/getPosts', async (req, res) => {
-        // if (!req.session.userID) return res.status(401).send("Not logged in");
-        const isTeacher = req.session.type === "teacher";
 
-        const page = (req.query.page || 1)-1;
+        let isTeacher = true;
+        if (!req.session.userID) {
+            isTeacher = true;
+        }
+        else {
+            isTeacher = req.session.type === "teacher";
+        }
+
+        const page = (req.query.page || 1) - 1;
 
         const posts = await db.getPosts(isTeacher, pageSize, pageSize * page);
         return res.status(200).send(posts);

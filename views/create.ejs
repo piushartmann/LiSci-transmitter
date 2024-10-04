@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>create a new Post</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <%- include("./partials/header.ejs") %>
+
+    <br><br>
+
+    <form method="post" action="internal/createTextPost">
+        <label for="title">Text</label>
+        <input type="text" name="title" required>
+        <label for="content">Content</label>
+        <textarea name="content" rows="4" required></textarea>
+        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
+        <input type="submit" value="Create Post" class="button">
+    </form>
+    
+    <br>
+    
+    <form method="post" enctype="multipart/form-data" action="internal/createFilePost">
+        <label for="title">Images/PDF</label>
+        <input type="text" name="title" required>
+        <input type="file" name="upload" accept=".pdf,image/*">
+        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
+        <input type="submit" value="Create Post" class="button">
+    </form>
+</body>
+</html>

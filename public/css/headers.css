@@ -64,6 +64,9 @@ header a {
     border-style: solid;
 }
 
+.right-button {
+    height: 100%;
+}
 
 
 .login-popup {
