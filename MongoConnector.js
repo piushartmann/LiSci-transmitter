@@ -150,4 +150,9 @@ module.exports.MongoConnector = class MongoConnector {
             .limit(limit);
 
     }
+
+    async getPostNumber(isTeacher) {
+        const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+        return await this.Post.countDocuments(query);
+    }
 };

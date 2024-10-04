@@ -48,6 +48,15 @@
 
     <br><br>
 
+    <div>
+        <label>Select Page:</label>
+        <% for (let i = 1; i <= pages; i++) { %>
+            <a href="?page=<%= i %>" style="margin: 0 5px; text-decoration: none; padding: 5px 10px; border: 1px solid #000; border-radius: 5px; <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'font-weight: bold; background-color: #f0f0f0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);' : '' %>"><%= i %></a>
+        <% } %>
+    </div>
+
+    <br><br>
+
     <div style="border: 1px solid #ccc; overflow-y: auto; padding: 10px; height: calc(100vh - 400px);" id="postBox">
         
     </div>

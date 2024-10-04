@@ -8,6 +8,7 @@ const oneDay = 24 * 3600 * 1000
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
+ * @param {number} pageSize - The number of posts per page.
  * @returns {Router} The router instance.
  */
 
@@ -21,7 +22,7 @@ function generateRandomFilename() {
     return result;
 }
 
-module.exports = (db, s3Client) => {
+module.exports = (db, s3Client, pageSize) => {
     router.get('/', (req, res) => {
         res.send("This is the API endpoint");
     });
@@ -172,9 +173,8 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const isTeacher = req.session.type === "teacher";
 
-        const page = req.query.page || 0;
+        const page = (req.query.page || 1)-1;
 
-        pageSize = 10;
         const posts = await db.getPosts(isTeacher, pageSize, pageSize * page);
         return res.status(200).send(posts);
     });

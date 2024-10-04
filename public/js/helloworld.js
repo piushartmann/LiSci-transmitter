@@ -51,5 +51,8 @@ function displayImage(post) {
 window.onload = function () {
     postContainer = document.getElementById("postBox");
 
-    loadPosts(0);
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+
+    loadPosts(page);
 };
