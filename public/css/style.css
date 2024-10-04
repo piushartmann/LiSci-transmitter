@@ -2,63 +2,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Sixtyfour+Convergence&display=swap');
 @import url('colors.css');
 
+@import url('headers.css');
+
 * {
     font-family: 'Fredoka', sans-serif;
 }
 
-header {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+body {
+    padding: 0 10% 0 10%;
 }
-
-.header-logo, .header-nav, .header-button {
-    width: 100%;
-}
-
-header a {
-    color: var(--main-text-color);
-    text-decoration: none;
-}
-
-.header-nav {
-    justify-content: center;
-    display: flex;
-    grid-area: menu;
-}
-
-.header-logo {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-}
-
-.header-logo a {
-    font-family: "Sixtyfour Convergence", sans-serif;
-    font-size: 0.75em;
-}
-
-.header-nav ul {
-    list-style-type: none;
-    display: flex;
-    gap: 1rem;
-    padding: 0;
-}
-
-.header-nav ul a {
-    padding: 10px
-}
-
-.header-button {
-    
-    display: flex;
-    justify-content: end;
-}
-
-.header-button button {
-    margin-right: 200px;
-}
-
-
-
 

@@ -1,0 +1,63 @@
+header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1em;
+
+    border-bottom-color: black;
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
+}
+
+.header-logo, .header-nav, .header-button {
+    width: 100%;
+}
+
+header a {
+    color: var(--main-text-color);
+    text-decoration: none;
+}
+
+.header-nav {
+    justify-content: center;
+    display: flex;
+}
+
+.header-logo {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.header-logo a {
+    margin: 0 0 0 50px;
+
+    font-family: "Sixtyfour Convergence", sans-serif;
+    font-size: 1em;
+}
+
+.header-nav ul {
+    list-style-type: none;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+}
+
+.header-nav ul a {
+    padding: 10px
+}
+
+.header-button {
+    display: flex;
+    justify-content: end;
+}
+
+.header-button button {
+    margin: 10px 50px 10px 0;
+    padding: 0 10px 0 10px;
+
+    background-color: transparent;
+    border-radius: 0;
+    border-color: black;
+    border-style: solid;
+}
