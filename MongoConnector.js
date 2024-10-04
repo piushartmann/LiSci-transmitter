@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 const crypto = require('crypto');
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
+const { generateApiKey } = require('generate-api-key');
 
 const commentSchema = new Schema({
-    userID: { type: ObjectId, ref: 'User', required: true },
+    userID: { type: ObjectId, ref: 'User', required: true, index: true },
     content: { type: String, required: true },
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
     likes: [{ userID: String, date: Date }],
@@ -12,7 +13,7 @@ const commentSchema = new Schema({
 });
 
 const postSchema = new Schema({
-    userID: { type: ObjectId, ref: 'User', required: true },
+    userID: { type: ObjectId, ref: 'User', required: true, index: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     type: { type: String, required: true },
@@ -23,13 +24,13 @@ const postSchema = new Schema({
 });
 
 const userSchema = new Schema({
-    username: { type: String, required: true },
+    username: { type: String, required: true, index: true },
     passHash: { type: String, required: true },
     profilePic: { type: String, required: false },
     email: { type: String, required: false },
-    comments: [{ type: ObjectId, ref: 'Comment' }],
     likes: [{ postID: { type: ObjectId, ref: 'Post', required: true }, date: { type: Date, default: Date.now } }],
-    type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] }
+    type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] },
+    apiKey: { type: String, default: generateApiKey() }
 });
 
 function hashPassword(password) {
@@ -97,7 +98,6 @@ module.exports.MongoConnector = class MongoConnector {
     async getUserData(userID) {
         return await this.User.findById(userID);
     }
-
 
     async getUser(username) {
         return await this.User.findOne({ username });
