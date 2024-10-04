@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello World</title>
-    <script src="/js/helloworld.js"></script>
+    <script src="js/index.js"></script>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="js/partials/header.js"></script>
 </head>
 
 <body>
@@ -14,21 +15,6 @@
     <%- include("./partials/header.ejs") %>
 
     <h1>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
-    <p>You viewed this page <%= views %> times.</p>
-
-    <form method="post" action="internal/login">
-        <label for="username">Username</label>
-        <input type="text" name="username">
-        <label for="password">Password</label>
-        <input type="password" name="password">
-        <input type="submit" class="button">
-    </form>
-
-    <form method="get" action="internal/logout">
-        <input type="submit" value="Logout" class="button">
-    </form>
-
-    <br>
 
     <form method="post" action="internal/createTextPost">
         <label for="title">Text</label>

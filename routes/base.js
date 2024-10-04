@@ -12,7 +12,7 @@ module.exports = (db, pageSize) => {
     router.get('/', async (req, res) => {
         req.session.views = (req.session.views || 0) + 1;
         const pages = Math.ceil(await db.getPostNumber(req.session.type === "teacher")/pageSize);
-        res.render('helloworld', { views: req.session.views, username: req.session.username, pages: pages});
+        res.render('index', { loggedIn: typeof req.session.username != "undefined", username: req.session.username, pages: pages});
     });
 
     return router;

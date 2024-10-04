@@ -4,7 +4,7 @@
             LiSciTransmitter
         </a>
     </div>
-    
+
 
     <nav class="header-nav">
         <ul>
@@ -13,11 +13,26 @@
             <li><a href="/about">About</a></li>
         </ul>
 
-        
+
     </nav>
     <div class="header-button">
-        <button>
-            <a href="/login">Login</a>
-        </button>
+        <% if (loggedIn) { %>
+            <button onclick="logout()">Logout</button>
+            <% } else { %>
+                <button onclick="showLoginPopup()">Login</button>
+                <% } %>
     </div>
 </header>
+
+<div class="login-popup" id="loginPopup">
+    <div class="login-popup-content">
+        <span class="close" onclick="hideLoginPopup()">&times;</span>
+        <form method="post" action="internal/login">
+            <label for="username">Username</label>
+            <input type="text" name="username">
+            <label for="password">Password</label>
+            <input type="password" name="password">
+            <input type="submit" class="button">
+        </form>
+    </div>
+</div>

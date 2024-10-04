@@ -9,7 +9,9 @@ header {
     border-bottom-style: solid;
 }
 
-.header-logo, .header-nav, .header-button {
+.header-logo,
+.header-nav,
+.header-button {
     width: 100%;
 }
 
@@ -60,4 +62,57 @@ header a {
     border-radius: 0;
     border-color: black;
     border-style: solid;
+}
+
+
+
+.login-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid #f1f1f1;
+    z-index: 9;
+}
+
+
+.login-popup-content {
+    max-width: 300px;
+    padding: 10px;
+    background-color: white;
+}
+
+.login-popup-content input[type=text],
+.login-popup-content input[type=password] {
+    width: 85%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #f1f1f1;
+}
+
+.login-popup-content input[type=text]:focus,
+.login-popup-content input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
+}
+
+.login-popup-content button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.login-popup-content .close {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
 }
