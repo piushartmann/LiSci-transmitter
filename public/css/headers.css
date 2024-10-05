@@ -57,11 +57,11 @@ header a {
 .header-button button {
     margin: 10px 50px 10px 0;
     padding: 0 10px 0 10px;
-
     background-color: transparent;
     border-radius: 0;
     border-color: black;
     border-style: solid;
+    cursor: pointer;
 }
 
 .right-button {

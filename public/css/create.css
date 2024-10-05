@@ -24,7 +24,7 @@ h1 {
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 20px 5% 20px 5%;
+    padding: 10px 20px 20px 20px;
 }
 
 .section-container {
@@ -53,5 +53,81 @@ input[type="file"] {
     border-radius: 5px;
     box-sizing: border-box;
     font-size: 1em;
-    min-height: 20vw;
+
+}
+
+.addSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.addSection img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.addSection img svg {
+    fill: #a81919;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.popup.hidden {
+    display: none;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.popup button {
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.image-preview {
+    display: none;
+    max-width: 100%;
+    height: auto;
+}
+
+.reziseHandle {
+    margin-top: 10px;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 0.5vh;
+    background: #afafaf;
+    cursor: n-resize;
+    border-radius: 10px;
+}
+
+.section-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
 }

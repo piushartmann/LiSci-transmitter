@@ -1,0 +1,202 @@
+openapi: '3.0.3'
+info:
+  title: transmitter API
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+    description: Local server
+  - url: https://liscitransmitter.live
+    description: Production server
+paths:
+  /api/checkKey:
+    get:
+      summary: Check API Key
+      description: Validates the provided API key.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Valid username
+        '401':
+          description: Invalid API key
+  /api/getPosts:
+    get:
+      summary: Get Posts
+      description: Retrieves a list of posts.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: The page number to retrieve.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    user:
+                      type: string
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    mediaPath:
+                      type: string
+                    type:
+                      type: string
+                    likes:
+                      type: integer
+        '401':
+          description: Invalid API key
+  /api/getComments:
+    get:
+      summary: Get Comments
+      description: Retrieves comments for a specific post.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+        - in: query
+          name: postID
+          schema:
+            type: string
+          description: The ID of the post to retrieve comments for.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    user:
+                      type: string
+                    content:
+                      type: string
+        '401':
+          description: Invalid API key
+  /api/createPost:
+    post:
+      summary: Create Post
+      description: Creates a new post.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+                type:
+                  type: string
+                permissions:
+                  type: string
+                mediaPath:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Invalid API key
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+  /api/createComment:
+    post:
+      summary: Create Comment
+      description: Creates a new comment on a post.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: string
+                content:
+                  type: string
+                permissions:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Invalid API key
+        '500':
+          description: Internal server error
+  /api/likePost:
+    post:
+      summary: Like Post
+      description: Likes a post.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Invalid API key
+        '500':
+          description: Internal server error

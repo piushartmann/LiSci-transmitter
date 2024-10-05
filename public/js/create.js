@@ -86,7 +86,7 @@ async function submitPost() {
 function addTextSection() {
     section = document.createElement('div');
     section.className = 'section';
-    section.innerHTML = `<label for="content">Artikel</label>
+    section.innerHTML = `<label for="content">Text</label>
         <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
@@ -96,17 +96,21 @@ function addTextSection() {
         sections[this.id] = { type: 'text', content: this.querySelector('#value').innerHTML };
     });
     sections[section.id] = { type: 'text', content: section.querySelector('#value').innerHTML };
+    section.appendChild(addSectionFooter(section));
+    closePopup();
 }
 
 function addImageSection() {
     section = document.createElement('div');
     section.className = 'section';
-    section.innerHTML = `<label for="upload">Upload Image (Optional)</label>
-          <input type="file" id="value" accept="image/*">
-          <img id="preview" style="display:none; max-width: 100%; height: auto;" />`;
+    section.innerHTML = `<label for="upload">Upload Image</label>
+          <input type="file" id="value" accept="image/*"></input>
+          <img id="preview" class="image-preview" /></img>
+          <div class="reziseHandle"></div>`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
     console.log(section.id);
+    imgRezise(section);
     section.querySelector('#value').addEventListener('change', function () {
         const file = this.files[0];
         if (file) {
@@ -117,16 +121,23 @@ function addImageSection() {
                 preview.style.display = 'block';
             };
             reader.readAsDataURL(file);
-            sections[section.id] = { type: 'img', content: file };
+            sections[section.id] = { type: 'img', content: file, size: section.querySelector('#preview').clientHeight };
         }
     });
-    sections[section.id] = { type: 'img', content: section.querySelector('#value').files[0] };
+    const observer = new ResizeObserver(() => {
+        sections[section.id] = { type: 'img', content: section.querySelector('#value').files[0], size: section.querySelector('#preview').clientHeight };
+    });
+    observer.observe(section.querySelector('#preview'));
+    sections[section.id] = { type: 'img', content: section.querySelector('#value').files[0], size: section.querySelector('#preview').clientHeight };
+    
+    section.appendChild(addSectionFooter(section));
+    closePopup();
 }
 
 function addFileSection() {
     section = document.createElement('div');
     section.className = 'section';
-    section.innerHTML = `<label for="upload">Upload File (Optional)</label>
+    section.innerHTML = `<label for="upload">Upload File</label>
           <input type="file" id="value" accept=".pdf,image/*">`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
@@ -136,10 +147,105 @@ function addFileSection() {
         sections[this.id] = { type: 'file', content: this.querySelector('#value').files[0] };
     });
     sections[section.id] = { type: 'file', content: section.querySelector('#value').files[0] };
+    section.appendChild(addSectionFooter(section));
+    closePopup();
+}
+
+function addSectionFooter(section) {
+    const footer = document.createElement('div');
+    footer.className = 'section-footer';
+    footer.innerHTML = `<button onclick="removeSection(${section.id})" class="remove-section">Remove Section</button>`;
+    return footer;
+}
+
+function removeSection(id) {
+    document.getElementById('section-container').removeChild(document.getElementById(id));
+    sections = sections.filter((section, index) => index != id);
+}
+
+function selectSection() {
+    document.getElementById('popup').classList.remove('hidden');
+}
+
+function closePopup() {
+    document.getElementById('popup').classList.add('hidden');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     addTextSection();
-    addTextSection();
-    addImageSection();
 });
+
+function imgRezise(element) {
+
+    let pos = 0;
+    let elementBeforeHeight;
+    let previewBeforeHeight;
+
+    const reziseHandle = element.querySelector('.reziseHandle');
+    reziseHandle.addEventListener('mousedown', imgReziseMouseDown);
+    reziseHandle.addEventListener('touchstart', imgReziseTouchStart);
+
+    function imgReziseMouseDown(e) {
+        e.preventDefault();
+
+        pos = e.clientY;
+        elementBeforeHeight = element.clientHeight;
+        previewBeforeHeight = element.querySelector('#preview').clientHeight;
+        mouseBeforeY = e.clientY;
+
+        document.onmouseup = imgReziseMouseUp;
+        document.onmousemove = imgReziseMouseMove;
+
+        padding = parseInt(window.getComputedStyle(element).getPropertyValue('padding-top')) + parseInt(window.getComputedStyle(element).getPropertyValue('padding-bottom'));
+    }
+
+    function imgReziseMouseUp() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+
+    function imgReziseMouseMove(e) {
+        e.preventDefault();
+        mouseMoved = e.clientY - mouseBeforeY;
+        const preview = element.querySelector('#preview');
+        const newElementHeight = elementBeforeHeight + mouseMoved - (padding);
+        const newPreviewHeight = previewBeforeHeight + mouseMoved;
+
+        if (newElementHeight > 0) {
+            element.style.height = newElementHeight + 'px';
+            preview.style.height = newPreviewHeight + 'px';
+        }
+    }
+
+    function imgReziseTouchStart(e) {
+        e.preventDefault();
+
+        pos = e.touches[0].clientY;
+        elementBeforeHeight = element.clientHeight;
+        previewBeforeHeight = element.querySelector('#preview').clientHeight;
+        touchBeforeY = e.touches[0].clientY;
+
+        document.ontouchend = imgReziseTouchEnd;
+        document.ontouchmove = imgReziseTouchMove;
+
+        padding = parseInt(window.getComputedStyle(element).getPropertyValue('padding-top')) + parseInt(window.getComputedStyle(element).getPropertyValue('padding-bottom'));
+    }
+
+    function imgReziseTouchEnd() {
+        document.ontouchend = null;
+        document.ontouchmove = null;
+    }
+
+    function imgReziseTouchMove(e) {
+        e.preventDefault();
+        touchMoved = e.touches[0].clientY - touchBeforeY;
+        const preview = element.querySelector('#preview');
+        const newElementHeight = elementBeforeHeight + touchMoved - (padding);
+        const newPreviewHeight = previewBeforeHeight + touchMoved;
+
+        if (newElementHeight > 0) {
+            element.style.height = newElementHeight + 'px';
+            preview.style.height = newPreviewHeight + 'px';
+        }
+    }
+}

@@ -15,6 +15,7 @@ const commentSchema = new Schema({
 const sectionSchema = new Schema({
     type: { type: String, required: true },
     content: { type: String, required: false },
+    size: { type: Number, required: false }
 });
 
 const postSchema = new Schema({

@@ -24,7 +24,7 @@ module.exports = (db, pageSize, s3Client) => {
     }
 
     router.get('/', async (req, res) => {
-        return res.send("This is the public API, documentation is coming soon.")
+        return res.render('swaggerui.ejs', { filepath: '/swagger/api.yml' });
     });
 
     router.get('/checkKey', async (req, res) => {

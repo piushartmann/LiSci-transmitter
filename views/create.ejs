@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/create.css">
   <script src="/js/create.js"></script>
+  <script src="/js/partials/header.js"></script>
 </head>
 
 <body>
@@ -19,19 +20,34 @@
 
       <div class="title">
         <label for="title">Titel</label>
-        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required> 
+        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required>
       </div>
-      
+
       <div class="checkbox-group">
         <input type="checkbox" id="teachersafe" value="teachersafe">
         <label for="teachersafe">Teachersafe</label>
       </div>
 
       <div class="section-container" id="section-container">
-        
+
       </div>
 
+      <button onclick="selectSection()" class="addSection">
+        <img src="/icons/add-section.svg" alt="Add Section">
+      </button>
+      <br>
+
       <button onclick="submitPost()" class="button">Create Post</button>
+    </div>
+  </div>
+
+  <div id="popup" class="popup hidden">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup()">&times;</span>
+      <h2>Select Section Type</h2>
+      <button onclick="addTextSection()">Text</button>
+      <button onclick="addImageSection()">Image</button>
+      <button onclick="addFileSection()">File</button>
     </div>
   </div>
 

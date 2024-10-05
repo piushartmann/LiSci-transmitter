@@ -26,7 +26,8 @@ function buildPost(post) {
                 sectionContainer.innerHTML = `<embed src="https://storage.liscitransmitter.live/${section.content}" width="500" height="375" type="application/pdf">`;
                 break;
             case "img":
-                sectionContainer.innerHTML = `<img src="https://storage.liscitransmitter.live/${section.content}" alt="${post.title}" style="max-width: 100%; height: auto;">`;
+                console.log(section.size);
+                sectionContainer.innerHTML = `<img src="https://storage.liscitransmitter.live/${section.content}" alt="${post.title}" style="max-width: 100%; height: ${section.size+"px" || "auto"}">`;
                 break;
             default:
                 console.error("Unknown section type");
@@ -46,33 +47,6 @@ function buildHeader(post) {
     <p style="display: inline; margin-left: 10px;">Von ${post.userID.username}</p>
     `;
     return headerDiv;
-}
-
-function displayText(post) {
-    let textDiv = document.createElement("div");
-    textDiv.className = "text";
-    textDiv.innerHTML = `
-    <p>${post.content}</p>
-    `;
-    postContainer.appendChild(textDiv);
-}
-
-function displayPDF(post) {
-    let pdfDiv = document.createElement("div");
-    pdfDiv.className = "pdf";
-    pdfDiv.innerHTML = `
-    <embed src="https://storage.liscitransmitter.live/${post.mediaPath}" width="500" height="375" type="application/pdf">
-    <p>${post.content}</p>`;
-    postContainer.appendChild(pdfDiv);
-}
-
-function displayImage(post) {
-    let imageDiv = document.createElement("div");
-    imageDiv.className = "image";
-    imageDiv.innerHTML = `
-    <img src="https://storage.liscitransmitter.live/${post.mediaPath}" alt="${post.title}" style="max-width: 100%; height: auto;">
-    <p>${post.content}</p>`;
-    postContainer.appendChild(imageDiv);
 }
 
 window.onload = function () {
