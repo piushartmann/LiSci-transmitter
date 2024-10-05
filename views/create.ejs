@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
   <meta charset="UTF-8">
@@ -14,26 +14,21 @@
 
   <%- include("./partials/header.ejs") %>
 
-  <div class="main-container">
-    <div class="form-container">
-      <div class="form-group">
+  <div class="article-box">
+    <div class="article-container">
+
+      <div class="title">
         <label for="title">Titel</label>
-        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required>
+        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required> 
       </div>
-
-      <div class="form-group">
-        <label for="content">Artikel</label>
-        <section contenteditable="true" id="content-editable" class="editable" required></section>
-      </div>
-
-      <div class="form-group">
-        <label for="upload">Upload File (Optional)</label>
-        <input type="file" id="upload" accept=".pdf,image/*">
-      </div>
-
-      <div class="form-group checkbox-group">
+      
+      <div class="checkbox-group">
         <input type="checkbox" id="teachersafe" value="teachersafe">
         <label for="teachersafe">Teachersafe</label>
+      </div>
+
+      <div class="section-container" id="section-container">
+        
       </div>
 
       <button onclick="submitPost()" class="button">Create Post</button>

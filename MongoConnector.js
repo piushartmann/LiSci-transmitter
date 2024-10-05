@@ -12,12 +12,15 @@ const commentSchema = new Schema({
     timestamp: { type: Date, default: Date.now }
 });
 
+const sectionSchema = new Schema({
+    type: { type: String, required: true },
+    content: { type: String, required: false },
+});
+
 const postSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
     title: { type: String, required: true },
-    content: { type: String, required: true },
-    mediaPath: { type: String, required: false },
-    type: { type: String, required: true },
+    sections: [{ type: sectionSchema, required: true }],
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
     timestamp: { type: Date, default: Date.now },
     comments: [{ type: ObjectId, ref: 'Comment' }],
@@ -30,6 +33,7 @@ const userSchema = new Schema({
     profilePic: { type: String, required: false },
     email: { type: String, required: false },
     likes: [{ postID: { type: ObjectId, ref: 'Post', required: true }, date: { type: Date, default: Date.now } }],
+    comments: [{ type: ObjectId, ref: 'Comment' }],
     type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] },
     apiKey: { type: String, default: generateApiKey() }
 });
@@ -55,8 +59,9 @@ module.exports.MongoConnector = class MongoConnector {
         await this.mongoose.connection.dropDatabase();
     }
 
-    async createPost(userID, title, content, type, permissions, mediaPath = "") {
-        const post = new this.Post({ userID, title, content, type, permissions, mediaPath });
+    async createPost(userID, title, sections, permissions) {
+        const filteredSections = sections.filter(section => section.content && section.content.trim() !== '');
+        const post = new this.Post({ userID, title, sections: filteredSections, permissions });
         return await post.save();
     }
 
