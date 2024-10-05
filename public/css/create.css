@@ -1,8 +1,8 @@
-.main-container {
+.article-box {
     padding: 20px;
 }
 
-.form-container {
+.article-container {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -16,25 +16,37 @@ h1 {
     margin-top: 10px;
 }
 
-.form-group {
+.title {
     margin-bottom: 20px;
+}
+
+.section {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px 5% 20px 5%;
+}
+
+.section-container {
+    margin-top: 20px;
+    background: #fff;
 }
 
 input[type="text"],
 textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-  font-size: 1em;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
 }
 
 input[type="file"] {
     margin-top: 10px;
-  }
+}
 
-.editable {
+.text-editable {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;

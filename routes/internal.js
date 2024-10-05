@@ -108,21 +108,19 @@ module.exports = (db, s3Client, pageSize) => {
 
 
 
-    router.post("/upload", async function (req, res) { //for testing
+    router.post("/uploadFile", async function (req, res) {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin") return res.status(403).send("You cannot upload a file");
+        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot upload an image");
 
         let filename;
         try {
-            filename = await uploadFile(req, res, "test");
+            filename = await uploadFile(req, res, "files");
         } catch (error) {
             return res.status(500).send(error.message);
         }
-        console.log(`new filename: ${filename}`);
-
-        return res.status(200).send("File uploaded successfully");
-
-    });
+        console.log(`File uploaded Successfully: ${filename}`);
+        return res.status(200).send(filename);
+    })
 
     router.post('/uploadImage', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -134,6 +132,7 @@ module.exports = (db, s3Client, pageSize) => {
         } catch (error) {
             return res.status(500).send(error.message);
         }
+        console.log(`Image uploaded Successfully: ${filename}`);
         return res.status(200).send(filename);
     })
 
@@ -141,36 +140,15 @@ module.exports = (db, s3Client, pageSize) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
 
-        const hasMedia = req.body.upload != "" && req.body.upload != null;
+        const { title, sections, permissions } = req.body;
+        const permissionsBool = permissions === "true";
+        console.log(title, sections, permissions);
+        
+        if (!title || !sections) return res.status(400).send("Missing parameters");
+        if (typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
 
-        if (hasMedia) {
-            let filename;
-            try {
-                filename = await uploadFile(req, res, "posts", ["pdf", "jpg", "jpeg", "png", "webp", "heic"]);
-            } catch (error) {
-                console.error("Error uploading file:", error.message);
-                return res.status(500).send(error.message);
-            }
-            const { title, content, teachersafe } = req.body;
-            const fileExtension = filename.split('.').pop().toLowerCase();
-
-            const imgFormats = ["jpg", "jpeg", "png", "webp", "heic"];
-            const pdfFormats = ["pdf"];
-
-            let type = "file";
-            type = imgFormats.includes(fileExtension) ? "img" : type;
-            type = pdfFormats.includes(fileExtension) ? "pdf" : type;
-
-            const sanitizedContent = sanitizeHtml(content, { allowedTags: sanitizeHtmlAllowedTags });
-            await db.createPost(req.session.userID, title, sanitizedContent, type, teachersafe ? "Teachersafe" : "classmatesonly", filename);
-            return res.status(200).redirect('/');
-
-        } else {
-            const { title, content, teachersafe } = req.body;
-            const sanitizedContent = sanitizeHtml(content, { allowedTags: sanitizeHtmlAllowedTags });
-            await db.createPost(req.session.userID, title, sanitizedContent, "text", teachersafe ? "Teachersafe" : "classmatesonly", "");
-            return res.status(200).redirect('/');
-        }
+        await db.createPost(req.session.userID, title, JSON.parse(sections), permissionsBool ? "Teachersafe" : "classmatesonly");
+        return res.status(200).send("Success");
     });
 
     router.get('/getPosts', async (req, res) => {
