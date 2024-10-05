@@ -2,6 +2,7 @@ const { Router } = require('express');
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const { MongoConnector } = require('../MongoConnector');
+const sanitizeHtml = require('sanitize-html');
 const router = Router();
 const oneDay = 24 * 3600 * 1000
 
@@ -11,6 +12,8 @@ const oneDay = 24 * 3600 * 1000
  * @param {number} pageSize - The number of posts per page.
  * @returns {Router} The router instance.
  */
+
+sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
 function generateRandomFilename() {
     const length = 20;
@@ -192,12 +195,14 @@ module.exports = (db, s3Client, pageSize) => {
             type = imgFormats.includes(fileExtension) ? "img" : type;
             type = pdfFormats.includes(fileExtension) ? "pdf" : type;
 
-            await db.createPost(req.session.userID, title, content, type, teachersafe ? "Teachersafe" : "classmatesonly", filename);
+            const sanitizedContent = sanitizeHtml(content, { allowedTags: sanitizeHtmlAllowedTags });
+            await db.createPost(req.session.userID, title, sanitizedContent, type, teachersafe ? "Teachersafe" : "classmatesonly", filename);
             return res.status(200).redirect('/');
 
         } else {
             const { title, content, teachersafe } = req.body;
-            await db.createPost(req.session.userID, title, content, "text", teachersafe ? "Teachersafe" : "classmatesonly", "");
+            const sanitizedContent = sanitizeHtml(content, { allowedTags: sanitizeHtmlAllowedTags });
+            await db.createPost(req.session.userID, title, sanitizedContent, "text", teachersafe ? "Teachersafe" : "classmatesonly", "");
             return res.status(200).redirect('/');
         }
     })
