@@ -54,15 +54,6 @@ module.exports = (db, s3Client, pageSize) => {
         return res.status(200).send("Logged in");
     });
 
-    router.post('/createPost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
-
-        const { title, content, type, permissions } = req.body;
-        const post = await db.createPost(req.session.userID, title, content, type, permissions);
-        return res.status(200).send(post);
-    });
-
     function uploadFile(req, res, directory = "", forceFormats = []) {
         return new Promise((resolve, reject) => {
             const filename = generateRandomFilename();
@@ -163,6 +154,40 @@ module.exports = (db, s3Client, pageSize) => {
         const post = await db.createPost(req.session.userID, title, filename, type, teachersafe ? "Teachersafe" : "classmatesonly");
         return res.status(200).redirect('/');
     });
+
+    router.post('/createPost', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
+
+        const hasMedia = req.body.upload != "" && req.body.upload != null;
+
+        if (hasMedia) {
+            let filename;
+            try {
+                filename = await uploadFile(req, res, "posts", ["pdf", "jpg", "jpeg", "png", "webp", "heic"]);
+            } catch (error) {
+                console.error("Error uploading file:", error.message);
+                return res.status(500).send(error.message);
+            }
+            const { title, content, teachersafe } = req.body;
+            const fileExtension = filename.split('.').pop().toLowerCase();
+
+            const imgFormats = ["jpg", "jpeg", "png", "webp", "heic"];
+            const pdfFormats = ["pdf"];
+
+            let type = "file";
+            type = imgFormats.includes(fileExtension) ? "img" : type;
+            type = pdfFormats.includes(fileExtension) ? "pdf" : type;
+
+            await db.createPost(req.session.userID, title, content, type, teachersafe ? "Teachersafe" : "classmatesonly", filename);
+            return res.status(200).redirect('/');
+
+        } else {
+            const { title, content, teachersafe } = req.body;
+            await db.createPost(req.session.userID, title, content, "text", teachersafe ? "Teachersafe" : "classmatesonly", "");
+            return res.status(200).redirect('/');
+        }
+    })
 
     router.get('/getPost/:postID', async (req, res) => {
         const post = await db.getPost(req.params.postID);

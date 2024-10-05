@@ -16,6 +16,7 @@ const postSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
+    mediaPath: { type: String, required: false },
     type: { type: String, required: true },
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
     timestamp: { type: Date, default: Date.now },
@@ -54,8 +55,8 @@ module.exports.MongoConnector = class MongoConnector {
         await this.mongoose.connection.dropDatabase();
     }
 
-    async createPost(userID, title, content, type, permissions) {
-        const post = new this.Post({ userID, title, content, type, permissions });
+    async createPost(userID, title, content, type, permissions, mediaPath="") {
+        const post = new this.Post({ userID, title, content, type, permissions, mediaPath });
         return await post.save();
     }
 
@@ -154,5 +155,15 @@ module.exports.MongoConnector = class MongoConnector {
     async getPostNumber(isTeacher) {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
         return await this.Post.countDocuments(query);
+    }
+
+    async searchForPosts(query, isTeacher, limit = 10, offset = 0) {
+        const search = { $text: { $search: query } };
+        const permissions = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+        return await this.Post.find({ $and: [search, permissions] })
+            .populate('userID', 'username profilePic')
+            .sort({ timestamp: -1 })
+            .skip(offset)
+            .limit(limit);
     }
 };

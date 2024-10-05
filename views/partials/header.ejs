@@ -1,49 +1,49 @@
 <header>
-    <div class="header-logo">
-        <a href="/">
-            LiSciTransmitter
-        </a>
+  <div class="header-logo">
+    <a href="/">
+      LiSciTransmitter
+    </a>
+  </div>
+
+
+  <nav class="header-nav">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/archive">Archive</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+
+
+  </nav>
+
+
+  <nav class="header-nav">
+    <% if (usertype=="writer" || usertype=="admin" ) { %>
+    <div class="header-button right-button">
+      <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
     </div>
-
-
-    <nav class="header-nav">
-        <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/archive">Archive</a></li>
-            <li><a href="/about">About</a></li>
-        </ul>
-
-
-    </nav>
-
-
-    <nav class="header-nav">
-        <% if (usertype=="writer" || usertype=="admin" ) { %>
-            <div class="header-button right-button">
-                <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
-            </div>
-        <% } %>
-        <div class="header-button right-button">
-            <% if (loggedIn) { %>
-                <!-- will change to profile picture later -->
-                <button onclick="logout()">Logout</button> 
-            <% } else { %>
-                <button onclick="showLoginPopup()">Login</button>
-            <% } %>
-        </div>
-    </nav>
+    <% } %>
+    <div class="header-button right-button">
+      <% if (loggedIn) { %>
+      <!-- will change to profile picture later -->
+      <button onclick="logout()">Logout</button>
+      <% } else { %>
+      <button onclick="showLoginPopup()">Login</button>
+      <% } %>
+    </div>
+  </nav>
 
 </header>
 
 <div class="login-popup" id="loginPopup">
-    <div class="login-popup-content">
-        <span class="close" onclick="hideLoginPopup()">&times;</span>
-        <form method="post" action="internal/login">
-            <label for="username">Username</label>
-            <input type="text" name="username">
-            <label for="password">Password</label>
-            <input type="password" name="password">
-            <input type="submit" class="button">
-        </form>
-    </div>
+  <div class="login-popup-content">
+    <span class="close" onclick="hideLoginPopup()">&times;</span>
+    <form method="post" action="internal/login">
+      <label for="username">Username</label>
+      <input type="text" name="username">
+      <label for="password">Password</label>
+      <input type="password" name="password">
+      <input type="submit" class="button">
+    </form>
+  </div>
 </div>

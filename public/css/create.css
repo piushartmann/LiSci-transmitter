@@ -1,0 +1,45 @@
+.main-container {
+    padding: 20px;
+}
+
+.form-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px 5% 20px 5%;
+}
+
+h1 {
+    text-align: center;
+    color: #444;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1em;
+}
+
+input[type="file"] {
+    margin-top: 10px;
+  }
+
+.editable {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    min-height: 20vw;
+}

@@ -33,8 +33,8 @@ function displayPDF(post) {
     pdfDiv.className = "pdf";
     pdfDiv.innerHTML = `
     <h3>${post.title}</h3>
-    <embed src="https://storage.liscitransmitter.live/${post.content}" width="500" height="375" type="application/pdf">
-    `;
+    <embed src="https://storage.liscitransmitter.live/${post.mediaPath}" width="500" height="375" type="application/pdf">
+    <p>${post.content}</p>`;
     postContainer.appendChild(pdfDiv);
 }
 
@@ -43,8 +43,8 @@ function displayImage(post) {
     imageDiv.className = "image";
     imageDiv.innerHTML = `
     <h3>${post.title}</h3>
-    <img src="https://storage.liscitransmitter.live/${post.content}" alt="${post.title}" style="max-width: 100%; height: auto;">
-    `;
+    <img src="https://storage.liscitransmitter.live/${post.mediaPath}" alt="${post.title}" style="max-width: 100%; height: auto;">
+    <p>${post.content}</p>`;
     postContainer.appendChild(imageDiv);
 }
 

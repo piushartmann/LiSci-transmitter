@@ -2,37 +2,32 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
-    <script src="js/index.js"></script>
-    <script src="/js/partials/header.js"></script>
-    <!-- maybe include this in index.js? Coulnd't find an easy way to do it, that's why it is here now -->
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello World</title>
+  <script src="js/index.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
 
-    <%- include("./partials/header.ejs") %>
+  <%- include("./partials/header.ejs") %>
 
-        <h1>Hello, <%= typeof username !=='undefined' ? username : 'World' %>
-        </h1>
+  <h1>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
+  <div>
+    <label>Select Page:</label>
+    <% for (let i=1; i <=pages; i++) { %>
+    <a href="?page=<%= i %>" class="page-selection <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'page-current' : '' %>">
+      <%= i %>
+    </a>
+    <% } %>
+  </div>
 
-        <div>
+  <br><br>
 
-            <label>Select Page:</label>
-            <% for (let i=1; i <=pages; i++) { %>
-                <a href="?page=<%= i %>" class="page-selection <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'page-current' : '' %>">
-                    <%= i %>
-                </a>
-                <% } %>
-        </div>
+  <div style="border: 1px solid #ccc; overflow-y: auto; padding: 10px; height: calc(100vh - 400px);" id="postBox">
 
-        <br><br>
-
-        <div style="border: 1px solid #ccc; overflow-y: auto; padding: 10px; height: calc(100vh - 400px);" id="postBox">
-
-        </div>
+  </div>
 
 </body>
 

@@ -1,34 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>create a new Post</title>
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a New Post</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/create.css">
+  <script src="/js/create.js"></script>
 </head>
+
 <body>
 
-    <%- include("./partials/header.ejs") %>
+  <%- include("./partials/header.ejs") %>
 
-    <br><br>
+  <div class="main-container">
+    <div class="form-container">
+      <form method="post" enctype="multipart/x-www-form-urlencoded" action="internal/createPost" onsubmit="preparePostForm()">
+        <div class="form-group">
+          <label for="title">Titel</label>
+          <input type="text" name="title" placeholder="Das Life-Science Profil wieder unterwergs" required>
+        </div>
 
-    <form method="post" action="internal/createTextPost">
-        <label for="title">Text</label>
-        <input type="text" name="title" required>
-        <label for="content">Content</label>
-        <textarea name="content" rows="4" required></textarea>
-        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
+        <div class="form-group">
+          <label for="content">Artikel</label>
+          <section contenteditable="true" id="content-editable" class="editable" required></section>
+          <input type="hidden" name="content" id="content">
+        </div>
+
+        <div class="form-group">
+          <label for="upload">Upload File (Optional)</label>
+          <input type="file" name="upload" accept=".pdf,image/*">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" name="teachersafe" value="teachersafe">
+          <label for="teachersafe">Teachersafe</label>
+        </div>
+
         <input type="submit" value="Create Post" class="button">
-    </form>
-    
-    <br>
-    
-    <form method="post" enctype="multipart/form-data" action="internal/createFilePost">
-        <label for="title">Images/PDF</label>
-        <input type="text" name="title" required>
-        <input type="file" name="upload" accept=".pdf,image/*">
-        <input type="checkbox" name="teachersafe" value="teachersafe"> Teachersafe
-        <input type="submit" value="Create Post" class="button">
-    </form>
+      </form>
+    </div>
+  </div>
+
 </body>
+
 </html>
