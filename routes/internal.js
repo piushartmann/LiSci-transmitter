@@ -121,6 +121,19 @@ module.exports = (db, s3Client, pageSize) => {
 
     });
 
+    router.post('/uploadImage', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot upload an image");
+
+        let filename;
+        try {
+            filename = await uploadFile(req, res, "images", ["jpg", "jpeg", "png", "webp", "heic"]);
+        } catch (error) {
+            return res.status(500).send(error.message);
+        }
+        return res.status(200).send(filename);
+    })
+
     router.post('/createTextPost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");

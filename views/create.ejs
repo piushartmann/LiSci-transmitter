@@ -16,30 +16,27 @@
 
   <div class="main-container">
     <div class="form-container">
-      <form method="post" enctype="multipart/x-www-form-urlencoded" action="internal/createPost" onsubmit="preparePostForm()">
-        <div class="form-group">
-          <label for="title">Titel</label>
-          <input type="text" name="title" placeholder="Das Life-Science Profil wieder unterwergs" required>
-        </div>
+      <div class="form-group">
+        <label for="title">Titel</label>
+        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required>
+      </div>
 
-        <div class="form-group">
-          <label for="content">Artikel</label>
-          <section contenteditable="true" id="content-editable" class="editable" required></section>
-          <input type="hidden" name="content" id="content">
-        </div>
+      <div class="form-group">
+        <label for="content">Artikel</label>
+        <section contenteditable="true" id="content-editable" class="editable" required></section>
+      </div>
 
-        <div class="form-group">
-          <label for="upload">Upload File (Optional)</label>
-          <input type="file" name="upload" accept=".pdf,image/*">
-        </div>
+      <div class="form-group">
+        <label for="upload">Upload File (Optional)</label>
+        <input type="file" id="upload" accept=".pdf,image/*">
+      </div>
 
-        <div class="form-group checkbox-group">
-          <input type="checkbox" name="teachersafe" value="teachersafe">
-          <label for="teachersafe">Teachersafe</label>
-        </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="teachersafe" value="teachersafe">
+        <label for="teachersafe">Teachersafe</label>
+      </div>
 
-        <input type="submit" value="Create Post" class="button">
-      </form>
+      <button onclick="submitPost()" class="button">Create Post</button>
     </div>
   </div>
 
