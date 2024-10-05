@@ -13,7 +13,7 @@ paths:
       summary: Root endpoint
       responses:
         '200':
-          description: Successful response
+          description: API endpoint message
   /login:
     post:
       summary: User login
@@ -41,12 +41,36 @@ paths:
           description: Successful logout
   /checkLogin:
     get:
-      summary: Check if user is logged in (testing)
+      summary: Check login status
       responses:
         '200':
-          description: User is logged in
+          description: Logged in
         '401':
           description: Not logged in
+  /upload:
+    post:
+      summary: Upload a file
+      responses:
+        '200':
+          description: File uploaded successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot upload a file
+        '500':
+          description: File upload error
+  /uploadImage:
+    post:
+      summary: Upload an image
+      responses:
+        '200':
+          description: Image uploaded successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot upload an image
+        '500':
+          description: Image upload error
   /createPost:
     post:
       summary: Create a new post
@@ -61,101 +85,28 @@ paths:
                   type: string
                 content:
                   type: string
-                type:
-                  type: string
-                permissions:
-                  type: string
-      responses:
-        '200':
-          description: Post created successfully
-        '401':
-          description: Not logged in
-        '403':
-          description: Forbidden
-  /upload:
-    post:
-      summary: Upload a file
-      responses:
-        '200':
-          description: File uploaded successfully
-        '401':
-          description: Not logged in
-        '403':
-          description: Forbidden
-        '500':
-          description: File upload error
-  /createTextPost:
-    post:
-      summary: Create a new text post
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                content:
-                  type: string
-                teachersafe:
-                  type: boolean
-      responses:
-        '200':
-          description: Post created successfully
-        '401':
-          description: Not logged in
-        '403':
-          description: Forbidden
-  /createFilePost:
-    post:
-      summary: Create a new file post
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
                 teachersafe:
                   type: boolean
                 upload:
                   type: string
-                  format: binary
       responses:
         '200':
           description: Post created successfully
         '401':
           description: Not logged in
         '403':
-          description: Forbidden
+          description: You cannot create a post
         '500':
-          description: File upload error
-  /getPost/{postID}:
-    get:
-      summary: Get a post by ID
-      parameters:
-        - name: postID
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
+          description: Error creating post
   /getPosts:
     get:
-      summary: Get all posts
+      summary: Get posts
       parameters:
-        - name: page
-          in: query
+        - in: query
+          name: page
           schema:
             type: integer
-            default: 0
+          description: Page number
       responses:
         '200':
-          description: Successful response
-        '401':
-          description: Not logged in
+          description: List of posts

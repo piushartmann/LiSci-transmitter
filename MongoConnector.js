@@ -55,7 +55,7 @@ module.exports.MongoConnector = class MongoConnector {
         await this.mongoose.connection.dropDatabase();
     }
 
-    async createPost(userID, title, content, type, permissions, mediaPath="") {
+    async createPost(userID, title, content, type, permissions, mediaPath = "") {
         const post = new this.Post({ userID, title, content, type, permissions, mediaPath });
         return await post.save();
     }
@@ -165,5 +165,9 @@ module.exports.MongoConnector = class MongoConnector {
             .sort({ timestamp: -1 })
             .skip(offset)
             .limit(limit);
+    }
+
+    async getUserByAPIKey(apiKey) {
+        return await this.User.findOne({ apiKey });
     }
 };

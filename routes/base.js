@@ -23,7 +23,7 @@ module.exports = (db, pageSize) => {
         if (req.session.type !== "admin" && req.session.type !== "writer") {
             return res.redirect('/');
         }
-        return res.render('create', { username: req.session.username, loggedIn: true, usertype: req.session.type });
+        return res.render('create', { username: req.session.username, loggedIn: true, usertype: req.session.type, isCreatePage: true });
     });
 
     return router;

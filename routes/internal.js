@@ -27,7 +27,7 @@ function generateRandomFilename() {
 
 module.exports = (db, s3Client, pageSize) => {
     router.get('/', (req, res) => {
-        res.send("This is the API endpoint");
+        res.send("This is the interal API, it is not meant to be accessed directly. On the /api route you can find the public API.");
     });
 
     router.post('/login', async (req, res) => {
@@ -137,40 +137,6 @@ module.exports = (db, s3Client, pageSize) => {
         return res.status(200).send(filename);
     })
 
-    router.post('/createTextPost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
-
-        const { title, content, teachersafe } = req.body;
-        const post = await db.createPost(req.session.userID, title, content, "text", teachersafe ? "Teachersafe" : "classmatesonly");
-        return res.status(200).redirect('/');
-    });
-
-    router.post('/createFilePost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
-
-        let filename;
-        try {
-            filename = await uploadFile(req, res, "posts", ["pdf", "jpg", "jpeg", "png", "webp", "heic"]);
-        } catch (error) {
-            return res.status(500).send(error.message);
-        }
-        const { title, teachersafe } = req.body;
-        const fileExtension = filename.split('.').pop().toLowerCase();
-
-        const imgFormats = ["jpg", "jpeg", "png", "webp", "heic"];
-        const pdfFormats = ["pdf"];
-
-        let type = "file";
-        type = imgFormats.includes(fileExtension) ? "img" : type;
-        type = pdfFormats.includes(fileExtension) ? "pdf" : type;
-
-
-        const post = await db.createPost(req.session.userID, title, filename, type, teachersafe ? "Teachersafe" : "classmatesonly");
-        return res.status(200).redirect('/');
-    });
-
     router.post('/createPost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
@@ -205,12 +171,7 @@ module.exports = (db, s3Client, pageSize) => {
             await db.createPost(req.session.userID, title, sanitizedContent, "text", teachersafe ? "Teachersafe" : "classmatesonly", "");
             return res.status(200).redirect('/');
         }
-    })
-
-    router.get('/getPost/:postID', async (req, res) => {
-        const post = await db.getPost(req.params.postID);
-        return res.status(200).send(post);
-    })
+    });
 
     router.get('/getPosts', async (req, res) => {
 

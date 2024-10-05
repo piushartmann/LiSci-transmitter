@@ -60,6 +60,7 @@ const db = new MongoConnector("transmitter", connectionString);
 //use routes
 app.use('/', require('./routes/base')(db, pageSize));
 app.use('/internal', require('./routes/internal')(db, s3Client, pageSize));
+app.use('/api', require('./routes/api')(db, s3Client, pageSize));
 
 //start server
 app.listen(port, () => {
