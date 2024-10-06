@@ -138,9 +138,11 @@ header a {
 
 .cancel-button {
     color: red;
+    cursor: pointer;
 }
 
 .submit-login {
     color: green;
+    cursor: pointer;
 }
 

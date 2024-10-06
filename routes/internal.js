@@ -167,5 +167,14 @@ module.exports = (db, s3Client, pageSize) => {
         return res.status(200).send(posts);
     });
 
+    router.get('/getPost/:id', async (req, res) => {
+        const post = await db.getPost(req.params.id);
+        if (req.session.type === "teacher" && post.permissions !== "Teachersafe" || !req.session.userID && post.permissions !== "Teachersafe") return res.status(403).send("You cannot view this post");
+        if (!post) {
+            return res.status(404).send("Post not found");
+        }
+        return res.status(200).send(post);
+    });
+
     return router;
 }

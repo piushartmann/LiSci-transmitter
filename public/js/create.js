@@ -113,8 +113,7 @@ function addTextSection() {
     section = document.createElement('div');
     section.className = 'section';
     section.innerHTML = `<label for="content">Text</label>
-        <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>
-        <div id="preview-${sections.length}" class="markdown-preview"></div>`;
+        <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
     

@@ -2,6 +2,21 @@
     margin-bottom: 20px;
     border-radius: 8px;
     box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1);
-    padding: 20px 5% 20px 5%;
+    padding: 20px 2.5% 20px 2.5%;
     background: #fff;
+}
+
+.section-container {
+    margin-top: 20px;
+    background: #fff;
+    border: 1px solid #a6a6a6;
+    border-radius: 8px;
+    padding: 0 20px 0 20px;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 20px;
 }

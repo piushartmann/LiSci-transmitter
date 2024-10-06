@@ -17,13 +17,13 @@ module.exports = (db, pageSize) => {
     });
 
     router.get('/create', async (req, res) => {
-        if (!req.session.userID) {
-            return res.redirect('/');
-        }
-        if (req.session.type !== "admin" && req.session.type !== "writer") {
-            return res.redirect('/');
-        }
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
         return res.render('create', { username: req.session.username, loggedIn: true, usertype: req.session.type, isCreatePage: true });
+    });
+
+    router.get('/post/:id', async (req, res) => {
+        return res.render('postFullscreen', { postID: req.params.id, loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.type });
     });
 
     return router;
