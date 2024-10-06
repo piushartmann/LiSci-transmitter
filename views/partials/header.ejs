@@ -16,34 +16,33 @@
 
   </nav>
 
-
-  <nav class="header-nav">
+  <div class="header-button">
     <% if (usertype=="writer" || usertype=="admin" ) { %>
-    <div class="header-button right-button">
-      <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
-    </div>
+  
+    <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
     <% } %>
-    <div class="header-button right-button">
-      <% if (loggedIn) { %>
+    <% if (loggedIn) { %>
       <!-- will change to profile picture later -->
       <button onclick="logout()">Logout</button>
       <% } else { %>
       <button onclick="showLoginPopup()">Login</button>
       <% } %>
-    </div>
-  </nav>
+  </div>
+  
 
 </header>
 
 <div class="login-popup" id="loginPopup">
   <div class="login-popup-content">
-    <span class="close" onclick="hideLoginPopup()">&times;</span>
+    <p id="login-popup-title">Login</p>
     <form method="post" action="internal/login">
-      <label for="username">Username</label>
-      <input type="text" name="username">
-      <label for="password">Password</label>
-      <input type="password" name="password">
-      <input type="submit" class="button">
+      <input type="text" name="username" placeholder="Username">
+      <input type="password" name="password" placeholder="Password">
+      
+      <div class="submit-button-container">
+        <button type="button" class="cancel-button" onclick="hideLoginPopup()">Cancel</button>
+        <input type="submit" class="submit-login" value="Login">
+      </div>
     </form>
   </div>
 </div>
