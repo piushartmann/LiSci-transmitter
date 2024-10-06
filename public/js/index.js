@@ -22,11 +22,10 @@ function buildPost(post) {
             case "text":
                 sectionContainer.innerHTML = `<p>${section.content}</p>`;
                 break;
-            case "pdf":
+            case "file":
                 sectionContainer.innerHTML = `<embed src="https://storage.liscitransmitter.live/${section.content}" width="500" height="375" type="application/pdf">`;
                 break;
             case "img":
-                console.log(section.size);
                 sectionContainer.innerHTML = `<img src="https://storage.liscitransmitter.live/${section.content}" alt="${post.title}" style="max-width: 100%; height: ${section.size+"px" || "auto"}">`;
                 break;
             default:
