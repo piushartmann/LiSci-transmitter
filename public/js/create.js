@@ -113,14 +113,44 @@ function addTextSection() {
     section = document.createElement('div');
     section.className = 'section';
     section.innerHTML = `<label for="content">Text</label>
-        <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>`;
+        <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>
+        <div id="preview-${sections.length}" class="markdown-preview"></div>`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
+    
     section.addEventListener('input', function () {
         console.log(this.id);
         sections[this.id] = { type: 'text', content: this.querySelector('#value').innerHTML, id: section.id };
     });
     sections[section.id] = { type: 'text', content: section.querySelector('#value').innerHTML, id: section.id };
+    section.appendChild(addSectionFooter(section));
+    closePopup();
+}
+
+function addMarkdownSection() {
+    section = document.createElement('div');
+    section.className = 'section';
+    section.innerHTML = `<label for="content">Markdown</label>
+        <textarea id="value" class="markdown-editable" rows=1 required></textarea>
+        <div id="preview-${sections.length}" class="markdown-preview"></div>`;
+
+    const textarea = section.querySelector('#value');
+    textarea.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+    document.getElementById('section-container').appendChild(section);
+    section.id = sections.length;
+
+    const preview = section.querySelector(`#preview-${sections.length}`);
+
+    textarea.addEventListener('input', function () {
+        const markdownContent = textarea.value;
+        sections[section.id] = { type: 'markdown', content: markdownContent, id: section.id };
+        preview.innerHTML = marked.parse(markdownContent, { breaks: true});
+    });
+
+    sections[section.id] = { type: 'markdown', content: textarea.value, id: section.id };
     section.appendChild(addSectionFooter(section));
     closePopup();
 }

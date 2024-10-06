@@ -56,6 +56,18 @@ input[type="file"] {
 
 }
 
+.markdown-editable {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
+    overflow: hidden;
+    resize: none;
+    height: 46px;
+}
+
 .addSection {
     display: flex;
     align-items: center;

@@ -28,6 +28,9 @@ function buildPost(post) {
             case "img":
                 sectionContainer.innerHTML = `<img src="https://storage.liscitransmitter.live/${section.content}" alt="${post.title}" style="max-width: 100%; height: ${section.size+"px" || "auto"}">`;
                 break;
+            case "markdown":
+                sectionContainer.innerHTML = marked.parse(section.content);
+                break;
             default:
                 console.error("Unknown section type");
                 break;
