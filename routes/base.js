@@ -13,7 +13,8 @@ module.exports = (db, pageSize) => {
         const currentPage = req.query.page || 1;
         req.session.views = (req.session.views || 0) + 1;
         const pages = Math.ceil(await db.getPostNumber(req.session.type === "teacher")/pageSize);
-        return res.render('index', { loggedIn: typeof req.session.username != "undefined", username: req.session.username, pages: pages, usertype: req.session.type, currentPage: currentPage });
+        const prank = req.session.username == "merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
+        return res.render('index', { loggedIn: typeof req.session.username != "undefined", username: req.session.username, pages: pages, usertype: req.session.type, currentPage: currentPage, prank: prank });
     });
 
     router.get('/create', async (req, res) => {

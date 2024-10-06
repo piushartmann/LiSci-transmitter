@@ -1,5 +1,4 @@
 function buildPost(post) {
-    console.log(post);
     postBox = document.getElementById("postBox");
     let postContainer = document.createElement("div");
     postContainer.className = "post";
