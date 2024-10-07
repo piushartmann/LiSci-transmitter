@@ -8,3 +8,4 @@
 - Add more Sections:
   - Tierlists
   - Voting
+- memes an posts anhängen
