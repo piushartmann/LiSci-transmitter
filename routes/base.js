@@ -34,5 +34,9 @@ module.exports = (db, pageSize) => {
         return res.render('citations', { loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.type });
     });
 
+    router.get('/archive', async (req, res) => {
+        return res.send("Das Archiv kommt bald!");
+    });
+
     return router;
 }

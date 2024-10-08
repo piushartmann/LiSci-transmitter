@@ -19,18 +19,15 @@
   <%- prank %>
 
   <h1>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
-  <div>
-    <label>Select Page:</label>
+
+  <div id="postBox" class="postBox">
+  </div>
+  <div class="pageSelector">
     <% for (let i=1; i <=pages; i++) { %>
     <a href="?page=<%= i %>" class="page-selection <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'page-current' : '' %>">
       <%= i %>
     </a>
     <% } %>
-  </div>
-
-  <br><br>
-
-  <div id="postBox" class="postBox">
   </div>
 
 </body>

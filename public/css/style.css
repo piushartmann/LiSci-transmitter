@@ -19,6 +19,9 @@ body {
     padding: 5px 10px;
     border: 1px solid #000;
     border-radius: 5px;
+    width: 0.7%;
+    height: 0.7%;
+    text-align: center;
 }
 
 .page-current {
@@ -32,4 +35,10 @@ body {
     transform: rotate(180deg);
     position: absolute;
     display: none;
+}
+
+.pageSelector {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
 }
