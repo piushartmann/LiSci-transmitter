@@ -4,11 +4,17 @@ const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
 
+
+const likeSchema = new Schema({
+    userID: { type: ObjectId, ref: 'User', required: true, index: true },
+    date: { type: Date, default: Date.now }
+});
+
 const commentSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
     content: { type: String, required: true },
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
-    likes: [{ userID: String, date: Date }],
+    likes: [likeSchema],
     timestamp: { type: Date, default: Date.now }
 });
 
@@ -25,7 +31,7 @@ const postSchema = new Schema({
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
     timestamp: { type: Date, default: Date.now },
     comments: [{ type: ObjectId, ref: 'Comment' }],
-    likes: [{ userID: { type: ObjectId, ref: 'User', required: true }, date: { type: Date, default: Date.now } }],
+    likes: [likeSchema],
 });
 
 const userSchema = new Schema({
@@ -33,10 +39,17 @@ const userSchema = new Schema({
     passHash: { type: String, required: true },
     profilePic: { type: String, required: false },
     email: { type: String, required: false },
-    likes: [{ postID: { type: ObjectId, ref: 'Post', required: true }, date: { type: Date, default: Date.now } }],
-    comments: [{ type: ObjectId, ref: 'Comment' }],
     type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] },
     apiKey: { type: String, default: generateApiKey() }
+});
+
+const citationSchema = new Schema({
+    userID: { type: ObjectId, ref: 'User', required: true, index: true },
+    author: { type: String, required: true },
+    content: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    likes: [likeSchema],
+    comments: [{ type: ObjectId, ref: 'Comment' }]
 });
 
 function hashPassword(password) {
@@ -54,6 +67,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
         this.Comment = this.mongoose.model('Comment', commentSchema);
+        this.Citation = this.mongoose.model('Citation', citationSchema);
     }
 
     async dropDatabase() { //be careful intended for debugging
@@ -68,20 +82,14 @@ module.exports.MongoConnector = class MongoConnector {
 
     async likePost(postID, userID) {
         const post = await this.Post.findById(postID);
-        const user = await this.User.findById(userID);
         post.likes.push({ userID, date: Date.now() });
-        user.likes.push({ postID, date: Date.now() });
-        await user.save();
         return await post.save();
     }
 
     async commentPost(postID, userID, content, permissions) {
         const comment = await this.Comment.create({ userID, content, permissions });
         const post = await this.Post.findById(postID);
-        const user = await this.User.findById(userID);
         post.comments.push(comment);
-        user.comments.push(comment);
-        await user.save();
         return await post.save();
     }
 
@@ -175,5 +183,35 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getUserByAPIKey(apiKey) {
         return await this.User.findOne({ apiKey });
+    }
+
+    async createCitation(userID, author, content) {
+        const citation = new this.Citation({ userID, author, content });
+        return await citation.save();
+    }
+
+    async getCitations(limit = 10, offset = 0) {
+        return await this.Citation.find()
+            .populate('userID', 'username profilePic')
+            .sort({ timestamp: -1 })
+            .skip(offset)
+            .limit(limit);
+    }
+
+    async getCitation(citationID) {
+        return await this.Citation.findById(citationID)
+            .populate('userID', 'username profilePic')
+            .populate('comments')
+    }
+
+    async deleteCitation(citationID) {
+        return await this.Citation.findByIdAndDelete(citationID);
+    }
+
+    async updateCitation(citationID, author, content) {
+        const citation = await this.Citation.findById(citationID);
+        citation.author = author;
+        citation.content = content;
+        return await citation.save();
     }
 };

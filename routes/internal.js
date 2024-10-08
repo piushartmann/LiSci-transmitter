@@ -9,7 +9,6 @@ const oneDay = 24 * 3600 * 1000
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
- * @param {number} pageSize - The number of posts per page.
  * @returns {Router} The router instance.
  */
 
@@ -25,7 +24,59 @@ function generateRandomFilename() {
     return result;
 }
 
-module.exports = (db, s3Client, pageSize) => {
+function uploadFile(req, res, directory = "", s3Client, forceFormats = []) {
+    return new Promise((resolve, reject) => {
+        const filename = generateRandomFilename();
+
+        const s3upload = multer({
+            storage: multerS3({
+                s3: s3Client,
+                bucket: "transmitterstorage",
+                acl: "public-read",
+                contentType: multerS3.AUTO_CONTENT_TYPE,
+                contentDisposition: "inline",
+                key: function (request, file, cb) {
+                    const fileExtension = file.originalname.split('.').pop().toLowerCase();
+
+                    if (forceFormats.length > 0 && !forceFormats.includes(fileExtension.toLowerCase())) {
+                        return cb(new Error(`Invalid file format. Expected format(s): ${forceFormats.join(', ')}`), null);
+                    }
+
+                    // Generate the filename for S3 storage
+                    let newFilename;
+                    if (directory !== "") {
+                        newFilename = `${directory}/${filename}.${fileExtension}`;
+                    } else {
+                        newFilename = `${filename}.${fileExtension}`;
+                    }
+
+                    cb(null, newFilename);
+                },
+                contentDisposition: "inline",
+            }),
+        }).array("upload", 1);
+
+        // Execute the upload
+        s3upload(req, res, function (error) {
+            if (error) {
+                console.error("File upload error:", error.message);
+                reject(error);
+            } else {
+                if (req.files && req.files.length > 0) {
+                    resolve(req.files[0].key);
+                } else {
+                    reject(new Error("No files uploaded"));
+                }
+            }
+        });
+    });
+}
+
+module.exports = (db, s3Client) => {
+    const config = require('../config.json');
+    const postsPageSize = config.postsPageSize;
+    const citationsPageSize = config.citationsPageSize;
+
     router.get('/', (req, res) => {
         res.send("This is the interal API, it is not meant to be accessed directly. On the /api route you can find the public API.");
     });
@@ -57,64 +108,13 @@ module.exports = (db, s3Client, pageSize) => {
         return res.status(200).send("Logged in");
     });
 
-    function uploadFile(req, res, directory = "", forceFormats = []) {
-        return new Promise((resolve, reject) => {
-            const filename = generateRandomFilename();
-
-            const s3upload = multer({
-                storage: multerS3({
-                    s3: s3Client,
-                    bucket: "transmitterstorage",
-                    acl: "public-read",
-                    contentType: multerS3.AUTO_CONTENT_TYPE,
-                    contentDisposition: "inline",
-                    key: function (request, file, cb) {
-                        const fileExtension = file.originalname.split('.').pop().toLowerCase();
-
-                        if (forceFormats.length > 0 && !forceFormats.includes(fileExtension.toLowerCase())) {
-                            return cb(new Error(`Invalid file format. Expected format(s): ${forceFormats.join(', ')}`), null);
-                        }
-
-                        // Generate the filename for S3 storage
-                        let newFilename;
-                        if (directory !== "") {
-                            newFilename = `${directory}/${filename}.${fileExtension}`;
-                        } else {
-                            newFilename = `${filename}.${fileExtension}`;
-                        }
-
-                        cb(null, newFilename);
-                    },
-                    contentDisposition: "inline",
-                }),
-            }).array("upload", 1);
-
-            // Execute the upload
-            s3upload(req, res, function (error) {
-                if (error) {
-                    console.error("File upload error:", error.message);
-                    reject(error);
-                } else {
-                    if (req.files && req.files.length > 0) {
-                        resolve(req.files[0].key);
-                    } else {
-                        reject(new Error("No files uploaded"));
-                    }
-                }
-            });
-        });
-    }
-
-
-
-
     router.post("/uploadFile", async function (req, res) {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot upload an image");
 
         let filename;
         try {
-            filename = await uploadFile(req, res, "files");
+            filename = await uploadFile(req, res, "files", s3Client);
         } catch (error) {
             return res.status(500).send(error.message);
         }
@@ -128,7 +128,7 @@ module.exports = (db, s3Client, pageSize) => {
 
         let filename;
         try {
-            filename = await uploadFile(req, res, "images", ["jpg", "jpeg", "png", "webp", "heic"]);
+            filename = await uploadFile(req, res, "images", s3Client, ["jpg", "jpeg", "png", "webp", "heic"]);
         } catch (error) {
             return res.status(500).send(error.message);
         }
@@ -143,7 +143,7 @@ module.exports = (db, s3Client, pageSize) => {
         const { title, sections, permissions } = req.body;
         const permissionsBool = permissions === "true";
         console.log(title, sections, permissions);
-        
+
         if (!title || !sections) return res.status(400).send("Missing parameters");
         if (typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
 
@@ -163,7 +163,7 @@ module.exports = (db, s3Client, pageSize) => {
 
         const page = (req.query.page || 1) - 1;
 
-        const posts = await db.getPosts(isTeacher, pageSize, pageSize * page);
+        const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
         return res.status(200).send(posts);
     });
 
@@ -174,6 +174,59 @@ module.exports = (db, s3Client, pageSize) => {
             return res.status(404).send("Post not found");
         }
         return res.status(200).send(post);
+    });
+
+    router.post('/createCitation', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { author, content } = req.body;
+        console.log(author, content);
+        if (!author || !content) return res.status(400).send("Missing parameters");
+        if (typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+
+        await db.createCitation(req.session.userID, author, content);
+        return res.status(200).redirect('/citations');
+    });
+
+    router.get('/getCitations', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (req.session.type == "teacher") return res.status(403).send("You cannot get this data");
+
+        const page = (req.query.page || 1) - 1;
+
+        const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
+        return res.status(200).send(citations);
+    });
+
+    router.post('/deleteCitation', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { citationID } = req.body;
+
+        if (!citationID) return res.status(400).send("Missing parameters");
+        if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
+
+        const citation = await db.getCitation(citationID);
+        if (citation.userID.toString() !== req.session.userID && req.session.type != "admin") return res.status(403).send("You cannot delete this citation");
+
+        await db.deleteCitation(citationID);
+        return res.status(200).send("Success");
+    });
+
+    router.post('/updateCitation', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { citationID, author, content } = req.body;
+        console.log(citationID, author, content);
+
+        if (!citationID || !author || !content) return res.status(400).send("Missing parameters");
+        if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+
+        const citation = await db.getCitation(citationID);
+        if (citation.userID.toString() !== req.session.userID && req.session.type != "admin") return res.status(403).send("You cannot update this citation");
+
+        await db.updateCitation(citationID, author, content);
+        return res.status(200).send("Success");
     });
 
     return router;

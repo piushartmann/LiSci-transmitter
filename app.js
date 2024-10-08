@@ -4,8 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const MongoDBStore = require('connect-mongo')
 const { S3Client } = require("@aws-sdk/client-s3");
-bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 
 const oneDay = 24 * 3600 * 1000
 
@@ -20,7 +20,7 @@ const app = express();
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false })); 
 
 dotenv.config({ path: path.join(__dirname, '.env') });

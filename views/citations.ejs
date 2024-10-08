@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/other/marked.min.js"></script>
+  <script src="/js/partials/header.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/citations.css">
+  <script src="/js/citations.js"></script>
+  <title>Zitate</title>
+</head>
+
+<body>
+  <%- include("./partials/header.ejs") %>
+
+  <div class="newCitationBox">
+    <h1>Ein neues Zitat einreichen</h1>
+    <form action="/internal/createCitation" method="POST">
+      <div class="sentenceStructure">
+        <input type="text" name="author" id="author" placeholder="Herr Treetzen" pattern="[A-Za-z\s]+" required>
+        <p> hat </p>
+        <input type="text" name="content" id="content" placeholder="ein lustiges Zitat" pattern="[A-Za-z\s]+" required>
+        <p> gesagt.</p>
+      </div>
+      <button id="citationSubmit" onclick="submitCitation()">Submit</button>
+    </form>
+  </div>
+
+  <h1>Zitate</h1>
+  <div class="citationsBox" id="citationBox">
+  </div>
+
+
+</body>
+
+</html>

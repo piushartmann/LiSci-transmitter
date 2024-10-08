@@ -1,4 +1,6 @@
 :root {
     --main-text-color: black;
     --main-background-color: white;
+    --post-background-color: #fff;
+    --post-outline-color: #a6a6a6;
 }

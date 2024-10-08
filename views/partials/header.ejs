@@ -10,7 +10,7 @@
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/archive">Archive</a></li>
-      <li><a href="/about">About</a></li>
+      <li><a href="/citations">Zitate</a></li>
     </ul>
 
 
@@ -18,17 +18,17 @@
 
   <div class="header-button">
     <% if (usertype=="writer" || usertype=="admin" ) { %>
-  
-    <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
+      <button class="create-post-button" onclick="window.location.href='/create'">Create Post</button>
     <% } %>
+
     <% if (loggedIn) { %>
       <!-- will change to profile picture later -->
       <button onclick="logout()">Logout</button>
-      <% } else { %>
+    <% } else { %>
       <button onclick="showLoginPopup()">Login</button>
-      <% } %>
+    <% } %>
   </div>
-  
+
 
 </header>
 
@@ -38,7 +38,7 @@
     <form method="post" action="internal/login">
       <input type="text" name="username" placeholder="Username">
       <input type="password" name="password" placeholder="Password">
-      
+
       <div class="submit-button-container">
         <button type="button" class="cancel-button" onclick="hideLoginPopup()">Cancel</button>
         <input type="submit" class="submit-login" value="Login">
