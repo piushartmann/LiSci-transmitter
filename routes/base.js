@@ -24,9 +24,23 @@ module.exports = (db, pageSize) => {
     router.get('/create', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a new Post");
+
         return res.render('create', {
             loggedIn: true, username: req.session.username, usertype: req.session.permissions || [],
             isCreatePage: true
+        });
+    });
+
+    router.get('/edit/:postID', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a new Post");
+
+        const postID = req.params.postID;
+        const post = await db.getPost(postID);
+
+        return res.render('create', {
+            loggedIn: true, username: req.session.username, usertype: req.session.permissions || [],
+            isCreatePage: true, post: post
         });
     });
 

@@ -53,11 +53,13 @@ async function uploadFile(file, name, endpoint) {
 
 async function uploadAllFiles() {
     for (const section of sections) {
-        if (section.type == 'img' && section.content) {
-            section.content = await uploadFile(section.content, section.content.name, "/uploadImage");
-        }
-        else if (section.type == 'file' && section.content) {
-            section.content = await uploadFile(section.content, section.content.name, "/uploadFile");
+        if (!section.uploaded) {
+            if (section.type == 'img' && section.content) {
+                section.content = await uploadFile(section.content, section.content.name, "/uploadImage");
+            }
+            else if (section.type == 'file' && section.content) {
+                section.content = await uploadFile(section.content, section.content.name, "/uploadFile");
+            }
         }
     }
 }
@@ -71,13 +73,12 @@ async function handleAllInlineImages() {
 
 }
 
-
 function removeAllEmptySections() {
     return sections.filter(section => section.content && (typeof section.content === 'string' ? section.content.trim() !== '' : true));
 }
 
 
-async function submitPost() {
+async function submitPost(save = false) {
     const title = document.getElementById('title').value;
     const teachersafe = document.getElementById('teachersafe').checked;
 
@@ -91,7 +92,7 @@ async function submitPost() {
         alert('Please add at least one section');
         return;
     }
-    
+
     await uploadAllFiles();
     await handleAllInlineImages();
 
@@ -100,34 +101,45 @@ async function submitPost() {
     formData.append('sections', JSON.stringify(nonEmptySections));
     formData.append('permissions', teachersafe);
 
-    await fetch('/internal/createPost', {
-        method: 'POST',
-        body: formData,
-        enctype: 'multipart/x-www-form-urlencoded',
-    });
+    if (!save) {
+        await fetch('/internal/createPost', {
+            method: 'POST',
+            body: formData,
+            enctype: 'multipart/x-www-form-urlencoded',
+        });
+    }
+    else {
+        formData.append('postID', post._id);
+        await fetch('/internal/updatePost', {
+            method: 'POST',
+            body: formData,
+            enctype: 'multipart/x-www-form-urlencoded',
+        });
+    }
 
     window.location.href = '/';
 }
 
-function addTextSection() {
-    section = document.createElement('div');
+function addTextSection(isRecontructed) {
+    let section = document.createElement('div');
     section.className = 'section';
     section.innerHTML = `<label for="content">Text</label>
         <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
-    
+
     section.addEventListener('input', function () {
         console.log(this.id);
-        sections[this.id] = { type: 'text', content: this.querySelector('#value').innerHTML, id: section.id };
+        sections[this.id] = { type: 'text', content: this.querySelector('#value').innerHTML, id: this.id };
     });
-    sections[section.id] = { type: 'text', content: section.querySelector('#value').innerHTML, id: section.id };
+    sections[section.id] = { type: 'text', content: section.querySelector('#value').innerHTML, id: this.id };
     section.appendChild(addSectionFooter(section));
     closePopup();
+    return section;
 }
 
-function addMarkdownSection() {
-    section = document.createElement('div');
+function addMarkdownSection(isRecontructed) {
+    let section = document.createElement('div');
     section.className = 'section';
     section.innerHTML = `<label for="content">Markdown</label>
         <textarea id="value" class="markdown-editable" rows=1 required></textarea>
@@ -145,17 +157,18 @@ function addMarkdownSection() {
 
     textarea.addEventListener('input', function () {
         const markdownContent = textarea.value;
-        sections[section.id] = { type: 'markdown', content: markdownContent, id: section.id };
-        preview.innerHTML = marked.parse(markdownContent, { breaks: true});
+        sections[section.id] = { type: 'markdown', content: markdownContent, id: this.id };
+        preview.innerHTML = marked.parse(markdownContent, { breaks: true });
     });
 
-    sections[section.id] = { type: 'markdown', content: textarea.value, id: section.id };
+    sections[section.id] = { type: 'markdown', content: textarea.value, id: this.id };
     section.appendChild(addSectionFooter(section));
     closePopup();
+    return section;
 }
 
-function addImageSection() {
-    const section = document.createElement('div');
+function addImageSection(isRecontructed = false) {
+    let section = document.createElement('div');
     section.className = 'section';
     const uniqueId = `section-${sections.length}`;
     section.innerHTML = `<label for="upload-${uniqueId}">Upload Image</label>
@@ -164,8 +177,10 @@ function addImageSection() {
           <div class="reziseHandle"></div>`;
     document.getElementById('section-container').appendChild(section);
     section.id = sections.length;
+
     imgRezise(section);
     section.querySelector(`#upload-${uniqueId}`).addEventListener('change', function () {
+        console.log("onchange");
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
@@ -175,33 +190,61 @@ function addImageSection() {
                 preview.style.display = 'block';
             };
             reader.readAsDataURL(file);
-            sections[section.id] = { type: 'img', content: file, size: section.querySelector(`#preview-${uniqueId}`).clientHeight };
+            if (!isRecontructed) {
+                sections[section.id] = { type: 'img', content: file, size: section.querySelector(`#preview-${uniqueId}`).clientHeight, id: section.id };
+                console.log("1");
+            } else {
+                sections[section.id] = { type: 'img', content: sections[section.id].content, size: section.querySelector(`#preview-${uniqueId}`).clientHeight, id: section.id, uploaded: true };
+            }
         }
     });
     const observer = new ResizeObserver(() => {
-        sections[section.id] = { type: 'img', content: section.querySelector(`#upload-${uniqueId}`).files[0], size: section.querySelector(`#preview-${uniqueId}`).clientHeight, id: section.id };
+        const uploadElement = section.querySelector(`#upload-${uniqueId}`);
+        const previewElement = section.querySelector(`#preview-${uniqueId}`);
+        if (uploadElement && previewElement) {
+            if (!isRecontructed) {
+                sections[section.id] = { type: 'img', content: uploadElement.files[0], size: previewElement.clientHeight, id: section.id };
+                console.log("2");
+            } else {
+                sections[section.id] = { type: 'img', content: sections[section.id].content, size: previewElement.clientHeight, id: section.id, uploaded: true };
+            }
+        }
     });
-    observer.observe(section.querySelector(`#preview-${uniqueId}`));
-    sections[section.id] = { type: 'img', content: section.querySelector(`#upload-${uniqueId}`).files[0], size: section.querySelector(`#preview-${uniqueId}`).clientHeight, id: section.id };
+    const previewElement = section.querySelector(`#preview-${uniqueId}`);
+    if (previewElement) {
+        observer.observe(previewElement);
+    }
+    const uploadElement = section.querySelector(`#upload-${uniqueId}`);
+    if (uploadElement && previewElement) {
+        if (!isRecontructed) {
+            sections[section.id] = { type: 'img', content: uploadElement.files[0], size: previewElement.clientHeight, id: section.id };
+            console.log("3");
+        } else {
+            sections[section.id] = { type: 'img', content: undefined, size: previewElement.clientHeight, id: section.id, uploaded: true };
+        }
+    }
 
     section.appendChild(addSectionFooter(section));
     closePopup();
+    return section;
 }
 
-function addFileSection() {
-    section = document.createElement('div');
+function addFileSection(isRecontructed) {
+    let section = document.createElement('div');
     section.className = 'section';
     section.innerHTML = `<label for="upload">Upload File</label>
           <input type="file" id="value" accept=".pdf,image/*">`;
     document.getElementById('section-container').appendChild(section);
-    section.id = sections.length;
+    section.id = id || sections.length;
+
     section.addEventListener('change', function () {
         console.log(this.id);
-        sections[this.id] = { type: 'file', content: this.querySelector('#value').files[0], id: section.id };
+        sections[this.id] = { type: 'file', content: this.querySelector('#value').files[0], id: this.id };
     });
-    sections[section.id] = { type: 'file', content: section.querySelector('#value').files[0], id: section.id };
+    sections[section.id] = { type: 'file', content: section.querySelector('#value').files[0], id: this.id };
     section.appendChild(addSectionFooter(section));
     closePopup();
+    return section;
 }
 
 function addSectionFooter(section) {
@@ -214,14 +257,15 @@ function addSectionFooter(section) {
 }
 
 function moveSection(id, direction) {
-    const sectionPostionInArray = sections.findIndex(arrayElement => arrayElement.id == id);
+    const sectionPostionInArray = sections.findIndex(section => section.id == id);
     const thisSection = document.getElementById(id);
     if (direction == 'up' && sectionPostionInArray > 0) {
         const upperSectionID = sections[sectionPostionInArray - 1].id;
         const upperSection = document.getElementById(upperSectionID);
 
+        const arraySection = sections[sectionPostionInArray];
         sections[sectionPostionInArray] = sections[sectionPostionInArray - 1];
-        sections[sectionPostionInArray - 1] = thisSection;
+        sections[sectionPostionInArray - 1] = arraySection;
         document.getElementById('section-container').insertBefore(thisSection, upperSection);
     }
     else if (direction == 'down' && sectionPostionInArray < sections.length - 1) {
@@ -323,6 +367,44 @@ function imgRezise(element) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    addTextSection();
-});
+function loadPost(post) {
+    console.log(post);
+    document.getElementById('title').value = post.title;
+    document.getElementById('teachersafe').checked = post.permissions == "Teachersafe";
+
+    post.sections.forEach(section => {
+        let newSection;
+        switch (section.type) {
+            case 'text':
+                newSection = addTextSection(true);
+                newSection.querySelector('#value').innerHTML = section.content;
+                sections[newSection.id].content = section.content;
+                sections[newSection.id].id = newSection.id;
+                break;
+            case 'markdown':
+                newSection = addMarkdownSection();
+                newSection.querySelector('#value').value = section.content;
+                newSection.querySelector('.markdown-preview').innerHTML = marked.parse(section.content, { breaks: true });
+                sections[newSection.id].content = section.content;
+                sections[newSection.id].id = newSection.id;
+                break;
+            case 'img':
+                newSection = addImageSection(true);
+                const img = newSection.querySelector('img');
+                img.src = 'https://storage.liscitransmitter.live/' + section.content;
+                img.style.display = 'block';
+                img.style.height = section.size + 'px';
+                sections[newSection.id].content = section.content;
+                sections[newSection.id].uploaded = true;
+                sections[newSection.id].size = section.size;
+                sections[newSection.id].id = newSection.id;
+                break;
+            case 'file':
+                newSection = addFileSection(true);
+                sections[newSection.id].uploaded = true;
+                sections[newSection.id].content = section.content;
+                sections[newSection.id].id = newSection.id;
+                break;
+        }
+    });
+}

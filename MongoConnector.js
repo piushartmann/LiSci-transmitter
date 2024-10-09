@@ -80,6 +80,18 @@ module.exports.MongoConnector = class MongoConnector {
         return await post.save();
     }
 
+    async deletePost(postID) {
+        return await this.Post.findByIdAndDelete(postID);
+    }
+
+    async updatePost(postID, title, sections, permissions) {
+        const post = await this.Post.findById(postID);
+        post.title = title;
+        post.sections = sections;
+        post.permissions = permissions;
+        return await post.save();
+    }
+
     async likePost(postID, userID) {
         const post = await this.Post.findById(postID);
         post.likes.push({ userID, date: Date.now() });

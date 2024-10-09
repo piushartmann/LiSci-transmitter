@@ -85,7 +85,7 @@ module.exports = (db, s3Client) => {
         const { username, password } = req.body;
         const user = await db.checkLogin(username, password);
         if (!user) {
-            return res.status(401).send("Invalid Username or Password");
+            return res.status(401).redirect('/');
         }
         else {
             req.session.username = user.username;
@@ -151,12 +151,36 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    router.post('/updatePost', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot update a post");
+
+        const { postID, title, sections, permissions } = req.body;
+        const permissionsBool = permissions === "true";
+        console.log(postID, title, sections, permissions);
+
+        if (!postID || !title || !sections) return res.status(400).send("Missing parameters");
+        if (typeof postID !== "string" || typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
+
+        await db.updatePost(postID, title, JSON.parse(sections), permissionsBool ? "Teachersafe" : "classmatesonly");
+        return res.status(200).send("Success");
+    })
+
     router.get('/getPosts', async (req, res) => {
         const permissions = req.session.permissions || [];
         const isTeacher = !(permissions.includes("classmate"));
         const page = (req.query.page || 1) - 1;
 
         const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
+        let filteredPosts = [];
+        if (req.session.permissions.includes("admin") || req.session.permissions.includes("writer")) {
+            posts.forEach(post => {
+                let postObj = post.toObject();
+                postObj.canEdit = true;
+                filteredPosts.push(postObj);
+            });
+            return res.status(200).send(filteredPosts);
+        }
         return res.status(200).send(posts);
     });
 
@@ -170,6 +194,20 @@ module.exports = (db, s3Client) => {
         }
         return res.status(200).send(post);
     });
+
+    router.post('/deletePost', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { postID } = req.body;
+        if (!postID) return res.status(400).send("Missing parameters");
+        if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
+
+        const post = await db.getPost(postID);
+        if (post.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
+
+        await db.deletePost(postID);
+        return res.status(200).send("Success");
+    })
 
     router.post('/createCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -186,13 +224,13 @@ module.exports = (db, s3Client) => {
     router.get('/getCitations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
-    
+
         const page = (req.query.page || 1) - 1;
-    
+
         const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
-    
+
         let filteredCitations = [];
-    
+
         citations.forEach(citation => {
             let citationObj = citation.toObject();
             if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
@@ -202,10 +240,10 @@ module.exports = (db, s3Client) => {
             }
             filteredCitations.push(citationObj);
         });
-    
+
         return res.status(200).send(filteredCitations);
     });
-    
+
 
     router.post('/deleteCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -248,13 +286,6 @@ module.exports = (db, s3Client) => {
         await db.setSubscription(req.session.userID, subscription);
         return res.status(200).send("Success");
     });
-
-    router.post('/log', async (req, res) => {
-        const { message } = req.body;
-        console.log(`Log message: ${message}`);
-        return res.status(200).send("Success");
-    });
-
 
     return router;
 }

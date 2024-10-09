@@ -3,8 +3,12 @@
 
 <head>
   <%- include("./partials/baseHead.ejs") %>
-  
+
+  <% if (typeof post != "undefined") { %>
+  <title>Edit a Post</title>
+  <% } else { %>
   <title>Create a New Post</title>
+  <% } %>
   <link rel="stylesheet" href="/css/create.css">
   <script src="/js/create.js"></script>
 </head>
@@ -35,7 +39,11 @@
       </button>
       <br>
 
+      <% if (typeof post != "undefined") { %>
+      <button onclick="submitPost(true)" class="button">Save Post</button>
+      <% } else { %>
       <button onclick="submitPost()" class="button">Create Post</button>
+      <% } %>
     </div>
   </div>
 
@@ -51,5 +59,13 @@
   </div>
 
 </body>
+
+<% if (typeof post != "undefined") { %>
+<script>
+  const post = <%- JSON.stringify(post) %>;
+  loadPost(post);
+</script>
+<% } %>
+
 
 </html>

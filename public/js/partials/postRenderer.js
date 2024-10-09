@@ -2,6 +2,7 @@ function buildPost(post) {
     postBox = document.getElementById("postBox");
     let postContainer = document.createElement("div");
     postContainer.className = "post";
+    postContainer.dataset.id = post._id;
     postContainer.appendChild(buildHeader(post));
 
     let sectionContainer = document.createElement("div");
@@ -30,7 +31,7 @@ function buildPost(post) {
         }
         sectionContainer.appendChild(sectionDiv);
     });
-
+    postContainer.appendChild(buildFooter(post));
     postBox.appendChild(postContainer);
 }
 
@@ -42,4 +43,41 @@ function buildHeader(post) {
     <p style="display: inline; margin-left: 10px;">Von ${post.userID.username}</p>
     `;
     return headerDiv;
+}
+
+function buildFooter(post) {
+    let footerDiv = document.createElement("div");
+    footerDiv.className = "post-footer";
+    footerDiv.innerHTML = `
+    <button class="like-button">Like</button>
+    <button class="comment-button">Comment</button>
+    `;
+    
+    if (post.canEdit) {
+        let editButton = document.createElement("button");
+        editButton.className = "edit-button";
+        editButton.textContent = "Edit";
+        editButton.onclick = () => window.location.href = `/edit/${post._id}`;
+        footerDiv.appendChild(editButton);
+
+        let deleteButton = document.createElement("button");
+        deleteButton.className = "delete-button";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = async () => {
+            if (confirm("Are you sure you want to delete this post?")) {
+                await fetch(`/internal/deletePost`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ postID: post._id }),
+                });
+                console.log(`Post ${post._id} deleted`);
+            }
+            window.location.reload();
+        };
+        footerDiv.appendChild(deleteButton);
+    }
+
+    return footerDiv;
 }
