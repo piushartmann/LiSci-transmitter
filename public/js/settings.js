@@ -32,7 +32,7 @@ async function enablePush() {
             userVisibleOnly: true,
         });
 
-        await fetch("/pushSubscribe", {
+        await fetch("internal/pushSubscribe", {
             method: "post",
             headers: {
                 "Content-Type": "application/json",
