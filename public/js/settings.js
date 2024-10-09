@@ -25,39 +25,27 @@ async function run() {
 
     const button = document.getElementById("enablePush");
 
-    const areNotificationsGranted = window.Notification.permission === "granted";
-    if (areNotificationsGranted) {
-        button.innerText = "Send Notification";
+    button.addEventListener("click", async () => {
+        const result = await window.Notification.requestPermission();
 
-        button.addEventListener("click", async () => {
-            await fetch("/send-notification");
-        });
-    } else {
-        button.addEventListener("click", async () => {
-            // Triggers popup to request access to send notifications
-            const result = await window.Notification.requestPermission();
+        if (result === "granted") {
+            const subscription = await registration.pushManager.subscribe({
+                applicationServerKey:
+                    "BA6ytZNJcaQnbML4C9w17snFJ_S5KmOzQamZddcchIPuyVPMfDBhNNvzCVkyUMxraUa-mfi8wBHP1gkyCDl50QA",
+                userVisibleOnly: true,
+            });
 
-            // If the user rejects the permission result will be "denied"
-            if (result === "granted") {
-                const subscription = await registration.pushManager.subscribe({
-                    // TODO: Replace with your public vapid key
-                    applicationServerKey:
-                        "BA6ytZNJcaQnbML4C9w17snFJ_S5KmOzQamZddcchIPuyVPMfDBhNNvzCVkyUMxraUa-mfi8wBHP1gkyCDl50QA",
-                    userVisibleOnly: true,
-                });
+            await fetch("/save-subscription", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(subscription),
+            });
 
-                await fetch("/save-subscription", {
-                    method: "post",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(subscription),
-                });
-
-                window.location.reload();
-            }
-        });
-    }
+            window.location.reload();
+        }
+    });
 }
 
 async function log(message) {
