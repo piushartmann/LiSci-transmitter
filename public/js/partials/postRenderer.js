@@ -48,10 +48,6 @@ function buildHeader(post) {
 function buildFooter(post) {
     let footerDiv = document.createElement("div");
     footerDiv.className = "post-footer";
-    footerDiv.innerHTML = `
-    <button class="like-button">Like</button>
-    <button class="comment-button">Comment</button>
-    `;
     
     if (post.canEdit) {
         let editButton = document.createElement("button");
