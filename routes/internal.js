@@ -235,7 +235,7 @@ module.exports = (db, s3Client) => {
         const subscription = req.body;
         console.log(subscription);
 
-        await db.setUserData(req.session.userID, "pushSubscription", subscription);
+        await db.setSubscription(req.session.userID, subscription);
         return res.status(200).send("Success");
     });
 

@@ -215,4 +215,15 @@ module.exports.MongoConnector = class MongoConnector {
         citation.content = content;
         return await citation.save();
     }
+
+    async setSubscription(userID, subscription) {
+        const user = await this.User.findById(userID);
+        user.pushSubscription = subscription;
+        return await user.save();
+    }
+
+    async getSubscription(userID) {
+        const user = await this.User.findById(userID);
+        return user.pushSubscription;
+    }
 };

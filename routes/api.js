@@ -6,10 +6,11 @@ const router = Router();
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
  * @param {number} pageSize - The number of posts per page.
+ * @param {webpush} webpush - The webpush instance.
  * @returns {Router} The router instance.
  */
 
-module.exports = (db, pageSize, s3Client) => {
+module.exports = (db, pageSize, s3Client, webpush) => {
 
     async function checkAPIKey(req) {
         keyHeader = req.headers['x-api-key'];
@@ -102,6 +103,22 @@ module.exports = (db, pageSize, s3Client) => {
         const { postID } = req.body;
         try {
             const post = await db.likePost(postID, user._id);
+            return res.status(200).send("Success");
+        }
+        catch (error) {
+            return res.status(500).send(error.message);
+        }
+    });
+
+    router.post('/sendPush', async (req, res) => {
+        const user = await checkAPIKey(req);
+        if (!user) return res.status(401).send("Invalid API key");
+
+        const { userID, title, body, icon, badge } = req.body;
+        const subscription = await db.getSubscription(userID);
+        const pushData = { title, body, icon, badge };
+        try {
+            webpush.sendNotification(subscription, pushData);
             return res.status(200).send("Success");
         }
         catch (error) {
