@@ -18,12 +18,15 @@
 
   <div class="header-button">
     <% if (usertype=="writer" || usertype=="admin" ) { %>
-      <button class="create-post-button" onclick="window.location.href='/create'">Neuer Post</button>
+    <button class="create-post-button" onclick="window.location.href='/create'">Neuer Post</button>
     <% } %>
 
     <% if (loggedIn) { %>
-      <!-- will change to profile picture later -->
-      <button onclick="logout()">Logout</button>
+      <% if (typeof isSettingsPage != "undefined") { %>
+        <button onclick="logout()">Logout</button>
+      <% } else { %>
+        <button onclick="window.location.href='/settings'">settings</button>
+      <% } %>
     <% } else { %>
       <button onclick="showLoginPopup()">Login</button>
     <% } %>
