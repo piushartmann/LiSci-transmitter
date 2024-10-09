@@ -31,18 +31,19 @@ function buildCitation(citation) {
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";
     citationContainer.appendChild(buttonRow);
+    if (citation.canEdit) {
+        let deleteButton = document.createElement("button");
+        deleteButton.className = "delete-button";
+        deleteButton.innerHTML = "Delete";
+        deleteButton.onclick = () => deleteCitation(citation._id);
+        buttonRow.appendChild(deleteButton);
 
-    let deleteButton = document.createElement("button");
-    deleteButton.className = "delete-button";
-    deleteButton.innerHTML = "Delete";
-    deleteButton.onclick = () => deleteCitation(citation._id);
-    buttonRow.appendChild(deleteButton);
-
-    let editButton = document.createElement("button");
-    editButton.className = "edit-button";
-    editButton.innerHTML = "Edit";
-    editButton.onclick = () => editCitation(citation._id);
-    buttonRow.appendChild(editButton);
+        let editButton = document.createElement("button");
+        editButton.className = "edit-button";
+        editButton.innerHTML = "Edit";
+        editButton.onclick = () => editCitation(citation._id);
+        buttonRow.appendChild(editButton);
+    }
 
     citationBox.appendChild(citationContainer);
 }
@@ -115,11 +116,11 @@ function saveCitation(id) {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => {
-        if (response.status === 200) {
-            window.location.href = "/citations";
-        }
-    });
+        .then(response => {
+            if (response.status === 200) {
+                window.location.href = "/citations";
+            }
+        });
 }
 
 function cancelEditCitation(id, originalContent, originalAuthor) {

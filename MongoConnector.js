@@ -40,8 +40,8 @@ const userSchema = new Schema({
     profilePic: { type: String, required: false },
     email: { type: String, required: false },
     pushSubscription: { type: Object, required: false },
-    type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] },
-    apiKey: { type: String, default: generateApiKey() }
+    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin'] }],
+    apiKey: { type: String, required: true }
 });
 
 const citationSchema = new Schema({
@@ -94,9 +94,9 @@ module.exports.MongoConnector = class MongoConnector {
         return await post.save();
     }
 
-    async createUser(username, password, type) {
+    async createUser(username, password, permissions) {
         const passHash = hashPassword(password);
-        const user = new this.User({ username, passHash, email: "", type });
+        const user = new this.User({ username, passHash, email: "", permissions: permissions,apiKey: generateApiKey() });
         return await user.save();
     }
 
@@ -144,7 +144,7 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async checkLogin(username, password) {
-        const user = await this.User.findOne({ username });
+        const user = await this.User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
         if (!user) {
             return false;
         }
@@ -159,11 +159,12 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPosts(isTeacher, limit = 10, offset = 0) {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
-        return await this.Post.find(query)
+        const post = await this.Post.find(query)
             .populate('userID', 'username profilePic')
             .sort({ timestamp: -1 })
             .skip(offset)
             .limit(limit);
+        return post;
 
     }
 

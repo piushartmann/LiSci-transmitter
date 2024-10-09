@@ -90,7 +90,7 @@ module.exports = (db, s3Client) => {
         else {
             req.session.username = user.username;
             req.session.userID = user._id;
-            req.session.type = user.type;
+            req.session.permissions = user.permissions;
             req.session.cookie.expires = new Date(Date.now() + oneDay * 30);
             res.status(200).redirect('/');
         }
@@ -110,7 +110,7 @@ module.exports = (db, s3Client) => {
 
     router.post("/uploadFile", async function (req, res) {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot upload an image");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot upload an image");
 
         let filename;
         try {
@@ -124,7 +124,7 @@ module.exports = (db, s3Client) => {
 
     router.post('/uploadImage', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot upload an image");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot upload a File");
 
         let filename;
         try {
@@ -138,7 +138,7 @@ module.exports = (db, s3Client) => {
 
     router.post('/createPost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type !== "admin" && req.session.type !== "writer") return res.status(403).send("You cannot create a post");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a post");
 
         const { title, sections, permissions } = req.body;
         const permissionsBool = permissions === "true";
@@ -152,15 +152,8 @@ module.exports = (db, s3Client) => {
     });
 
     router.get('/getPosts', async (req, res) => {
-
-        let isTeacher = true;
-        if (!req.session.userID) {
-            isTeacher = true;
-        }
-        else {
-            isTeacher = req.session.type === "teacher";
-        }
-
+        const permissions = req.session.permissions || [];
+        const isTeacher = !(permissions.includes("classmate"));
         const page = (req.query.page || 1) - 1;
 
         const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
@@ -169,7 +162,9 @@ module.exports = (db, s3Client) => {
 
     router.get('/getPost/:id', async (req, res) => {
         const post = await db.getPost(req.params.id);
-        if (req.session.type === "teacher" && post.permissions !== "Teachersafe" || !req.session.userID && post.permissions !== "Teachersafe") return res.status(403).send("You cannot view this post");
+        const permissions = req.session.permissions || [];
+        if (!(permissions.includes("classmate")) && post.permissions === "classmatesonly") return res.status(403).send("You cannot view this post");
+
         if (!post) {
             return res.status(404).send("Post not found");
         }
@@ -190,13 +185,27 @@ module.exports = (db, s3Client) => {
 
     router.get('/getCitations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (req.session.type == "teacher") return res.status(403).send("You cannot get this data");
-
+        if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
+    
         const page = (req.query.page || 1) - 1;
-
+    
         const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
-        return res.status(200).send(citations);
+    
+        let filteredCitations = [];
+    
+        citations.forEach(citation => {
+            let citationObj = citation.toObject();
+            if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
+                citationObj.canEdit = true;
+            } else {
+                citationObj.canEdit = false;
+            }
+            filteredCitations.push(citationObj);
+        });
+    
+        return res.status(200).send(filteredCitations);
     });
+    
 
     router.post('/deleteCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -207,9 +216,10 @@ module.exports = (db, s3Client) => {
         if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
 
         const citation = await db.getCitation(citationID);
-        if (citation.userID.toString() !== req.session.userID && req.session.type != "admin") return res.status(403).send("You cannot delete this citation");
+        if (citation.userID.id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
 
         await db.deleteCitation(citationID);
+
         return res.status(200).send("Success");
     });
 
@@ -223,7 +233,7 @@ module.exports = (db, s3Client) => {
         if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
 
         const citation = await db.getCitation(citationID);
-        if (citation.userID.toString() !== req.session.userID && req.session.type != "admin") return res.status(403).send("You cannot update this citation");
+        if (citation.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
 
         await db.updateCitation(citationID, author, content);
         return res.status(200).send("Success");
