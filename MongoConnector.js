@@ -38,7 +38,6 @@ const userSchema = new Schema({
     username: { type: String, required: true, index: true },
     passHash: { type: String, required: true },
     profilePic: { type: String, required: false },
-    email: { type: String, required: false },
     pushSubscription: { type: Object, required: false },
     permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin'] }],
     apiKey: { type: String, required: true }
@@ -96,7 +95,7 @@ module.exports.MongoConnector = class MongoConnector {
 
     async createUser(username, password, permissions) {
         const passHash = hashPassword(password);
-        const user = new this.User({ username, passHash, email: "", permissions: permissions,apiKey: generateApiKey() });
+        const user = new this.User({ username, passHash, permissions: permissions,apiKey: generateApiKey() });
         return await user.save();
     }
 
