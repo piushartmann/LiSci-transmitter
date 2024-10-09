@@ -118,7 +118,7 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         const subscription = await db.getSubscription(userID);
         const pushData = { title, body, icon, badge };
         try {
-            webpush.sendNotification(subscription, pushData);
+            webpush.sendNotification(subscription, JSON.stringify(pushData));
             return res.status(200).send("Success");
         }
         catch (error) {
