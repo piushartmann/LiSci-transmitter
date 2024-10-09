@@ -173,7 +173,7 @@ module.exports = (db, s3Client) => {
 
         const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
         let filteredPosts = [];
-        if (req.session.permissions.includes("admin") || req.session.permissions.includes("writer")) {
+        if (permissions.includes("admin") || permissions.includes("writer")) {
             posts.forEach(post => {
                 let postObj = post.toObject();
                 postObj.canEdit = true;
