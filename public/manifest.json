@@ -1,0 +1,13 @@
+{
+    "theme_color": "#000000",
+    "orientation": "any",
+    "display": "standalone",
+    "dir": "auto",
+    "lang": "de",
+    "shortcuts": "test",
+    "start_url": "https://liscitransmitter.live/",
+    "name": "Life Science Transmitter",
+    "short_name": "Transmitter",
+    "scope": "https://liscitransmitter.live",
+    "description": "This is the PWA version of the Life Science Transmitter"
+}

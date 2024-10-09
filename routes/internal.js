@@ -229,5 +229,22 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    router.post('/pushSubscribe', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const subscription = req.body;
+        console.log(subscription);
+
+        await db.setUserData(req.session.userID, "pushSubscription", subscription);
+        return res.status(200).send("Success");
+    });
+
+    router.post('/log', async (req, res) => {
+        const { message } = req.body;
+        console.log(`Log message: ${message}`);
+        return res.status(200).send("Success");
+    });
+
+
     return router;
 }

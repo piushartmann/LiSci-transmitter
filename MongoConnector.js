@@ -39,6 +39,7 @@ const userSchema = new Schema({
     passHash: { type: String, required: true },
     profilePic: { type: String, required: false },
     email: { type: String, required: false },
+    pushSubscription: { type: Object, required: false },
     type: { type: String, required: true, enum: ['classmate', 'teacher', 'writer', 'admin'] },
     apiKey: { type: String, default: generateApiKey() }
 });
