@@ -114,9 +114,9 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
 
-        const { userID, title, body, icon, badge } = req.body;
+        const { userID, title, body, icon, badge, urgency } = req.body;
         const subscription = await db.getSubscription(userID);
-        const pushData = { title, body, icon, badge };
+        const pushData = { title, body, icon, badge, urgency };
         try {
             webpush.sendNotification(subscription, JSON.stringify(pushData));
             return res.status(200).send("Success");

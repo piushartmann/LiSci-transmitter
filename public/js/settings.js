@@ -15,9 +15,9 @@ async function registerServiceWorker() {
                 scope: "push/",
             }
         );
-        console.log("Service Worker registered with scope: ", registration);
     } else {
-        console.log("Service Worker API is not supported in this browser.");
+        button = document.getElementById('enablePush');
+        button.disabled = true;
     }
     console.log("Service Worker registered with scope: ", registration);
 }

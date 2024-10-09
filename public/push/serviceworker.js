@@ -14,12 +14,18 @@ self.addEventListener('push', event => {
         data = event.data.json();
     }
 
-    const title = data.title || 'Default title';
+    const title = data.title;
     const options = {
-        body: data.body || 'Default body',
-        icon: data.icon || '/images/icon.png',
-        badge: data.badge || '/images/badge.png'
+        body: data.body,
     };
+    if (data.badge) {
+        if (data.badge < 0){
+            navigator.clearAppBadge();
+        }
+        else {
+            navigator.setAppBadge(data.badge);
+        }
+    }
 
     event.waitUntil(
         self.registration.showNotification(title, options)
