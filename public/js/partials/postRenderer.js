@@ -47,34 +47,91 @@ function buildHeader(post) {
 
 function buildFooter(post) {
     let footerDiv = document.createElement("div");
-    footerDiv.className = "post-footer";
+    footerDiv.className = "post-footer flex";
+    let liked = post.liked === true;
+    let likes = post.likes.length;
 
-    let likeCounter = document.createElement("p");
-    likeCounter.className = "like-counter";
-    likeCounter.textContent = `${post.likes.length} Likes`;
-    footerDiv.appendChild(likeCounter)
+    let iteractionButtons = document.createElement("div");
+    iteractionButtons.className = "flex";
+
+
 
     let likeButton = document.createElement("button");
-    likeButton.className = "like-button";
-    likeButton.textContent = "Like";
+    likeButton.className = "button";
+
+    let likeIcon = document.createElement("img");
+    likeIcon.className = "icon";
+    likeIcon.src = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
+
+    let likeCounter = document.createElement("p");
+    likeCounter.className = "counter";
+    likeCounter.textContent = `${likes} Likes`;
+
+    likeButton.appendChild(likeIcon);
+    likeButton.appendChild(likeCounter);
+
+
+
+    let commentButton = document.createElement("button");
+    commentButton.className = "button";
+    commentButton.onclick = () => renderComments(post);
+
+    let commentIcon = document.createElement("img");
+    commentIcon.className = "icon";
+    commentIcon.src = post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg";
+
+    let commentCounter = document.createElement("p");
+    commentCounter.className = "counter";
+    commentCounter.textContent = `${post.comments.length} Comments`;
+
+    commentButton.appendChild(commentIcon);
+    commentButton.appendChild(commentCounter);
+
+
+
+    iteractionButtons.appendChild(likeButton);
+    iteractionButtons.appendChild(commentButton);
+
+    footerDiv.appendChild(iteractionButtons);
+
     likeButton.onclick = async () => {
-        await fetch("/internal/likePost", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ postID: post._id }),
-        });
-        likeCounter.textContent = `${post.likes.length + 1} Likes`;
+        if (!liked) {
+            await fetch("/internal/likePost", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ postID: post._id }),
+            });
+            likeCounter.textContent = `${likes + 1} Likes`;
+            likes++;
+            likeIcon.src = "/icons/like-filled.svg";
+            liked = true;
+        }
+        else {
+            await fetch("/internal/likePost", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ postID: post._id }),
+            });
+            likeCounter.textContent = `${likes - 1} Likes`;
+            likes--;
+            likeIcon.src = "/icons/like-unfilled.svg";
+            liked = false;
+        }
     }
-    footerDiv.appendChild(likeButton)
-    
+
     if (post.canEdit) {
+        let editButtons = document.createElement("div");
+        editButtons.className = "flex";
+
         let editButton = document.createElement("button");
         editButton.className = "edit-button";
         editButton.textContent = "Edit";
         editButton.onclick = () => window.location.href = `/edit/${post._id}`;
-        footerDiv.appendChild(editButton);
+        editButtons.appendChild(editButton);
 
         let deleteButton = document.createElement("button");
         deleteButton.className = "delete-button";
@@ -92,8 +149,29 @@ function buildFooter(post) {
             }
             window.location.reload();
         };
-        footerDiv.appendChild(deleteButton);
+        editButtons.appendChild(deleteButton);
+        footerDiv.appendChild(editButtons);
     }
 
     return footerDiv;
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    var modal = document.getElementById('commentModal');
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            hideComments();
+        }
+    }
+
+    window.ontouchstart = function (event) {
+        if (event.target == modal) {
+            hideComments();
+        }
+    }
+
+    document.getElementById("modalClose").addEventListener("click", () => {
+        hideComments();
+    });
+});

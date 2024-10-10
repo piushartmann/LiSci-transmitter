@@ -28,9 +28,15 @@ function buildCitation(citation) {
     authorDiv.innerHTML = `<p>-${citation.author}</p>`;
     citationContainer.appendChild(authorDiv);
 
+    let userDiv = document.createElement("div");
+    userDiv.className = "username";
+    userDiv.innerHTML = `<p>Von ${citation.userID.username}</p>`;
+    citationContainer.appendChild(userDiv);
+
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";
     citationContainer.appendChild(buttonRow);
+
     if (citation.canEdit) {
         let deleteButton = document.createElement("button");
         deleteButton.className = "delete-button";

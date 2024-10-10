@@ -7,6 +7,7 @@
   <title>Life Science Transmitter</title>
   <script src="js/index.js"></script>
   <script src="/js/partials/postRenderer.js"></script>
+  <script src="/js/partials/commentRenderer.js"></script>
   <link rel="stylesheet" href="/css/sections.css">
 </head>
 
@@ -25,6 +26,24 @@
       <%= i %>
     </a>
     <% } %>
+  </div>
+
+  <div id="commentModal" class="modal">
+    <span id="modalClose" class="close" title="Close Modal">&times;</span>
+
+    <form class="modal-content animate">
+
+      <h1 id="title">Kommentare</h1>
+      <div class="newCommentContainer">
+        <p for="commentTextarea">Verfasse einen neuen Kommentar:</p>
+        <textarea id="commentTextarea" placeholder="Das ist ja das lustigste was ich jemals gesehen habe!" name="comment" required></textarea>
+        <button type="button" id="commentButton" class="commentButton">Kommentieren</button>
+      </div>
+      <h2 id="commentTitle">Kommentare</h2>
+      <div id="commentContainer" class="commentContainer">
+      </div>
+
+    </form>
   </div>
 
 </body>

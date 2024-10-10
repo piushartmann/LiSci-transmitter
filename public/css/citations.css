@@ -4,6 +4,7 @@
     border: 1px solid var(--post-outline-color);
     border-radius: 8px;
     background-color: var(--post-background-color);
+    position: relative;
 }
 
 .citation .content {
@@ -17,7 +18,7 @@
 }
 
 .newCitationBox {
-    margin-bottom: 3%;
+    margin-bottom: 2vh;
 }
 
 .sentenceStructure {
@@ -40,7 +41,7 @@
     box-sizing: border-box;
     font-size: 1em;
     margin: 5px;
-    margin-bottom: 1%;
+    margin-bottom: 1vh;
 }
 
 
@@ -61,4 +62,10 @@
 
 .button-row button {
     margin: 0 5px 0 5px;
+}
+
+.username {
+    position: absolute;
+    top: 0px;
+    right: 15px;
 }

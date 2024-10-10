@@ -95,17 +95,19 @@ module.exports.MongoConnector = class MongoConnector {
     async likePost(postID, userID) {
         const post = await this.Post.findById(postID);
         const hasLiked = post.likes.some(like => like.userID.equals(userID));
-    
+
         if (hasLiked) {
-            return { success: false, message: 'You have already liked this post.' };
+            post.likes = post.likes.filter(like => !like.userID.equals(userID));
+            await post.save();
+            return { success: true, message: 'Like removed successfully!' };
         }
-        
+
         post.likes.push({ userID, date: Date.now() });
         await post.save();
-    
+
         return { success: true, message: 'Post liked successfully!' };
     }
-    
+
 
     async commentPost(postID, userID, content, permissions) {
         const comment = await this.Comment.create({ userID, content, permissions });
@@ -114,9 +116,23 @@ module.exports.MongoConnector = class MongoConnector {
         return await post.save();
     }
 
+    async getComment(commentID) {
+        return await this.Comment.findById(commentID);
+    }
+
+    async deleteComment(commentID) {
+        return await this.Comment.findByIdAndDelete(commentID);
+    }
+
+    async updateComment(commentID, content) {
+        const comment = await this.Comment.findById(commentID);
+        comment.content = content;
+        return await comment.save();
+    }
+
     async createUser(username, password, permissions) {
         const passHash = hashPassword(password);
-        const user = new this.User({ username, passHash, permissions: permissions,apiKey: generateApiKey() });
+        const user = new this.User({ username, passHash, permissions: permissions, apiKey: generateApiKey() });
         return await user.save();
     }
 
@@ -142,6 +158,7 @@ module.exports.MongoConnector = class MongoConnector {
     async getPost(postID) {
         return await this.Post.findById(postID)
             .populate('userID', 'username profilePic')
+            .populate('likes', 'userID');
     }
 
     async loadPostComments(postID) {
@@ -179,13 +196,19 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPosts(isTeacher, limit = 10, offset = 0) {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
-        const post = await this.Post.find(query)
+        const posts = await this.Post.find(query)
             .populate('userID', 'username profilePic')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'userID',
+                    select: 'username'
+                }
+            })
             .sort({ timestamp: -1 })
             .skip(offset)
             .limit(limit);
-        return post;
-
+        return posts;
     }
 
     async getPostNumber(isTeacher) {
@@ -217,13 +240,13 @@ module.exports.MongoConnector = class MongoConnector {
             .populate('userID', 'username profilePic')
             .sort({ timestamp: -1 })
             .skip(offset)
+            .populate('comments')
             .limit(limit);
     }
 
     async getCitation(citationID) {
         return await this.Citation.findById(citationID)
             .populate('userID', 'username profilePic')
-            .populate('comments')
     }
 
     async deleteCitation(citationID) {
