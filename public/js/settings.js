@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     profilePicturePreview.addEventListener('click', () => {
+        profilePictureColorPicker.focus();
         profilePictureColorPicker.click();
     });
 
