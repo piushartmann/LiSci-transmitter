@@ -297,8 +297,12 @@ module.exports = (db, s3Client) => {
         if (!postID) return res.status(400).send("Missing parameters");
         if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
 
-        await db.likePost(postID, req.session.userID);
-        return res.status(200).send("Success");
+        const {success, message} = await db.likePost(postID, req.session.userID);
+        if (success){
+            return res.status(200).send("Success");
+        }else{
+            return res.status(500).send("Error:" + message)
+        }
     })
 
     return router;
