@@ -5,6 +5,12 @@ function renderComments(post) {
     const commentButton = document.getElementById('commentButton');
     commentButton.onclick = () => submitComment(post);
 
+    window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            hideComments();
+        }
+    });
+
     const comments = post.comments;
 
     comments.forEach(comment => {
@@ -99,6 +105,7 @@ function buildComment(comment) {
 }
 
 function deleteComment(commentID) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
     fetch('internal/deleteComment', {
         method: 'post',
         headers: {
