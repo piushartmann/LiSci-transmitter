@@ -233,6 +233,9 @@ module.exports = (db, s3Client) => {
 
         citations.forEach(citation => {
             let citationObj = citation.toObject();
+            if(!citation.userID){
+                continue;
+            }
             if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
                 citationObj.canEdit = true;
             } else {
