@@ -24,7 +24,7 @@ module.exports = (db, s3Client) => {
     const citationsPageSize = config.citationsPageSize;
 
     router.get('/', (req, res) => {
-        res.send("This is the interal API, it is not meant to be accessed directly. On the /api route you can find the public API.");
+        res.send("This is the internal API, it is not meant to be accessed directly. On the /api route you can find the public API.");
     });
 
     router.post('/login', async (req, res) => {
@@ -72,6 +72,7 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    //include all internal routes
     router.use('/', require('./internal/interactions')(db, s3Client));
     router.use('/', require('./internal/citations')(db, s3Client));
     router.use('/', require('./internal/posts')(db, s3Client));

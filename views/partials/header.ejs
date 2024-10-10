@@ -10,7 +10,9 @@
     <ul>
       <li><a href="/">Home</a></li>
       <li><a href="/archive">Archiv</a></li>
-      <li><a href="/citations">Zitate</a></li>
+      <% if (usertype.includes("classmate")) { %>
+        <li><a href="/citations">Zitate</a></li>
+      <% } %>
     </ul>
 
 

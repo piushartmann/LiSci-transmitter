@@ -320,7 +320,7 @@ module.exports.MongoConnector = class MongoConnector {
             }
         }
         else {
-            randomProfilePic = generateRandomProfilePic();
+            let randomProfilePic = generateRandomProfilePic();
             restructuredObject.userID.profilePic = randomProfilePic;
             this.setPreference(restructuredObject.userID._id, 'profilePic', randomProfilePic);
         }
