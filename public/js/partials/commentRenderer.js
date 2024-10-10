@@ -33,8 +33,6 @@ async function submitComment(post) {
 }
 
 function buildComment(comment) {
-    console.log(comment);
-
     const commentContainer = document.getElementById('commentContainer');
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
@@ -60,17 +58,38 @@ function buildComment(comment) {
     commentDiv.appendChild(buttonRow);
 
     if (comment.canEdit) {
-        let deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button";
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = () => deleteComment(comment._id);
-        buttonRow.appendChild(deleteButton);
-
         let editButton = document.createElement("button");
-        editButton.className = "edit-button";
-        editButton.innerHTML = "Edit";
-        editButton.onclick = () => editComment(comment._id);
+        editButton.className = "edit-button button";
+        editButton.onclick = () => window.location.href = `/edit/${post._id}`;
+
+        let editIcon = document.createElement("img");
+        editIcon.className = "icon";
+        editIcon.src = "/icons/edit.svg";
+
+        let editLabel = document.createElement("p");
+        editLabel.className = "counter";
+        editLabel.textContent = "Edit";
+
+        editButton.appendChild(editIcon);
+        editButton.appendChild(editLabel);
+        
         buttonRow.appendChild(editButton);
+
+        let deleteButton = document.createElement("button");
+        deleteButton.className = "delete-button button";
+        deleteButton.onclick = () => deleteComment(comment._id);
+        let deleteIcon = document.createElement("img");
+        deleteIcon.className = "icon";
+        deleteIcon.src = "/icons/delete.svg";
+
+        let deleteLabel = document.createElement("p");
+        deleteLabel.className = "counter";
+        deleteLabel.textContent = "Delete";
+
+        deleteButton.appendChild(deleteIcon);
+        deleteButton.appendChild(deleteLabel);
+
+        buttonRow.appendChild(deleteButton);
     }
 
 

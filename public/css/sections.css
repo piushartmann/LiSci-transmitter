@@ -31,23 +31,6 @@
     margin-top: 1vh;
 }
 
-.button {
-    border: 1px solid var(--post-outline-color);
-    border-radius: 8px;
-    background-color: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 5px;
-}
-
-.button .icon {
-    width: 25px;
-    height: 25px;
-    margin: 5px;
-}
-
 .counter {
     display: inline-block;
     padding-right: 5px;

@@ -124,18 +124,28 @@ function buildFooter(post) {
     }
 
     if (post.canEdit) {
-        let editButtons = document.createElement("div");
-        editButtons.className = "flex";
+        let buttonRow = document.createElement("div");
+        buttonRow.className = "flex";
 
         let editButton = document.createElement("button");
-        editButton.className = "edit-button";
-        editButton.textContent = "Edit";
+        editButton.className = "edit-button button";
         editButton.onclick = () => window.location.href = `/edit/${post._id}`;
-        editButtons.appendChild(editButton);
+
+        let editIcon = document.createElement("img");
+        editIcon.className = "icon";
+        editIcon.src = "/icons/edit.svg";
+
+        let editLabel = document.createElement("p");
+        editLabel.className = "counter";
+        editLabel.textContent = "Edit";
+
+        editButton.appendChild(editIcon);
+        editButton.appendChild(editLabel);
+
+        buttonRow.appendChild(editButton);
 
         let deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button";
-        deleteButton.textContent = "Delete";
+        deleteButton.className = "delete-button button";
         deleteButton.onclick = async () => {
             if (confirm("Are you sure you want to delete this post?")) {
                 await fetch(`/internal/deletePost`, {
@@ -149,8 +159,21 @@ function buildFooter(post) {
             }
             window.location.reload();
         };
-        editButtons.appendChild(deleteButton);
-        footerDiv.appendChild(editButtons);
+
+        let deleteIcon = document.createElement("img");
+        deleteIcon.className = "icon";
+        deleteIcon.src = "/icons/delete.svg";
+
+        let deleteLabel = document.createElement("p");
+        deleteLabel.className = "counter";
+        deleteLabel.textContent = "Delete";
+
+        deleteButton.appendChild(deleteIcon);
+        deleteButton.appendChild(deleteLabel);
+
+        buttonRow.appendChild(deleteButton);
+
+        footerDiv.appendChild(buttonRow);
     }
 
     return footerDiv;
