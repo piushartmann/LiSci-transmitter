@@ -60,7 +60,8 @@ function buildComment(comment) {
     if (comment.canEdit) {
         let editButton = document.createElement("button");
         editButton.className = "edit-button button";
-        editButton.onclick = () => window.location.href = `/edit/${post._id}`;
+        editButton.type = "button";
+        editButton.onclick = () => editComment(comment._id);
 
         let editIcon = document.createElement("img");
         editIcon.className = "icon";
@@ -77,6 +78,7 @@ function buildComment(comment) {
 
         let deleteButton = document.createElement("button");
         deleteButton.className = "delete-button button";
+        editButton.type = "button";
         deleteButton.onclick = () => deleteComment(comment._id);
         let deleteIcon = document.createElement("img");
         deleteIcon.className = "icon";
