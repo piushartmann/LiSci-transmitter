@@ -53,10 +53,11 @@ module.exports = (db, pageSize) => {
 
     router.get('/citations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
+        const permissions = req.session.permissions || []
+        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
         return res.render('citations', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [],
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions,
 
         });
     });
