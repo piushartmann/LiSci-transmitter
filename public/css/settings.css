@@ -1,0 +1,23 @@
+.settingsBox{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.settingsBox div{
+    display: flex;
+    justify-content:center;
+    width: 100%;
+    margin: 10px 0;
+}
+
+label{
+    margin-right: 20px;
+}
+
+.profilePictureContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}

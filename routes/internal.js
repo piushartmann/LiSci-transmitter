@@ -55,28 +55,12 @@ module.exports = (db, s3Client) => {
         res.status(200).redirect('/');
     });
 
-    router.get('/checkLogin', async (req, res) => { //for testing
-        if (!req.session.userID) {
-            return res.status(401).send("Not logged in");
-        }
-        return res.status(200).send("Logged in");
-    });
-
-    router.post('/pushSubscribe', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-
-        const subscription = req.body;
-        console.log(subscription);
-
-        await db.setSubscription(req.session.userID, subscription);
-        return res.status(200).send("Success");
-    });
-
     //include all internal routes
     router.use('/', require('./internal/interactions')(db, s3Client));
     router.use('/', require('./internal/citations')(db, s3Client));
     router.use('/', require('./internal/posts')(db, s3Client));
     router.use('/', require('./internal/uploads')(db, s3Client));
+    router.use('/', require('./internal/users')(db, s3Client));
 
     return router;
 }

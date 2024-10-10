@@ -5,12 +5,29 @@
   <%- include("./partials/baseHead.ejs") %>
   <script src="/js/settings.js"></script>
   <title>Settings</title>
+  <link rel="stylesheet" href="/css/settings.css">
 </head>
 
 <body>
   <%- include("./partials/header.ejs") %>
-  <label for="enablePush">Push Notifications</label>
-  <button id="enablePush">Enable</button>
+
+  <div class="settingsBox">
+    <h1>Settings</h1>
+    <div class="enablePushContainer">
+      <label for="enablePush">Push Notifications</label>
+      <button id="enablePush">Enable</button>
+    </div>
+
+    <div class="profilePictureContainer">
+      <label for="head">Pick Profile Picture Color</label>
+      <input type="color" id="profilePictureColorPicker" name="ColorPicker" value=<%= profilePic.content %> />
+      <button id="profilePictureColorSubmit">Save</button>
+      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="window.location.href='/settings'">
+        <%= username.charAt(0).toUpperCase() %>
+      </p>
+    </div>
+  </div>
+
 </body>
 
 </html>

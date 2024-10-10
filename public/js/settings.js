@@ -4,6 +4,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     await registerServiceWorker();
     button = document.getElementById('enablePush');
     button.addEventListener('click', enablePush);
+
+    const profilePictureColorPicker = document.getElementById('profilePictureColorPicker');
+    const profilePicturePreview = document.getElementById('profilePicturePreview');
+    profilePictureColorPicker.addEventListener('input', () => {
+        profilePicturePreview.style.backgroundColor = profilePictureColorPicker.value;
+    });
+
+    const profilePictureColorSubmit = document.getElementById('profilePictureColorSubmit');
+    profilePictureColorSubmit.addEventListener('click', async () => {
+        const color = profilePictureColorPicker.value;
+        await fetch('internal/setProfilePictureColor', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ color: color }),
+        });
+        window.location.reload();
+    });
 });
 
 async function registerServiceWorker() {

@@ -40,7 +40,7 @@ const userSchema = new Schema({
     pushSubscription: { type: Object, required: false },
     permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin'] }],
     apiKey: { type: String, required: true },
-    preferences: [Object]
+    preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
 });
 
 const citationSchema = new Schema({
@@ -358,13 +358,13 @@ module.exports.MongoConnector = class MongoConnector {
     async setPreference(userID, key, value) {
         console.log(userID, key, value);
         const user = await this.User.findById(userID);
-        const preference = user.preferences.find(pref => pref.key === key);
-        if (preference) {
-            preference.value = value;
+        const preferenceIndex = user.preferences.findIndex(pref => pref.key === key);
+        if (preferenceIndex !== -1) {
+            user.preferences[preferenceIndex].value = value;
         } else {
             user.preferences.push({ key, value });
         }
-        return await user.save();
+        return user.save();
     }
 
     async getPreference(userID, key) {
