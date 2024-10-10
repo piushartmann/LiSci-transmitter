@@ -48,6 +48,24 @@ function buildHeader(post) {
 function buildFooter(post) {
     let footerDiv = document.createElement("div");
     footerDiv.className = "post-footer";
+
+    let likeCounter = document.createElement("p");
+    likeCounter.className = "like-counter";
+    likeCounter.textContent = `${post.likes.length} Likes`;
+
+    let likeButton = document.createElement("button");
+    likeButton.className = "like-button";
+    likeButton.textContent = "Like";
+    likeButton.onclick = async () => {
+        await fetch("/internal/likePost", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ postID: post._id }),
+        });
+        likeCounter.textContent = `${post.likes.length + 1} Likes`;
+    }
     
     if (post.canEdit) {
         let editButton = document.createElement("button");

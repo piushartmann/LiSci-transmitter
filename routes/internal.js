@@ -290,5 +290,16 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    router.post('/likePost', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { postID } = req.body;
+        if (!postID) return res.status(400).send("Missing parameters");
+        if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
+
+        await db.likePost(postID, req.session.userID);
+        return res.status(200).send("Success");
+    })
+
     return router;
 }
