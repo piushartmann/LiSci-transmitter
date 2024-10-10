@@ -1,5 +1,5 @@
 function buildPost(post) {
-    postBox = document.getElementById("postBox");
+    const postBox = document.getElementById("postBox");
     let postContainer = document.createElement("div");
     postContainer.className = "post";
     postContainer.dataset.id = post._id;
@@ -52,6 +52,7 @@ function buildFooter(post) {
     let likeCounter = document.createElement("p");
     likeCounter.className = "like-counter";
     likeCounter.textContent = `${post.likes.length} Likes`;
+    footerDiv.appendChild(likeCounter)
 
     let likeButton = document.createElement("button");
     likeButton.className = "like-button";
@@ -66,6 +67,7 @@ function buildFooter(post) {
         });
         likeCounter.textContent = `${post.likes.length + 1} Likes`;
     }
+    footerDiv.appendChild(likeButton)
     
     if (post.canEdit) {
         let editButton = document.createElement("button");
