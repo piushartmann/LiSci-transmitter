@@ -30,8 +30,46 @@ function buildCitation(citation) {
 
     let userDiv = document.createElement("div");
     userDiv.className = "username";
-    userDiv.innerHTML = `<p>Von ${citation.userID.username}</p>`;
     citationContainer.appendChild(userDiv);
+
+    const profilePic = citation.userID.profilePic
+    if (profilePic.type === "default") {
+        let authorDiv = document.createElement("div");
+        authorDiv.className = "author-info";
+
+        let authorName = document.createElement("p");
+        authorName.textContent = citation.userID.username;
+        authorName.style = "margin-left: 10px;";
+
+        let authorProfilePic = document.createElement("p");
+        authorProfilePic.className = "defaultProfilePicture";
+        authorProfilePic.style = `background-color: ${profilePic.content};`;
+        authorProfilePic.textContent = citation.userID.username.charAt(0).toUpperCase();
+
+        authorDiv.appendChild(authorName);
+        authorDiv.appendChild(authorProfilePic);
+
+        userDiv.appendChild(authorDiv);
+    }
+    else if (profilePic.type === "custom") {
+        let authorDiv = document.createElement("div");
+        authorDiv.className = "author-info";
+
+        let authorName = document.createElement("p");
+        authorName.textContent = citation.userID.username;
+        authorName.style = "margin-left: 10px;";
+
+        let authorProfilePic = document.createElement("img");
+        authorProfilePic.className = "profilePicture";
+        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
+        authorProfilePic.alt = citation.userID.username;
+        headerDiv.appendChild(authorProfilePic);
+
+        authorDiv.appendChild(authorName);
+        authorDiv.appendChild(authorProfilePic);
+
+        userDiv.appendChild(authorDiv);
+    }
 
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";

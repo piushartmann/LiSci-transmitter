@@ -14,62 +14,8 @@ const oneDay = 24 * 3600 * 1000
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-function generateRandomFilename() {
-    const length = 20;
-    const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return result;
-}
-
-function uploadFile(req, res, directory = "", s3Client, forceFormats = []) {
-    return new Promise((resolve, reject) => {
-        const filename = generateRandomFilename();
-
-        const s3upload = multer({
-            storage: multerS3({
-                s3: s3Client,
-                bucket: "transmitterstorage",
-                acl: "public-read",
-                contentType: multerS3.AUTO_CONTENT_TYPE,
-                contentDisposition: "inline",
-                key: function (request, file, cb) {
-                    const fileExtension = file.originalname.split('.').pop().toLowerCase();
-
-                    if (forceFormats.length > 0 && !forceFormats.includes(fileExtension.toLowerCase())) {
-                        return cb(new Error(`Invalid file format. Expected format(s): ${forceFormats.join(', ')}`), null);
-                    }
-
-                    // Generate the filename for S3 storage
-                    let newFilename;
-                    if (directory !== "") {
-                        newFilename = `${directory}/${filename}.${fileExtension}`;
-                    } else {
-                        newFilename = `${filename}.${fileExtension}`;
-                    }
-
-                    cb(null, newFilename);
-                },
-                contentDisposition: "inline",
-            }),
-        }).array("upload", 1);
-
-        // Execute the upload
-        s3upload(req, res, function (error) {
-            if (error) {
-                console.error("File upload error:", error.message);
-                reject(error);
-            } else {
-                if (req.files && req.files.length > 0) {
-                    resolve(req.files[0].key);
-                } else {
-                    reject(new Error("No files uploaded"));
-                }
-            }
-        });
-    });
+function generateRandomProfilePic() {
+    return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
 }
 
 module.exports = (db, s3Client) => {
@@ -92,6 +38,14 @@ module.exports = (db, s3Client) => {
             req.session.userID = user._id;
             req.session.permissions = user.permissions;
             req.session.cookie.expires = new Date(Date.now() + oneDay * 30);
+            const profilePicPreference = user.preferences.find(preference => preference.key === "profilePic");
+            if (profilePicPreference) {
+                req.session.profilePic = profilePicPreference.value;
+            }
+            else {
+                req.session.profilePic = generateRandomProfilePic();
+                await db.setPreference(user._id, 'profilePic', req.session.profilePic);
+            }
             res.status(200).redirect('/');
         }
     });
@@ -108,265 +62,20 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Logged in");
     });
 
-    router.post("/uploadFile", async function (req, res) {
+    router.post('/pushSubscribe', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot upload an image");
 
-        let filename;
-        try {
-            filename = await uploadFile(req, res, "files", s3Client);
-        } catch (error) {
-            return res.status(500).send(error.message);
-        }
-        console.log(`File uploaded Successfully: ${filename}`);
-        return res.status(200).send(filename);
-    })
+        const subscription = req.body;
+        console.log(subscription);
 
-    router.post('/uploadImage', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot upload a File");
-
-        let filename;
-        try {
-            filename = await uploadFile(req, res, "images", s3Client, ["jpg", "jpeg", "png", "webp", "heic"]);
-        } catch (error) {
-            return res.status(500).send(error.message);
-        }
-        console.log(`Image uploaded Successfully: ${filename}`);
-        return res.status(200).send(filename);
-    })
-
-    router.post('/createPost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a post");
-
-        const { title, sections, permissions } = req.body;
-        const permissionsBool = permissions === "true";
-        console.log(title, sections, permissions);
-
-        const sanitizedSections = JSON.parse(sections).map(section => {
-            if (section.type === "text" || section.type === "markdown") {
-                section.content = sanitizeHtml(section.content, {
-                    allowedTags: sanitizeHtmlAllowedTags,
-                    allowedAttributes: {}
-                });
-            }
-            return section;
-        });
-
-        if (!title || !sections) return res.status(400).send("Missing parameters");
-        if (typeof title !== "string") return res.status(400).send("Invalid parameters");
-
-        await db.createPost(req.session.userID, title, JSON.parse(sanitizedSections), permissionsBool ? "Teachersafe" : "classmatesonly");
+        await db.setSubscription(req.session.userID, subscription);
         return res.status(200).send("Success");
     });
 
-    router.post('/updatePost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot update a post");
+    router.use('/', require('./internal/interactions')(db, s3Client));
+    router.use('/', require('./internal/citations')(db, s3Client));
+    router.use('/', require('./internal/posts')(db, s3Client));
+    router.use('/', require('./internal/uploads')(db, s3Client));
 
-        const { postID, title, sections, permissions } = req.body;
-        const permissionsBool = permissions === "true";
-        console.log(postID, title, sections, permissions);
-
-        if (!postID || !title || !sections) return res.status(400).send("Missing parameters");
-        if (typeof postID !== "string" || typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
-
-        await db.updatePost(postID, title, JSON.parse(sections), permissionsBool ? "Teachersafe" : "classmatesonly");
-        return res.status(200).send("Success");
-    })
-
-    router.get('/getPosts', async (req, res) => {
-        const permissions = req.session.permissions || [];
-        const isTeacher = !(permissions.includes("classmate"));
-        const page = (req.query.page || 1) - 1;
-
-        const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
-        let filteredPosts = [];
-        posts.forEach(post => {
-            let postObj = post.toObject();
-            if (permissions.includes("admin") || permissions.includes("writer")) {
-                postObj.canEdit = true;
-            }
-            postObj.liked = post.likes.map(like => like.userID.toString()).includes(req.session.userID);
-
-            for (let i = 0; i < post.comments.length; i++) {
-                if (permissions.includes("admin")) {
-                    postObj.comments[i].canEdit = true;
-                } else {
-                    postObj.comments[i].canEdit = postObj.comments[i].userID._id.toString() === req.session.userID;
-                }
-            }
-
-            filteredPosts.push(postObj);
-        });
-        return res.status(200).send(filteredPosts);
-});
-
-router.get('/getPost/:id', async (req, res) => {
-    const post = await db.getPost(req.params.id);
-    const permissions = req.session.permissions || [];
-    if (!(permissions.includes("classmate")) && post.permissions === "classmatesonly") return res.status(403).send("You cannot view this post");
-
-    if (!post) {
-        return res.status(404).send("Post not found");
-    }
-    return res.status(200).send(post);
-});
-
-router.post('/deletePost', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { postID } = req.body;
-    if (!postID) return res.status(400).send("Missing parameters");
-    if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
-
-    const post = await db.getPost(postID);
-    if (post.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
-
-    await db.deletePost(postID);
-    return res.status(200).send("Success");
-})
-
-router.post('/createCitation', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { author, content } = req.body;
-    console.log(author, content);
-    if (!author || !content) return res.status(400).send("Missing parameters");
-    if (typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
-
-    const sanitizedContent = sanitizeHtml(content);
-    const sanitizedAuthor = sanitizeHtml(author);
-
-    await db.createCitation(req.session.userID, sanitizedAuthor, sanitizedContent);
-    return res.status(200).redirect('/citations');
-});
-
-router.get('/getCitations', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-    if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
-
-    const page = (req.query.page || 1) - 1;
-
-    const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
-
-    let filteredCitations = [];
-
-    citations.forEach(citation => {
-        let citationObj = citation.toObject();
-        if (!citation.userID) {
-            return;
-        }
-        if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
-            citationObj.canEdit = true;
-        } else {
-            citationObj.canEdit = false;
-        }
-        filteredCitations.push(citationObj);
-    });
-
-    return res.status(200).send(filteredCitations);
-});
-
-
-router.post('/deleteCitation', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { citationID } = req.body;
-
-    if (!citationID) return res.status(400).send("Missing parameters");
-    if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
-
-    const citation = await db.getCitation(citationID);
-    if (citation.userID.id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
-
-    await db.deleteCitation(citationID);
-
-    return res.status(200).send("Success");
-});
-
-router.post('/updateCitation', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { citationID, author, content } = req.body;
-    console.log(citationID, author, content);
-
-    if (!citationID || !author || !content) return res.status(400).send("Missing parameters");
-    if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
-
-    const citation = await db.getCitation(citationID);
-    if (citation.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
-
-    await db.updateCitation(citationID, author, content);
-    return res.status(200).send("Success");
-});
-
-router.post('/pushSubscribe', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const subscription = req.body;
-    console.log(subscription);
-
-    await db.setSubscription(req.session.userID, subscription);
-    return res.status(200).send("Success");
-});
-
-router.post('/likePost', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { postID } = req.body;
-    if (!postID) return res.status(400).send("Missing parameters");
-    if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
-
-    const { success, message } = await db.likePost(postID, req.session.userID);
-    if (success) {
-        return res.status(200).send("Success");
-    } else {
-        return res.status(500).send("Error:" + message)
-    }
-})
-
-router.post('/createComment', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { postID, content, permissions } = req.body;
-    if (!postID || !content || !permissions) return res.status(400).send("Missing parameters");
-    if (typeof postID !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
-
-    const sanitizedContent = sanitizeHtml(content);
-
-    await db.commentPost(postID, req.session.userID, sanitizedContent, permissions);
-    return res.status(200).send("Success");
-});
-
-router.post('/deleteComment', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { commentID } = req.body;
-    if (!commentID) return res.status(400).send("Missing parameters");
-    if (typeof commentID !== "string") return res.status(400).send("Invalid parameters");
-
-    const comment = await db.getComment(commentID);
-    if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this comment");
-
-    await db.deleteComment(commentID);
-    return res.status(200).send("Success");
-});
-
-router.post('/updateComment', async (req, res) => {
-    if (!req.session.userID) return res.status(401).send("Not logged in");
-
-    const { commentID, content } = req.body;
-    if (!commentID || !content) return res.status(400).send("Missing parameters");
-    if (typeof commentID !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
-
-    const comment = await db.getComment(commentID);
-    if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this comment");
-
-    await db.updateComment(commentID, content);
-    return res.status(200).send("Success");
-});
-
-return router;
+    return router;
 }

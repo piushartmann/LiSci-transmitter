@@ -37,10 +37,10 @@ const postSchema = new Schema({
 const userSchema = new Schema({
     username: { type: String, required: true, index: true },
     passHash: { type: String, required: true },
-    profilePic: { type: String, required: false },
     pushSubscription: { type: Object, required: false },
     permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin'] }],
-    apiKey: { type: String, required: true }
+    apiKey: { type: String, required: true },
+    preferences: [Object]
 });
 
 const citationSchema = new Schema({
@@ -152,13 +152,16 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async getUser(username) {
-        return await this.User.findOne({ username });
+        const user = await this.User.findOne({ username })
+            .populate('preferences');
+        console.log(user);
+        return user;
     }
 
     async getPost(postID) {
         return await this.Post.findById(postID)
-            .populate('userID', 'username profilePic')
-            .populate('likes', 'userID');
+            .populate('userID', 'username')
+            .populate('likes.userID', 'username profilePic');
     }
 
     async loadPostComments(postID) {
@@ -196,20 +199,64 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPosts(isTeacher, limit = 10, offset = 0) {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+
+        function generateRandomProfilePic() {
+            return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
+        }
+
         const posts = await this.Post.find(query)
-            .populate('userID', 'username profilePic')
+            .populate({
+                path: 'userID',
+                select: 'username',
+                populate: {
+                    path: 'preferences',
+                    match: { key: 'profilePic' },
+                    select: 'value'
+                }
+            })
             .populate({
                 path: 'comments',
                 populate: {
                     path: 'userID',
-                    select: 'username'
+                    select: 'username',
+                    populate: {
+                        path: 'preferences',
+                        match: { key: 'profilePic' },
+                        select: 'value'
+                    }
                 }
             })
             .sort({ timestamp: -1 })
             .skip(offset)
             .limit(limit);
-        return posts;
+
+        let restructuredPosts = posts.map(post => {
+            let restructuredPost = this.restructureUser(post);
+
+            restructuredPost.comments = restructuredPost.comments.map(comment => {
+                if (comment.userID.profilePic) {
+                    return comment;
+                }
+                if (comment.userID.preferences && comment.userID.preferences.length > 0) {
+                    const profilePicPreference = comment.userID.preferences.find(pref => pref.key === 'profilePic');
+                    if (profilePicPreference) {
+                        comment.userID.profilePic = profilePicPreference.value;
+                    }
+                } else {
+                    const randomProfilePic = generateRandomProfilePic();
+                    comment.userID.profilePic = randomProfilePic;
+                    this.setPreference(comment.userID._id, 'profilePic', randomProfilePic);
+                }
+                delete comment.userID.preferences;
+                return comment;
+            });
+
+            return restructuredPost;
+        });
+
+        return restructuredPosts;
     }
+
 
     async getPostNumber(isTeacher) {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
@@ -236,12 +283,49 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async getCitations(limit = 10, offset = 0) {
-        return await this.Citation.find()
-            .populate('userID', 'username profilePic')
+
+        const citations = await this.Citation.find()
+            .populate({
+                path: 'userID',
+                select: 'username',
+                populate: {
+                    path: 'preferences',
+                    match: { key: 'profilePic' },
+                    select: 'value'
+                }
+            })
             .sort({ timestamp: -1 })
             .skip(offset)
             .populate('comments')
             .limit(limit);
+
+        let restructuredCitations = citations.map(citation => {
+            return this.restructureUser(citation);
+        });
+
+        return restructuredCitations;
+    }
+
+    restructureUser(object) {
+
+        function generateRandomProfilePic() {
+            return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
+        }
+
+        let restructuredObject = object.toObject();
+        if (restructuredObject.userID.preferences && restructuredObject.userID.preferences.length > 0) {
+            const profilePicPreference = restructuredObject.userID.preferences.find(pref => pref.key === 'profilePic');
+            if (profilePicPreference) {
+                restructuredObject.userID.profilePic = profilePicPreference.value;
+            }
+        }
+        else {
+            randomProfilePic = generateRandomProfilePic();
+            restructuredObject.userID.profilePic = randomProfilePic;
+            this.setPreference(restructuredObject.userID._id, 'profilePic', randomProfilePic);
+        }
+        delete restructuredObject.userID.preferences;
+        return restructuredObject;
     }
 
     async getCitation(citationID) {
@@ -269,5 +353,29 @@ module.exports.MongoConnector = class MongoConnector {
     async getSubscription(userID) {
         const user = await this.User.findById(userID);
         return user.pushSubscription;
+    }
+
+    async setPreference(userID, key, value) {
+        console.log(userID, key, value);
+        const user = await this.User.findById(userID);
+        const preference = user.preferences.find(pref => pref.key === key);
+        if (preference) {
+            preference.value = value;
+        } else {
+            user.preferences.push({ key, value });
+        }
+        return await user.save();
+    }
+
+    async getPreference(userID, key) {
+        const user = await this.User.findById(userID);
+        const preference = user.preferences.find(pref => pref.key === key);
+        return preference ? preference.value : null;
+    }
+
+    async setProfilePic(type, profilePic, username) {
+        const user = await this.User.findOne({ username });
+        await this.setPreference(user._id, 'profilePic', { "type": type, "content": profilePic });
+        return user.save();
     }
 };

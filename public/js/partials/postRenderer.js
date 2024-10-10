@@ -38,10 +38,55 @@ function buildPost(post) {
 function buildHeader(post) {
     let headerDiv = document.createElement("div");
     headerDiv.className = "post-header";
-    headerDiv.innerHTML = `
-    <h1 style="display: inline;">${post.title}</h1>
-    <p style="display: inline; margin-left: 10px;">Von ${post.userID.username}</p>
-    `;
+    const profilePic = post.userID.profilePic
+    if (profilePic.type === "default") {
+        let authorDiv = document.createElement("div");
+        authorDiv.className = "author-info";
+
+        let authorName = document.createElement("p");
+        authorName.textContent = post.userID.username;
+        authorName.style = "margin-left: 10px;";
+
+        let authorProfilePic = document.createElement("p");
+        authorProfilePic.className = "defaultProfilePicture";
+        authorProfilePic.style = `background-color: ${profilePic.content};`;
+        authorProfilePic.textContent = post.userID.username.charAt(0).toUpperCase();
+
+        authorDiv.appendChild(authorName);
+        authorDiv.appendChild(authorProfilePic);
+
+        let titleDiv = document.createElement("h1");
+        titleDiv.textContent = post.title;
+        titleDiv.style = "display: inline;";
+
+        headerDiv.appendChild(titleDiv);
+        headerDiv.appendChild(authorDiv);
+    }
+    else if (profilePic.type === "custom") {
+        let authorDiv = document.createElement("div");
+        authorDiv.className = "author-info";
+
+        let authorName = document.createElement("p");
+        authorName.textContent = post.userID.username;
+        authorName.style = "margin-left: 10px;";
+        
+        let authorProfilePic = document.createElement("img");
+        authorProfilePic.className = "profilePicture";
+        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
+        authorProfilePic.alt = post.userID.username;
+        headerDiv.appendChild(authorProfilePic);
+
+        authorDiv.appendChild(authorName);
+        authorDiv.appendChild(authorProfilePic);
+
+        let titleDiv = document.createElement("h1");
+        titleDiv.textContent = post.title;
+        titleDiv.style = "display: inline;";
+
+        headerDiv.appendChild(titleDiv);
+        headerDiv.appendChild(authorDiv);
+    }
+
     return headerDiv;
 }
 

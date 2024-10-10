@@ -54,8 +54,46 @@ function buildComment(comment) {
 
     let userDiv = document.createElement("div");
     userDiv.className = "username";
-    userDiv.innerHTML = `<p>Von ${comment.userID.username}</p>`;
     contentContainer.appendChild(userDiv);
+
+    const profilePic = comment.userID.profilePic
+    if (profilePic.type === "default") {
+        let authorDiv = document.createElement("div");
+        authorDiv.className = "author-info";
+
+        let authorName = document.createElement("p");
+        authorName.textContent = comment.userID.username;
+        authorName.style = "margin-left: 10px;";
+
+        let authorProfilePic = document.createElement("p");
+        authorProfilePic.className = "defaultProfilePicture";
+        authorProfilePic.style = `background-color: ${profilePic.content};`;
+        authorProfilePic.textContent = comment.userID.username.charAt(0).toUpperCase();
+
+        authorDiv.appendChild(authorName);
+        authorDiv.appendChild(authorProfilePic);
+
+        userDiv.appendChild(authorDiv);
+    }
+    else if (profilePic.type === "custom") {
+        let authorDiv = document.createElement("div");
+        authorDiv.className = "author-info";
+
+        let authorName = document.createElement("p");
+        authorName.textContent = comment.userID.username;
+        authorName.style = "margin-left: 10px;";
+        
+        let authorProfilePic = document.createElement("img");
+        authorProfilePic.className = "profilePicture";
+        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
+        authorProfilePic.alt = comment.userID.username;
+        headerDiv.appendChild(authorProfilePic);
+
+        authorDiv.appendChild(authorName);
+        authorDiv.appendChild(authorProfilePic);
+
+        userDiv.appendChild(authorDiv);
+    }
 
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";

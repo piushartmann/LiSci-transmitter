@@ -235,7 +235,7 @@ function addFileSection(isRecontructed) {
     section.innerHTML = `<label for="upload">Upload File</label>
           <input type="file" id="value" accept=".pdf,image/*">`;
     document.getElementById('section-container').appendChild(section);
-    section.id = id || sections.length;
+    section.id = sections.length;
 
     section.addEventListener('change', function () {
         console.log(this.id);
