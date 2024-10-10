@@ -14,7 +14,7 @@ module.exports = (db, pageSize) => {
         req.session.views = (req.session.views || 0) + 1;
         const permissions = req.session.permissions || [];
         const pages = Math.ceil(await db.getPostNumber(!(permissions.includes("classmate"))) / pageSize);
-        const prank = req.session.username == "merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
+        const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
         return res.render('index', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [],
             currentPage: currentPage, prank: prank, pages: pages
