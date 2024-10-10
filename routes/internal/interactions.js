@@ -70,7 +70,9 @@ module.exports = (db, s3Client) => {
         const comment = await db.getComment(commentID);
         if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this comment");
 
-        await db.updateComment(commentID, content);
+        const sanitizedContent = sanitizeHtml(content);
+
+        await db.updateComment(commentID, sanitizedContent);
         return res.status(200).send("Success");
     });
 
