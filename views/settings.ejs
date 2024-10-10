@@ -20,11 +20,11 @@
 
     <div class="profilePictureContainer">
       <label for="head">Pick Profile Picture Color</label>
-      <input type="color" id="profilePictureColorPicker" name="ColorPicker" value=<%= profilePic.content %> />
-      <button id="profilePictureColorSubmit">Save</button>
-      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="window.location.href='/settings'">
+      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;"">
         <%= username.charAt(0).toUpperCase() %>
+        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
       </p>
+      <button id="profilePictureColorSubmit">Save</button>
     </div>
   </div>
 

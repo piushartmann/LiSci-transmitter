@@ -21,3 +21,15 @@ label{
     align-items: center;
     margin: 20px 0;
 }
+
+.profilePicturePreview{
+    border: 0;
+}
+
+.ColorPicker{
+    position: absolute;
+    color: transparent;
+    z-index: -1;
+    height: 0;
+    width: 0;
+}

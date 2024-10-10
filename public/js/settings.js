@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         profilePicturePreview.style.backgroundColor = profilePictureColorPicker.value;
     });
 
+    profilePicturePreview.addEventListener('click', () => {
+        profilePictureColorPicker.click();
+    });
+
     const profilePictureColorSubmit = document.getElementById('profilePictureColorSubmit');
     profilePictureColorSubmit.addEventListener('click', async () => {
         const color = profilePictureColorPicker.value;
