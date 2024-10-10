@@ -14,6 +14,8 @@ function renderComments(post) {
 
 function hideComments() {
     const commentModal = document.getElementById('commentModal');
+    const commentContainer = document.getElementById('commentContainer');
+    commentContainer.innerHTML = '';
     commentModal.style.display = 'none';
 }
 
