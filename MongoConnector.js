@@ -94,9 +94,18 @@ module.exports.MongoConnector = class MongoConnector {
 
     async likePost(postID, userID) {
         const post = await this.Post.findById(postID);
+        const hasLiked = post.likes.some(like => like.userID.equals(userID));
+    
+        if (hasLiked) {
+            return { success: false, message: 'You have already liked this post.' };
+        }
+        
         post.likes.push({ userID, date: Date.now() });
-        return await post.save();
+        await post.save();
+    
+        return { success: true, message: 'Post liked successfully!' };
     }
+    
 
     async commentPost(postID, userID, content, permissions) {
         const comment = await this.Comment.create({ userID, content, permissions });
