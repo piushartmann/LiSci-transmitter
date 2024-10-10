@@ -178,10 +178,13 @@ module.exports = (db, s3Client) => {
                 let postObj = post.toObject();
                 postObj.canEdit = true;
                 postObj.liked = post.likes.map(like => like.userID.toString()).includes(req.session.userID);
-                
+
                 for (let i = 0; i < post.comments.length; i++) {
-                    postObj.comments[i].canEdit = postObj.comments[i].userID._id.toString() === req.session.userID || permissions.includes("admin");;
-                    postObj.comments[i].canDelete = postObj.comments[i].userID._id.toString() === req.session.userID || permissions.includes("admin");
+                    if (permissions.includes("admin")) {
+                        postObj.comments[i].canEdit = true;
+                    } else {
+                        postObj.comments[i].canEdit = postObj.comments[i].userID._id.toString() === req.session.userID;
+                    }
                 }
 
                 filteredPosts.push(postObj);
@@ -240,7 +243,7 @@ module.exports = (db, s3Client) => {
 
         citations.forEach(citation => {
             let citationObj = citation.toObject();
-            if(!citation.userID){
+            if (!citation.userID) {
                 return;
             }
             if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
@@ -304,10 +307,10 @@ module.exports = (db, s3Client) => {
         if (!postID) return res.status(400).send("Missing parameters");
         if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
 
-        const {success, message} = await db.likePost(postID, req.session.userID);
-        if (success){
+        const { success, message } = await db.likePost(postID, req.session.userID);
+        if (success) {
             return res.status(200).send("Success");
-        }else{
+        } else {
             return res.status(500).send("Error:" + message)
         }
     })
