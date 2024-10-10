@@ -144,10 +144,20 @@ module.exports = (db, s3Client) => {
         const permissionsBool = permissions === "true";
         console.log(title, sections, permissions);
 
-        if (!title || !sections) return res.status(400).send("Missing parameters");
-        if (typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
+        const sanitizedSections = JSON.parse(sections).map(section => {
+            if (section.type === "text" || section.type === "markdown") {
+                section.content = sanitizeHtml(section.content, {
+                    allowedTags: sanitizeHtmlAllowedTags,
+                    allowedAttributes: {}
+                });
+            }
+            return section;
+        });
 
-        await db.createPost(req.session.userID, title, JSON.parse(sections), permissionsBool ? "Teachersafe" : "classmatesonly");
+        if (!title || !sections) return res.status(400).send("Missing parameters");
+        if (typeof title !== "string") return res.status(400).send("Invalid parameters");
+
+        await db.createPost(req.session.userID, title, JSON.parse(sanitizedSections), permissionsBool ? "Teachersafe" : "classmatesonly");
         return res.status(200).send("Success");
     });
 
@@ -173,186 +183,190 @@ module.exports = (db, s3Client) => {
 
         const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
         let filteredPosts = [];
-        if (permissions.includes("admin") || permissions.includes("writer")) {
-            posts.forEach(post => {
-                let postObj = post.toObject();
+        posts.forEach(post => {
+            let postObj = post.toObject();
+            if (permissions.includes("admin") || permissions.includes("writer")) {
                 postObj.canEdit = true;
-                postObj.liked = post.likes.map(like => like.userID.toString()).includes(req.session.userID);
+            }
+            postObj.liked = post.likes.map(like => like.userID.toString()).includes(req.session.userID);
 
-                for (let i = 0; i < post.comments.length; i++) {
-                    if (permissions.includes("admin")) {
-                        postObj.comments[i].canEdit = true;
-                    } else {
-                        postObj.comments[i].canEdit = postObj.comments[i].userID._id.toString() === req.session.userID;
-                    }
+            for (let i = 0; i < post.comments.length; i++) {
+                if (permissions.includes("admin")) {
+                    postObj.comments[i].canEdit = true;
+                } else {
+                    postObj.comments[i].canEdit = postObj.comments[i].userID._id.toString() === req.session.userID;
                 }
-
-                filteredPosts.push(postObj);
-            });
-            return res.status(200).send(filteredPosts);
-        }
-        return res.status(200).send(posts);
-    });
-
-    router.get('/getPost/:id', async (req, res) => {
-        const post = await db.getPost(req.params.id);
-        const permissions = req.session.permissions || [];
-        if (!(permissions.includes("classmate")) && post.permissions === "classmatesonly") return res.status(403).send("You cannot view this post");
-
-        if (!post) {
-            return res.status(404).send("Post not found");
-        }
-        return res.status(200).send(post);
-    });
-
-    router.post('/deletePost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-
-        const { postID } = req.body;
-        if (!postID) return res.status(400).send("Missing parameters");
-        if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
-
-        const post = await db.getPost(postID);
-        if (post.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
-
-        await db.deletePost(postID);
-        return res.status(200).send("Success");
-    })
-
-    router.post('/createCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-
-        const { author, content } = req.body;
-        console.log(author, content);
-        if (!author || !content) return res.status(400).send("Missing parameters");
-        if (typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
-
-        await db.createCitation(req.session.userID, author, content);
-        return res.status(200).redirect('/citations');
-    });
-
-    router.get('/getCitations', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
-
-        const page = (req.query.page || 1) - 1;
-
-        const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
-
-        let filteredCitations = [];
-
-        citations.forEach(citation => {
-            let citationObj = citation.toObject();
-            if (!citation.userID) {
-                return;
             }
-            if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
-                citationObj.canEdit = true;
-            } else {
-                citationObj.canEdit = false;
-            }
-            filteredCitations.push(citationObj);
+
+            filteredPosts.push(postObj);
         });
+        return res.status(200).send(filteredPosts);
+});
 
-        return res.status(200).send(filteredCitations);
-    });
+router.get('/getPost/:id', async (req, res) => {
+    const post = await db.getPost(req.params.id);
+    const permissions = req.session.permissions || [];
+    if (!(permissions.includes("classmate")) && post.permissions === "classmatesonly") return res.status(403).send("You cannot view this post");
 
+    if (!post) {
+        return res.status(404).send("Post not found");
+    }
+    return res.status(200).send(post);
+});
 
-    router.post('/deleteCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+router.post('/deletePost', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
 
-        const { citationID } = req.body;
+    const { postID } = req.body;
+    if (!postID) return res.status(400).send("Missing parameters");
+    if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
 
-        if (!citationID) return res.status(400).send("Missing parameters");
-        if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
+    const post = await db.getPost(postID);
+    if (post.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
 
-        const citation = await db.getCitation(citationID);
-        if (citation.userID.id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
+    await db.deletePost(postID);
+    return res.status(200).send("Success");
+})
 
-        await db.deleteCitation(citationID);
+router.post('/createCitation', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
 
-        return res.status(200).send("Success");
-    });
+    const { author, content } = req.body;
+    console.log(author, content);
+    if (!author || !content) return res.status(400).send("Missing parameters");
+    if (typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
 
-    router.post('/updateCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    const sanitizedContent = sanitizeHtml(content);
+    const sanitizedAuthor = sanitizeHtml(author);
 
-        const { citationID, author, content } = req.body;
-        console.log(citationID, author, content);
+    await db.createCitation(req.session.userID, sanitizedAuthor, sanitizedContent);
+    return res.status(200).redirect('/citations');
+});
 
-        if (!citationID || !author || !content) return res.status(400).send("Missing parameters");
-        if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+router.get('/getCitations', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
+    if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
 
-        const citation = await db.getCitation(citationID);
-        if (citation.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
+    const page = (req.query.page || 1) - 1;
 
-        await db.updateCitation(citationID, author, content);
-        return res.status(200).send("Success");
-    });
+    const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
 
-    router.post('/pushSubscribe', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    let filteredCitations = [];
 
-        const subscription = req.body;
-        console.log(subscription);
-
-        await db.setSubscription(req.session.userID, subscription);
-        return res.status(200).send("Success");
-    });
-
-    router.post('/likePost', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-
-        const { postID } = req.body;
-        if (!postID) return res.status(400).send("Missing parameters");
-        if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
-
-        const { success, message } = await db.likePost(postID, req.session.userID);
-        if (success) {
-            return res.status(200).send("Success");
-        } else {
-            return res.status(500).send("Error:" + message)
+    citations.forEach(citation => {
+        let citationObj = citation.toObject();
+        if (!citation.userID) {
+            return;
         }
-    })
-
-    router.post('/createComment', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-
-        const { postID, content, permissions } = req.body;
-        if (!postID || !content || !permissions) return res.status(400).send("Missing parameters");
-        if (typeof postID !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
-
-        await db.commentPost(postID, req.session.userID, content, permissions);
-        return res.status(200).send("Success");
+        if (citation.userID.id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
+            citationObj.canEdit = true;
+        } else {
+            citationObj.canEdit = false;
+        }
+        filteredCitations.push(citationObj);
     });
 
-    router.post('/deleteComment', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    return res.status(200).send(filteredCitations);
+});
 
-        const { commentID } = req.body;
-        if (!commentID) return res.status(400).send("Missing parameters");
-        if (typeof commentID !== "string") return res.status(400).send("Invalid parameters");
 
-        const comment = await db.getComment(commentID);
-        if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this comment");
+router.post('/deleteCitation', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
 
-        await db.deleteComment(commentID);
+    const { citationID } = req.body;
+
+    if (!citationID) return res.status(400).send("Missing parameters");
+    if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
+
+    const citation = await db.getCitation(citationID);
+    if (citation.userID.id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
+
+    await db.deleteCitation(citationID);
+
+    return res.status(200).send("Success");
+});
+
+router.post('/updateCitation', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
+
+    const { citationID, author, content } = req.body;
+    console.log(citationID, author, content);
+
+    if (!citationID || !author || !content) return res.status(400).send("Missing parameters");
+    if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+
+    const citation = await db.getCitation(citationID);
+    if (citation.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
+
+    await db.updateCitation(citationID, author, content);
+    return res.status(200).send("Success");
+});
+
+router.post('/pushSubscribe', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
+
+    const subscription = req.body;
+    console.log(subscription);
+
+    await db.setSubscription(req.session.userID, subscription);
+    return res.status(200).send("Success");
+});
+
+router.post('/likePost', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
+
+    const { postID } = req.body;
+    if (!postID) return res.status(400).send("Missing parameters");
+    if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
+
+    const { success, message } = await db.likePost(postID, req.session.userID);
+    if (success) {
         return res.status(200).send("Success");
-    });
+    } else {
+        return res.status(500).send("Error:" + message)
+    }
+})
 
-    router.post('/updateComment', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+router.post('/createComment', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
 
-        const { commentID, content } = req.body;
-        if (!commentID || !content) return res.status(400).send("Missing parameters");
-        if (typeof commentID !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+    const { postID, content, permissions } = req.body;
+    if (!postID || !content || !permissions) return res.status(400).send("Missing parameters");
+    if (typeof postID !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
 
-        const comment = await db.getComment(commentID);
-        if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this comment");
+    const sanitizedContent = sanitizeHtml(content);
 
-        await db.updateComment(commentID, content);
-        return res.status(200).send("Success");
-    });
+    await db.commentPost(postID, req.session.userID, sanitizedContent, permissions);
+    return res.status(200).send("Success");
+});
 
-    return router;
+router.post('/deleteComment', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
+
+    const { commentID } = req.body;
+    if (!commentID) return res.status(400).send("Missing parameters");
+    if (typeof commentID !== "string") return res.status(400).send("Invalid parameters");
+
+    const comment = await db.getComment(commentID);
+    if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this comment");
+
+    await db.deleteComment(commentID);
+    return res.status(200).send("Success");
+});
+
+router.post('/updateComment', async (req, res) => {
+    if (!req.session.userID) return res.status(401).send("Not logged in");
+
+    const { commentID, content } = req.body;
+    if (!commentID || !content) return res.status(400).send("Missing parameters");
+    if (typeof commentID !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+
+    const comment = await db.getComment(commentID);
+    if (comment.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this comment");
+
+    await db.updateComment(commentID, content);
+    return res.status(200).send("Success");
+});
+
+return router;
 }

@@ -47,7 +47,7 @@ paths:
           description: Logged in
         '401':
           description: Not logged in
-  /upload:
+  /uploadFile:
     post:
       summary: Upload a file
       responses:
@@ -83,11 +83,9 @@ paths:
               properties:
                 title:
                   type: string
-                content:
+                sections:
                   type: string
-                teachersafe:
-                  type: boolean
-                upload:
+                permissions:
                   type: string
       responses:
         '200':
@@ -96,8 +94,39 @@ paths:
           description: Not logged in
         '403':
           description: You cannot create a post
+        '400':
+          description: Missing or invalid parameters
         '500':
           description: Error creating post
+  /updatePost:
+    post:
+      summary: Update a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: string
+                title:
+                  type: string
+                sections:
+                  type: string
+                permissions:
+                  type: string
+      responses:
+        '200':
+          description: Post updated successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot update a post
+        '400':
+          description: Missing or invalid parameters
+        '500':
+          description: Error updating post
   /getPosts:
     get:
       summary: Get posts
@@ -110,3 +139,226 @@ paths:
       responses:
         '200':
           description: List of posts
+  /getPost/{id}:
+    get:
+      summary: Get a post by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Post ID
+      responses:
+        '200':
+          description: Post details
+        '403':
+          description: You cannot view this post
+        '404':
+          description: Post not found
+  /deletePost:
+    post:
+      summary: Delete a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: string
+      responses:
+        '200':
+          description: Post deleted successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot delete this post
+        '400':
+          description: Missing or invalid parameters
+  /createCitation:
+    post:
+      summary: Create a new citation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                author:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Citation created successfully
+        '401':
+          description: Not logged in
+        '400':
+          description: Missing or invalid parameters
+  /getCitations:
+    get:
+      summary: Get citations
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Page number
+      responses:
+        '200':
+          description: List of citations
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot get this data
+  /deleteCitation:
+    post:
+      summary: Delete a citation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                citationID:
+                  type: string
+      responses:
+        '200':
+          description: Citation deleted successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot delete this citation
+        '400':
+          description: Missing or invalid parameters
+  /updateCitation:
+    post:
+      summary: Update a citation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                citationID:
+                  type: string
+                author:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Citation updated successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot update this citation
+        '400':
+          description: Missing or invalid parameters
+  /pushSubscribe:
+    post:
+      summary: Subscribe to push notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Subscription successful
+        '401':
+          description: Not logged in
+  /likePost:
+    post:
+      summary: Like a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: string
+      responses:
+        '200':
+          description: Post liked successfully
+        '401':
+          description: Not logged in
+        '400':
+          description: Missing or invalid parameters
+        '500':
+          description: Error liking post
+  /createComment:
+    post:
+      summary: Create a comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postID:
+                  type: string
+                content:
+                  type: string
+                permissions:
+                  type: string
+      responses:
+        '200':
+          description: Comment created successfully
+        '401':
+          description: Not logged in
+        '400':
+          description: Missing or invalid parameters
+  /deleteComment:
+    post:
+      summary: Delete a comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commentID:
+                  type: string
+      responses:
+        '200':
+          description: Comment deleted successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot delete this comment
+        '400':
+          description: Missing or invalid parameters
+  /updateComment:
+    post:
+      summary: Update a comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commentID:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '200':
+          description: Comment updated successfully
+        '401':
+          description: Not logged in
+        '403':
+          description: You cannot update this comment
+        '400':
+          description: Missing or invalid parameters

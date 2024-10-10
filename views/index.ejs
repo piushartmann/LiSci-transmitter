@@ -20,13 +20,15 @@
 
   <div id="postBox" class="postBox">
   </div>
-  <div class="pageSelector">
-    <% for (let i=1; i <=pages; i++) { %>
-    <a href="?page=<%= i %>" class="page-selection <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'page-current' : '' %>">
-      <%= i %>
-    </a>
-    <% } %>
-  </div>
+  <% if (pages > 1) { %>
+    <div class="pageSelector">
+      <% for (let i=1; i <=pages; i++) { %>
+      <a href="?page=<%= i %>" class="page-selection <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'page-current' : '' %>">
+        <%= i %>
+      </a>
+      <% } %>
+    </div>
+  <% } %>
 
   <div id="commentModal" class="modal">
     <span id="modalClose" class="close" title="Close Modal">&times;</span>
