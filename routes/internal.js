@@ -1,6 +1,4 @@
 const { Router } = require('express');
-const multer = require("multer");
-const multerS3 = require("multer-s3");
 const { MongoConnector } = require('../MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
@@ -19,9 +17,6 @@ function generateRandomProfilePic() {
 }
 
 module.exports = (db, s3Client) => {
-    const config = require('../config.json');
-    const postsPageSize = config.postsPageSize;
-    const citationsPageSize = config.citationsPageSize;
 
     router.get('/', (req, res) => {
         res.send("This is the internal API, it is not meant to be accessed directly. On the /api route you can find the public API.");

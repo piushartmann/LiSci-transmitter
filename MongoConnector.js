@@ -147,10 +147,6 @@ module.exports.MongoConnector = class MongoConnector {
         return user[key];
     }
 
-    async getUserData(userID) {
-        return await this.User.findById(userID);
-    }
-
     async getUser(username) {
         const user = await this.User.findOne({ username })
             .populate('preferences');
@@ -313,7 +309,7 @@ module.exports.MongoConnector = class MongoConnector {
         }
 
         let restructuredObject = object.toObject();
-        if (restructuredObject.userID){
+        if (restructuredObject.userID) {
             if (restructuredObject.userID.preferences && restructuredObject.userID.preferences.length > 0) {
                 const profilePicPreference = restructuredObject.userID.preferences.find(pref => pref.key === 'profilePic');
                 if (profilePicPreference) {
@@ -370,6 +366,9 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPreference(userID, key) {
         const user = await this.User.findById(userID);
+        if (!user) {
+            return null;
+        }
         const preference = user.preferences.find(pref => pref.key === key);
         return preference ? preference.value : null;
     }

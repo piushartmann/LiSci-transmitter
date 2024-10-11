@@ -1,10 +1,7 @@
 const { Router } = require('express');
-const multer = require("multer");
-const multerS3 = require("multer-s3");
 const { MongoConnector } = require('../../MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
-const oneDay = 24 * 3600 * 1000
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -16,7 +13,6 @@ sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embe
 
 module.exports = (db, s3Client) => {
     const config = require('../../config.json');
-    const postsPageSize = config.postsPageSize;
     const citationsPageSize = config.citationsPageSize;
 
     router.post('/createCitation', async (req, res) => {
@@ -81,7 +77,8 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
         const { citationID, author, content } = req.body;
-        console.log(citationID, author, content);
+        const sanitizedContent = sanitizeHtml(content);
+        const sanitizedAuthor = sanitizeHtml(author);
 
         if (!citationID || !author || !content) return res.status(400).send("Missing parameters");
         if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
@@ -89,7 +86,7 @@ module.exports = (db, s3Client) => {
         const citation = await db.getCitation(citationID);
         if (citation.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
 
-        await db.updateCitation(citationID, author, content);
+        await db.updateCitation(citationID, sanitizedAuthor, sanitizedContent);
         return res.status(200).send("Success");
     });
     return router;

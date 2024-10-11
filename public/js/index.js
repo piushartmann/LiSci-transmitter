@@ -29,8 +29,8 @@ function prank() {
             setTimeout(() => {
                 document.getElementById("prank").style.display = "none";
                 showPrank();
-            }, 1000);
-        }, Math.floor(Math.random() * 30000) + 500);
+            }, 5000);
+        }, Math.floor(Math.random() * 1000 * 60 * 5) + 5000);
 
     }
     showPrank();

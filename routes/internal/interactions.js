@@ -1,10 +1,7 @@
 const { Router } = require('express');
-const multer = require("multer");
-const multerS3 = require("multer-s3");
 const { MongoConnector } = require('../../MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
-const oneDay = 24 * 3600 * 1000
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -15,9 +12,6 @@ const oneDay = 24 * 3600 * 1000
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
 module.exports = (db, s3Client) => {
-    const config = require('../../config.json');
-    const postsPageSize = config.postsPageSize;
-    const citationsPageSize = config.citationsPageSize;
 
     router.post('/likePost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");

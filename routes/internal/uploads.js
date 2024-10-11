@@ -4,7 +4,6 @@ const multerS3 = require("multer-s3");
 const { MongoConnector } = require('../../MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
-const oneDay = 24 * 3600 * 1000
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -73,9 +72,6 @@ function uploadFile(req, res, directory = "", s3Client, forceFormats = []) {
 }
 
 module.exports = (db, s3Client) => {
-    const config = require('../../config.json');
-    const postsPageSize = config.postsPageSize;
-    const citationsPageSize = config.citationsPageSize;
 
     router.post("/uploadFile", async function (req, res) {
         if (!req.session.userID) return res.status(401).send("Not logged in");

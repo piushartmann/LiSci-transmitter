@@ -1,10 +1,7 @@
 const { Router } = require('express');
-const multer = require("multer");
-const multerS3 = require("multer-s3");
 const { MongoConnector } = require('../../MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
-const oneDay = 24 * 3600 * 1000
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -17,7 +14,6 @@ sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embe
 module.exports = (db, s3Client) => {
     const config = require('../../config.json');
     const postsPageSize = config.postsPageSize;
-    const citationsPageSize = config.citationsPageSize;
 
     router.post('/createPost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -49,13 +45,24 @@ module.exports = (db, s3Client) => {
         if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot update a post");
 
         const { postID, title, sections, permissions } = req.body;
+
+        const sanitizedSections = JSON.parse(sections).map(section => {
+            if (section.type === "text" || section.type === "markdown") {
+                section.content = sanitizeHtml(section.content, {
+                    allowedTags: sanitizeHtmlAllowedTags,
+                    allowedAttributes: {}
+                });
+            }
+            return section;
+        });
+
         const permissionsBool = permissions === "true";
         console.log(postID, title, sections, permissions);
 
         if (!postID || !title || !sections) return res.status(400).send("Missing parameters");
         if (typeof postID !== "string" || typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
 
-        await db.updatePost(postID, title, JSON.parse(sections), permissionsBool ? "Teachersafe" : "classmatesonly");
+        await db.updatePost(postID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
         return res.status(200).send("Success");
     })
 

@@ -16,7 +16,7 @@ module.exports = (db, pageSize) => {
         const pages = Math.ceil(await db.getPostNumber(!(permissions.includes("classmate"))) / pageSize);
         const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
         return res.render('index', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [], profilePic: req.session.profilePic,
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'),
             currentPage: currentPage, prank: prank, pages: pages
         });
     });
@@ -26,7 +26,7 @@ module.exports = (db, pageSize) => {
         if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a new Post");
 
         return res.render('create', {
-            loggedIn: true, username: req.session.username, usertype: req.session.permissions || [], profilePic: req.session.profilePic,
+            loggedIn: true, username: req.session.username, usertype: req.session.permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'),
             isCreatePage: true
         });
     });
@@ -39,14 +39,14 @@ module.exports = (db, pageSize) => {
         const post = await db.getPost(postID);
 
         return res.render('create', {
-            loggedIn: true, username: req.session.username, usertype: req.session.permissions || [], profilePic: req.session.profilePic,
+            loggedIn: true, username: req.session.username, usertype: req.session.permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'),
             isCreatePage: true, post: post
         });
     });
 
     router.get('/post/:id', async (req, res) => {
         return res.render('postFullscreen', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [], profilePic: req.session.profilePic,
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'),
             postID: req.params.id
         });
     });
@@ -57,7 +57,7 @@ module.exports = (db, pageSize) => {
         if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
         return res.render('citations', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: req.session.profilePic,
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
 
         });
     });
@@ -66,8 +66,8 @@ module.exports = (db, pageSize) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
         return res.render('settings', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions, profilePic: req.session.profilePic,
-            isSettingsPage: true
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey')
         });
     });
 

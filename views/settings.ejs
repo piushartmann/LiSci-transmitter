@@ -26,6 +26,11 @@
       </p>
       <button id="profilePictureColorSubmit">Save</button>
     </div>
+
+    <div class="apiKeysContainer">
+      <label for="apiKeys">API Key</label>
+      <input type="text" disabled="disabled" value="<%= apiKey %>" id="apiKeys">
+      <button id="copyApiKey" onclick="navigator.clipboard.writeText('<%= apiKey %>')">Copy</button>
   </div>
 
 </body>
