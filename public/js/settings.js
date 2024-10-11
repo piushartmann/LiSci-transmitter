@@ -1,3 +1,5 @@
+const api = require("../../routes/api");
+
 let registration = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -28,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         window.location.reload();
     });
+
 });
 
 async function registerServiceWorker() {
