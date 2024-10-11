@@ -126,5 +126,20 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         }
     });
 
+    router.post('/createCitation', async (req, res) => {
+        const user = await checkAPIKey(req);
+        if (!user) return res.status(401).send("Invalid API key")
+
+        const { author, content } = req.body;
+
+        try {
+            await db.createCitation(user._id, author, content);
+            return res.status(200).send("Success");
+        }
+        catch (error) {
+            return res.status(500).send(error.message);
+        }
+    });
+
     return router;
 };
