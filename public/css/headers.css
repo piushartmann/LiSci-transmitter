@@ -145,3 +145,40 @@ header a {
     cursor: pointer;
 }
 
+.userMenu {
+    position: absolute;
+    top: 55px;
+    right: 5vw;
+    z-index: 9;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    animation: 0.1s 1 normal forwards fadeIn;
+}
+
+@keyframes fadeIn {
+    0% {
+        transform: translateY(-50px);
+        opacity: 0.5;
+        scale: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+        scale: 1;
+    }
+}
+
+.userMenu .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    margin-right: 0;
+}
+
+.userMenu .content .button {
+    margin-right: 0;
+}

@@ -356,7 +356,6 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async setPreference(userID, key, value) {
-        console.log(userID, key, value);
         const user = await this.User.findById(userID);
         const preferenceIndex = user.preferences.findIndex(pref => pref.key === key);
         if (preferenceIndex !== -1) {

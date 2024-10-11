@@ -69,7 +69,7 @@ function buildHeader(post) {
         let authorName = document.createElement("p");
         authorName.textContent = post.userID.username;
         authorName.style = "margin-left: 10px;";
-        
+
         let authorProfilePic = document.createElement("img");
         authorProfilePic.className = "profilePicture";
         authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
@@ -106,10 +106,16 @@ function buildFooter(post) {
 
     let likeIcon = document.createElement("img");
     likeIcon.className = "icon";
-    likeIcon.src = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
+
+    if (loggedIn) {
+        likeIcon.src = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
+    }
+    else {
+        likeIcon.src = "/icons/like-locked.svg";
+    }
 
     let likeCounter = document.createElement("p");
-    likeCounter.className = "counter";
+    likeCounter.className = "button-label";
     likeCounter.textContent = `${likes} Likes`;
 
     likeButton.appendChild(likeIcon);
@@ -126,45 +132,45 @@ function buildFooter(post) {
     commentIcon.src = post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg";
 
     let commentCounter = document.createElement("p");
-    commentCounter.className = "counter";
+    commentCounter.className = "button-label";
     commentCounter.textContent = `${post.comments.length} Comments`;
 
     commentButton.appendChild(commentIcon);
     commentButton.appendChild(commentCounter);
-
-
 
     iteractionButtons.appendChild(likeButton);
     iteractionButtons.appendChild(commentButton);
 
     footerDiv.appendChild(iteractionButtons);
 
-    likeButton.onclick = async () => {
-        if (!liked) {
-            await fetch("/internal/likePost", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ postID: post._id }),
-            });
-            likeCounter.textContent = `${likes + 1} Likes`;
-            likes++;
-            likeIcon.src = "/icons/like-filled.svg";
-            liked = true;
-        }
-        else {
-            await fetch("/internal/likePost", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ postID: post._id }),
-            });
-            likeCounter.textContent = `${likes - 1} Likes`;
-            likes--;
-            likeIcon.src = "/icons/like-unfilled.svg";
-            liked = false;
+    if (loggedIn) {
+        likeButton.onclick = async () => {
+            if (!liked) {
+                await fetch("/internal/likePost", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ postID: post._id }),
+                });
+                likeCounter.textContent = `${likes + 1} Likes`;
+                likes++;
+                likeIcon.src = "/icons/like-filled.svg";
+                liked = true;
+            }
+            else {
+                await fetch("/internal/likePost", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ postID: post._id }),
+                });
+                likeCounter.textContent = `${likes - 1} Likes`;
+                likes--;
+                likeIcon.src = "/icons/like-unfilled.svg";
+                liked = false;
+            }
         }
     }
 
@@ -181,7 +187,7 @@ function buildFooter(post) {
         editIcon.src = "/icons/edit.svg";
 
         let editLabel = document.createElement("p");
-        editLabel.className = "counter";
+        editLabel.className = "button-label";
         editLabel.textContent = "Edit";
 
         editButton.appendChild(editIcon);
@@ -210,7 +216,7 @@ function buildFooter(post) {
         deleteIcon.src = "/icons/delete.svg";
 
         let deleteLabel = document.createElement("p");
-        deleteLabel.className = "counter";
+        deleteLabel.className = "button-label";
         deleteLabel.textContent = "Delete";
 
         deleteButton.appendChild(deleteIcon);

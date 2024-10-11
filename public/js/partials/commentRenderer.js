@@ -16,6 +16,12 @@ function renderComments(post) {
     comments.forEach(comment => {
         buildComment(comment);
     });
+
+    const textarea = document.getElementById('commentTextarea');
+    if (!loggedIn){
+        textarea.disabled = true;
+        textarea.placeholder = "Please log in to comment";
+    }
 }
 
 function hideComments() {
@@ -112,7 +118,7 @@ function buildComment(comment) {
         editIcon.src = "/icons/edit.svg";
 
         let editLabel = document.createElement("p");
-        editLabel.className = "counter";
+        editLabel.className = "button-label";
         editLabel.textContent = "Edit";
 
         editButton.appendChild(editIcon);
@@ -129,7 +135,7 @@ function buildComment(comment) {
         deleteIcon.src = "/icons/delete.svg";
 
         let deleteLabel = document.createElement("p");
-        deleteLabel.className = "counter";
+        deleteLabel.className = "button-label";
         deleteLabel.textContent = "Delete";
 
         deleteButton.appendChild(deleteIcon);

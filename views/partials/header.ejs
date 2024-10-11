@@ -11,7 +11,7 @@
       <li><a href="/">Home</a></li>
       <li><a href="/archive">Archiv</a></li>
       <% if (usertype.includes("classmate")) { %>
-        <li><a href="/citations">Zitate</a></li>
+      <li><a href="/citations">Zitate</a></li>
       <% } %>
     </ul>
 
@@ -24,17 +24,13 @@
     <% } %>
 
     <% if (loggedIn) { %>
-      <% if (typeof isSettingsPage != "undefined") { %>
-        <button onclick="logout()">Logout</button>
-      <% } else { %>
-        <% if (profilePic.type == "default") { %>
-          <p class="defaultProfilePicture" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="window.location.href='/settings'">
-            <%= username.charAt(0).toUpperCase() %>
-          </p>
-        <% } %>
-      <% } %>
+    <% if (profilePic.type == "default") { %>
+    <p class="defaultProfilePicture" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
+      <%= username.charAt(0).toUpperCase() %>
+    </p>
+    <% } %>
     <% } else { %>
-      <button onclick="showLoginPopup()">Login</button>
+    <button onclick="showLoginPopup()">Login</button>
     <% } %>
   </div>
 
@@ -54,4 +50,24 @@
       </div>
     </form>
   </div>
+</div>
+
+<div class="userMenu" id="userMenu" style="display: none">
+
+  <% if (typeof isSettingsPage == "undefined") { %>
+  <div class="content">
+    <button onclick="window.location.href='/settings'" class="button">
+      <img class="icon" src="icons/settings.svg"></img>
+      <label class="button-label">Settings</label>
+    </button>
+  </div>
+  <% } %>
+
+  <div class="content">
+    <button onclick="logout()" class="button">
+      <img class="icon" src="icons/logout.svg"></img>
+      <label class="button-label">Logout</label>
+    </button>
+  </div>
+  
 </div>

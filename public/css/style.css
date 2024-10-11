@@ -61,6 +61,10 @@ body {
     margin: 5px;
 }
 
+.button-label {
+    cursor: pointer!important;
+}
+
 .defaultProfilePicture {
     width: 40px;
     height: 40px;
@@ -71,6 +75,7 @@ body {
     justify-content: center;
     font-size: 20px;
     margin: 5px;
+    user-select: none;
 }
 
 .author-info{

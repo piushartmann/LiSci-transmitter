@@ -47,7 +47,6 @@ module.exports = (db, s3Client) => {
                 return res.status(500).send("Internal Server Error");
             }
         });
-        console.log(color);
 
         await db.setPreference(req.session.userID, 'profilePic', { "type": "default", "content": color });
         return res.status(200).send("Success");
