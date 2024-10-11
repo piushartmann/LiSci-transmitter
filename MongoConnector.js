@@ -313,18 +313,20 @@ module.exports.MongoConnector = class MongoConnector {
         }
 
         let restructuredObject = object.toObject();
-        if (restructuredObject.userID.preferences && restructuredObject.userID.preferences.length > 0) {
-            const profilePicPreference = restructuredObject.userID.preferences.find(pref => pref.key === 'profilePic');
-            if (profilePicPreference) {
-                restructuredObject.userID.profilePic = profilePicPreference.value;
+        if (restructuredObject.userID){
+            if (restructuredObject.userID.preferences && restructuredObject.userID.preferences.length > 0) {
+                const profilePicPreference = restructuredObject.userID.preferences.find(pref => pref.key === 'profilePic');
+                if (profilePicPreference) {
+                    restructuredObject.userID.profilePic = profilePicPreference.value;
+                }
             }
+            else {
+                let randomProfilePic = generateRandomProfilePic();
+                restructuredObject.userID.profilePic = randomProfilePic;
+                this.setPreference(restructuredObject.userID._id, 'profilePic', randomProfilePic);
+            }
+            delete restructuredObject.userID.preferences;
         }
-        else {
-            let randomProfilePic = generateRandomProfilePic();
-            restructuredObject.userID.profilePic = randomProfilePic;
-            this.setPreference(restructuredObject.userID._id, 'profilePic', randomProfilePic);
-        }
-        delete restructuredObject.userID.preferences;
         return restructuredObject;
     }
 
