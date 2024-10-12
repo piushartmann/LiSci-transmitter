@@ -38,7 +38,7 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         if (!user) return res.status(401).send("Invalid API key");
 
         const currentPage = req.query.page || 1;
-        const posts = await db.getPosts(currentPage, pageSize, user.type === "teacher");
+        const posts = await db.getPosts(currentPage, pageSize, !user.permissions.includes("classmate"));
 
         const filteredPosts = posts.map(post => ({
             id: post._id,
@@ -69,7 +69,7 @@ module.exports = (db, pageSize, s3Client, webpush) => {
     router.post('/createPost', async (req, res) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
-        if (user.type !== "admin" && user.type !== "writer") return res.status(403).send("You cannot create a post");
+        if (!req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a post");
 
         const { title, content, type, permissions, mediaPath } = req.body;
         try {
@@ -113,6 +113,7 @@ module.exports = (db, pageSize, s3Client, webpush) => {
     router.post('/sendPush', async (req, res) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
+        if (!user.permissions.includes("push")) return res.status(403).send("You cannot send a push notification");
 
         const { userID, title, body, icon, badge, urgency } = req.body;
         const subscription = await db.getSubscription(userID);

@@ -1,35 +1,46 @@
-.settingsBox{
+.settingsBox {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.settingsBox div{
+.setting {
     display: flex;
-    justify-content:center;
+    justify-content: center;
     width: 100%;
     margin: 10px 0;
 }
 
-label{
+.settingsBox div form {
+    margin: auto 10px;
+}
+
+label {
     margin-right: 20px;
 }
 
-.profilePictureContainer{
+.profilePictureContainer {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 20px 0;
 }
 
-.profilePicturePreview{
+.profilePicturePreview {
     border: 0;
 }
 
-.ColorPicker{
+.ColorPicker {
     position: absolute;
     color: transparent;
     z-index: -1;
     height: 0;
     width: 0;
+}
+
+.userField {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
 }

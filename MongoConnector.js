@@ -31,14 +31,15 @@ const postSchema = new Schema({
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
     timestamp: { type: Date, default: Date.now },
     comments: [{ type: ObjectId, ref: 'Comment' }],
+    viewedBy: [{ type: ObjectId, ref: 'User' }],
     likes: [likeSchema],
 });
 
 const userSchema = new Schema({
-    username: { type: String, required: true, index: true },
+    username: { type: String, required: true, index: true, unique: true },
     passHash: { type: String, required: true },
     pushSubscription: { type: Object, required: false },
-    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin'] }],
+    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin', 'push'] }],
     apiKey: { type: String, required: true },
     preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
 });
@@ -259,6 +260,10 @@ module.exports.MongoConnector = class MongoConnector {
         return await this.Post.countDocuments(query);
     }
 
+    async getCitationNumber() {
+        return await this.Citation.countDocuments();
+    }
+
     async searchForPosts(query, isTeacher, limit = 10, offset = 0) {
         const search = { $text: { $search: query } };
         const permissions = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
@@ -377,5 +382,18 @@ module.exports.MongoConnector = class MongoConnector {
         const user = await this.User.findOne({ username });
         await this.setPreference(user._id, 'profilePic', { "type": type, "content": profilePic });
         return user.save();
+    }
+
+    async getAllUsers() {
+        return await this.User.find();
+    }
+
+    async updateUserData(userID, username, password, permissions, preferences) {
+        const user = await this.User.findById(userID);
+        if (username) user.username = username;
+        if (password) user.passHash = hashPassword(password);
+        if (permissions) user.permissions = permissions;
+        if (preferences) user.preferences = preferences;
+        return await user.save();
     }
 };

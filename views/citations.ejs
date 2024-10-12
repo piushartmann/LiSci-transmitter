@@ -29,6 +29,16 @@
   <div class="citationsBox" id="citationBox">
   </div>
 
+  <% if (pages > 1) { %>
+  <div class="pageSelector">
+    <% for (let i=1; i <=pages; i++) { %>
+    <a href="?page=<%= i %>" class="page-selection <%= (typeof currentPage !== 'undefined' && currentPage == i) ? 'page-current' : '' %>">
+      <%= i %>
+    </a>
+    <% } %>
+  </div>
+  <% } %>
+
 
 </body>
 

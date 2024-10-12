@@ -2,8 +2,16 @@ document.addEventListener("DOMContentLoaded", function () {
     loadCitations();
 });
 
-function loadCitations() {
-    fetch(`internal/getCitations`)
+window.onload = function () {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+
+    loadCitations(page);
+}
+
+function loadCitations(page) {
+    fetch(`internal/getCitations?page=${page}`)
         .then(response => response.json())
         .then(data => {
             data.forEach(citation => {

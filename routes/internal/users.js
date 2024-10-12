@@ -38,5 +38,13 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    router.get('/getAllUsers', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot get this data");
+
+        const users = await db.getAllUsers();
+        return res.status(200).send(users);
+    });
+
     return router;
 };

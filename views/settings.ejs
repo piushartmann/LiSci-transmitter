@@ -6,6 +6,10 @@
   <script src="/js/settings.js"></script>
   <title>Settings</title>
   <link rel="stylesheet" href="/css/settings.css">
+  <% if (isAdmin) { %>
+   <link rel="stylesheet" href="/css/adminSettings.css">
+   <script src="/js/partials/adminSettings.js"></script>
+  <% } %>
 </head>
 
 <body>
@@ -13,12 +17,12 @@
 
   <div class="settingsBox">
     <h1>Settings</h1>
-    <div class="enablePushContainer">
+    <div class="enablePushContainer setting">
       <label for="enablePush">Push Notifications</label>
       <button id="enablePush">Enable</button>
     </div>
 
-    <div class="profilePictureContainer">
+    <div class="profilePictureContainer setting">
       <label for="head">Pick Profile Picture Color</label>
       <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;"">
         <%= username.charAt(0).toUpperCase() %>
@@ -27,9 +31,14 @@
       <button id="profilePictureColorSubmit">Save</button>
     </div>
 
-    <div class="apiKeysContainer">
+    <div class="apiKeysContainer setting">
       <label for="apiKeys">API Key</label>
       <input type="text" value="<%= apiKey %>" id="apiKey">
+    </div>
+
+    <% if (isAdmin) { %>
+     <%- include('./partials/adminSettings.ejs') %>
+    <% } %>
   </div>
 
 </body>

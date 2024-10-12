@@ -1,5 +1,3 @@
-const api = require("../../routes/api");
-
 let registration = null;
 
 document.addEventListener('DOMContentLoaded', async () => {

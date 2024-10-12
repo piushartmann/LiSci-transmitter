@@ -4,16 +4,19 @@ const router = Router();
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
- * @param {number} pageSize - The number of posts per page.
  * @returns {Router} The router instance.
  */
 
-module.exports = (db, pageSize) => {
+module.exports = (db) => {
+    const config = require('../config.json');
+    const postsPageSize = config.postsPageSize;
+    const citationsPageSize = config.citationsPageSize;
+
     router.get('/', async (req, res) => {
         const currentPage = req.query.page || 1;
         req.session.views = (req.session.views || 0) + 1;
         const permissions = req.session.permissions || [];
-        const pages = Math.ceil(await db.getPostNumber(!(permissions.includes("classmate"))) / pageSize);
+        const pages = Math.ceil(await db.getPostNumber(!(permissions.includes("classmate"))) / postsPageSize);
         const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
         return res.render('index', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'),
@@ -54,10 +57,13 @@ module.exports = (db, pageSize) => {
     router.get('/citations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = req.session.permissions || []
+        const currentPage = req.query.page || 1;
+        const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
         if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
         return res.render('citations', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+            currentPage: currentPage, pages: pages
 
         });
     });
@@ -67,7 +73,7 @@ module.exports = (db, pageSize) => {
 
         return res.render('settings', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey')
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = req.session.permissions.includes("admin"))
         });
     });
 
