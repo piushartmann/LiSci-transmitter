@@ -162,3 +162,17 @@
 .comment {
     margin-bottom: 2vh;
 }
+
+.file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-direction: column;
+    height: auto;
+    width: 100%;
+}
+
+.file canvas {
+    width: inherit;
+}

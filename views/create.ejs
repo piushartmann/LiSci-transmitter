@@ -10,7 +10,9 @@
   <title>Create a New Post</title>
   <% } %>
   <link rel="stylesheet" href="/css/create.css">
+  <link rel="stylesheet" href="/css/sections.css">
   <script src="/js/create.js"></script>
+  <script src="/js/partials/postRenderer.js"></script>
 </head>
 
 <body>
@@ -30,7 +32,7 @@
         <label for="teachersafe">Teachersafe</label>
       </div>
 
-      <div class="section-container" id="section-container">
+      <div class="edit-section-container" id="edit-section-container">
 
       </div>
 
@@ -63,7 +65,9 @@
 <% if (typeof post != "undefined") { %>
 <script>
   const post = <%- JSON.stringify(post) %>;
-  loadPost(post);
+  document.addEventListener("DOMContentLoaded", () => {
+    loadPost(post);
+  });
 </script>
 <% } %>
 

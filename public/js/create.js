@@ -125,7 +125,7 @@ function addTextSection(isRecontructed) {
     section.className = 'section';
     section.innerHTML = `<label for="content">Text</label>
         <section contenteditable="true" id="value" class="text-editable" onchange="" required></section>`;
-    document.getElementById('section-container').appendChild(section);
+    document.getElementById('edit-section-container').appendChild(section);
     section.id = sections.length;
 
     section.addEventListener('input', function () {
@@ -150,7 +150,7 @@ function addMarkdownSection(isRecontructed) {
         this.style.height = 'auto';
         this.style.height = this.scrollHeight + 'px';
     });
-    document.getElementById('section-container').appendChild(section);
+    document.getElementById('edit-section-container').appendChild(section);
     section.id = sections.length;
 
     const preview = section.querySelector(`#preview-${sections.length}`);
@@ -175,7 +175,7 @@ function addImageSection(isRecontructed = false) {
           <input type="file" id="upload-${uniqueId}" accept="image/*"></input>
           <img id="preview-${uniqueId}" class="image-preview" /></img>
           <div class="reziseHandle"></div>`;
-    document.getElementById('section-container').appendChild(section);
+    document.getElementById('edit-section-container').appendChild(section);
     section.id = sections.length;
 
     imgRezise(section);
@@ -232,14 +232,18 @@ function addImageSection(isRecontructed = false) {
 function addFileSection(isRecontructed) {
     let section = document.createElement('div');
     section.className = 'section';
+    const uniqueId = `section-${sections.length}`;
     section.innerHTML = `<label for="upload">Upload File</label>
-          <input type="file" id="value" accept=".pdf,image/*">`;
-    document.getElementById('section-container').appendChild(section);
+          <input type="file" id="value" accept=".pdf">
+          <div class="file" id="preview-${uniqueId}"></div>`;
+    document.getElementById('edit-section-container').appendChild(section);
     section.id = sections.length;
 
     section.addEventListener('change', function () {
         console.log(this.id);
         sections[this.id] = { type: 'file', content: this.querySelector('#value').files[0], id: this.id };
+        const preview = document.getElementById(`preview-${uniqueId}`);
+        renderPDF(URL.createObjectURL(this.querySelector('#value').files[0]), preview, 2);
     });
     sections[section.id] = { type: 'file', content: section.querySelector('#value').files[0], id: this.id };
     section.appendChild(addSectionFooter(section));
@@ -266,7 +270,7 @@ function moveSection(id, direction) {
         const arraySection = sections[sectionPostionInArray];
         sections[sectionPostionInArray] = sections[sectionPostionInArray - 1];
         sections[sectionPostionInArray - 1] = arraySection;
-        document.getElementById('section-container').insertBefore(thisSection, upperSection);
+        document.getElementById('edit-section-container').insertBefore(thisSection, upperSection);
     }
     else if (direction == 'down' && sectionPostionInArray < sections.length - 1) {
         const lowerSectionID = sections[sectionPostionInArray + 1].id;
@@ -274,13 +278,13 @@ function moveSection(id, direction) {
 
         sections[sectionPostionInArray] = sections[sectionPostionInArray + 1];
         sections[sectionPostionInArray + 1] = thisSection;
-        document.getElementById('section-container').insertBefore(thisSection, lowerSection.nextSibling);
+        document.getElementById('edit-section-container').insertBefore(thisSection, lowerSection.nextSibling);
     }
 
 }
 
 function removeSection(id) {
-    document.getElementById('section-container').removeChild(document.getElementById(id));
+    document.getElementById('edit-section-container').removeChild(document.getElementById(id));
     sections = sections.filter((section, index) => index != id);
 }
 
@@ -404,6 +408,8 @@ function loadPost(post) {
                 sections[newSection.id].uploaded = true;
                 sections[newSection.id].content = section.content;
                 sections[newSection.id].id = newSection.id;
+                const preview = document.getElementById(`preview-section-${newSection.id}`);
+                renderPDF('https://storage.liscitransmitter.live/' + section.content, preview, 2);
                 break;
         }
     });

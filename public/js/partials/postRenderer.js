@@ -14,16 +14,28 @@ function buildPost(post) {
         sectionDiv.className = "section";
         switch (section.type) {
             case "text":
-                sectionDiv.innerHTML = `<p>${section.content}</p>`;
+                const text = document.createElement("p");
+                text.textContent = section.content;
+                sectionDiv.appendChild(text);
                 break;
             case "file":
-                sectionDiv.innerHTML = `<embed src="https://storage.liscitransmitter.live/${section.content}" width="500" height="375" type="application/pdf">`;
+                const fileContainer = document.createElement("div");
+                fileContainer.className = "file";
+                const url = `https://storage.liscitransmitter.live/${section.content}`;
+                sectionDiv.appendChild(fileContainer);
+                renderPDF(url, fileContainer, 2);
                 break;
             case "img":
-                sectionDiv.innerHTML = `<img src="https://storage.liscitransmitter.live/${section.content}" alt="${post.title}" style="max-width: 100%; height: ${section.size + "px" || "auto"}">`;
+                const img = document.createElement("img");
+                img.src = `https://storage.liscitransmitter.live/${section.content}`;
+                img.alt = post.title;
+                img.style = `max-width: 100%; height: ${section.size + "px" || "auto"}`;
+                sectionDiv.appendChild(img);
                 break;
             case "markdown":
-                sectionDiv.innerHTML = marked.parse(section.content);
+                const markdown = document.createElement("div");
+                markdown.innerHTML = marked.parse(section.content);
+                sectionDiv.appendChild(markdown);
                 break;
             default:
                 console.error("Unknown section type");
@@ -230,22 +242,38 @@ function buildFooter(post) {
     return footerDiv;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    var modal = document.getElementById('commentModal');
-
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            hideComments();
-        }
+async function renderPDF(url, container, scale) {
+    const pdf = await loadPDF(url);
+    const numPages = pdf.numPages;
+    for (let i = 1; i <= numPages; i++) {
+        const canvas = document.createElement("canvas");
+        container.appendChild(canvas);
+        await renderPDFPage(pdf, canvas, i, scale);
     }
+}
 
-    window.ontouchstart = function (event) {
-        if (event.target == modal) {
-            hideComments();
-        }
-    }
+async function renderPDFPage(pdf, canvas, pageNumber, scale) {
+    const page = await pdf.getPage(pageNumber);
+    var viewport = page.getViewport({ scale: scale });
 
-    document.getElementById("modalClose").addEventListener("click", () => {
-        hideComments();
-    });
-});
+    var context = canvas.getContext('2d');
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    var renderContext = {
+        canvasContext: context,
+        viewport: viewport
+    };
+    await page.render(renderContext).promise;
+    return;
+}
+
+async function loadPDF(url) {
+    var { pdfjsLib } = globalThis;
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.worker.mjs';
+
+    var pdf = await pdfjsLib.getDocument(url).promise;
+    console.log("PDF loaded");
+    return pdf;
+}

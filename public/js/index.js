@@ -8,7 +8,7 @@ function loadPosts(page) {
         });
 }
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', async () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page') || 1;
@@ -19,7 +19,26 @@ window.onload = function () {
         prank();
     }
 
-};
+
+    var modal = document.getElementById('commentModal');
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            hideComments();
+        }
+    }
+
+    window.ontouchstart = function (event) {
+        if (event.target == modal) {
+            hideComments();
+        }
+    }
+
+    document.getElementById("modalClose").addEventListener("click", () => {
+        hideComments();
+    });
+});
+
 
 function prank() {
     function showPrank() {
