@@ -3,8 +3,9 @@
 
 <head>
   <%- include("./partials/baseHead.ejs") %>
-
+  <title id="title"><%= postID %></title>
   <script src="/js/partials/postRenderer.js"></script>
+  <script src="/js/partials/commentRenderer.js"></script>
   <link rel="stylesheet" href="/css/sections.css">
 </head>
 
@@ -17,8 +18,12 @@
 </html>
 
 <script>
+  const loggedIn = <%= typeof username !== 'undefined' ? true : false %>;
   document.addEventListener('DOMContentLoaded', async () => {
-    const post = await fetch(`/internal/getPost/<%= postID %>`);
-    buildPost(await post.json());
+    const req = await fetch(`/internal/getPost/<%= postID %>`);
+    const post = req.json();
+    document.getElementById('title').innerText = (await post).title;
+    console.log(await post);
+    buildPost(await post);
   });
 </script>

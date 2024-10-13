@@ -155,12 +155,6 @@ module.exports.MongoConnector = class MongoConnector {
         return user;
     }
 
-    async getPost(postID) {
-        return await this.Post.findById(postID)
-            .populate('userID', 'username')
-            .populate('likes.userID', 'username profilePic');
-    }
-
     async loadPostComments(postID) {
         const post = await this.Post.findById(postID)
             .populate('comments')
@@ -252,6 +246,54 @@ module.exports.MongoConnector = class MongoConnector {
         });
 
         return restructuredPosts;
+    }
+
+    async getPost(postID) {
+        const post = await this.Post.findById(postID)
+            .populate({
+                path: 'userID',
+                select: 'username',
+                populate: {
+                    path: 'preferences',
+                    match: { key: 'profilePic' },
+                    select: 'value'
+                }
+            })
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'userID',
+                    select: 'username',
+                    populate: {
+                        path: 'preferences',
+                        match: { key: 'profilePic' },
+                        select: 'value'
+                    }
+                }
+            })
+            .sort({ timestamp: -1 });
+
+        let restructuredPost = this.restructureUser(post);
+
+        restructuredPost.comments = restructuredPost.comments.map(comment => {
+            if (comment.userID.profilePic) {
+                return comment;
+            }
+            if (comment.userID.preferences && comment.userID.preferences.length > 0) {
+                const profilePicPreference = comment.userID.preferences.find(pref => pref.key === 'profilePic');
+                if (profilePicPreference) {
+                    comment.userID.profilePic = profilePicPreference.value;
+                }
+            } else {
+                const randomProfilePic = generateRandomProfilePic();
+                comment.userID.profilePic = randomProfilePic;
+                this.setPreference(comment.userID._id, 'profilePic', randomProfilePic);
+            }
+            delete comment.userID.preferences;
+            return comment;
+        });
+
+        return restructuredPost;
     }
 
 

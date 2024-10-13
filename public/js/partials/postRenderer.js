@@ -9,29 +9,54 @@ function buildPost(post) {
     sectionContainer.className = "section-container";
     postContainer.appendChild(sectionContainer);
 
+    const footer = buildFooter(post);
+
     post.sections.forEach(section => {
         let sectionDiv = document.createElement("div");
         sectionDiv.className = "section";
         switch (section.type) {
             case "text":
                 const text = document.createElement("p");
-                text.textContent = section.content;
+                text.innerHTML = section.content;
                 sectionDiv.appendChild(text);
                 break;
             case "file":
-                const fileContainer = document.createElement("div");
-                fileContainer.className = "file";
-                const url = `https://storage.liscitransmitter.live/${section.content}`;
-                sectionDiv.appendChild(fileContainer);
-                renderPDF(url, fileContainer, 2);
-                break;
+                if (window.location.pathname === "/") {
+                    if (!document.getElementById("viewButton")){
+                        const viewButton = document.createElement("button");
+                        viewButton.className = "button";
+                        viewButton.id = "viewButton";
+
+                        const viewIcon = document.createElement("img");
+                        viewIcon.className = "icon";
+                        viewIcon.src = "/icons/view.svg";
+
+                        const viewLabel = document.createElement("p");
+                        viewLabel.className = "button-label";
+                        viewLabel.textContent = "View";
+
+                        viewButton.appendChild(viewIcon);
+                        viewButton.appendChild(viewLabel);
+
+                        viewButton.onclick = () => window.location.href = `/post/${post._id}`;
+                        footer.firstChild.appendChild(viewButton);
+                    }
+                    break;
+                } else {
+                    const fileContainer = document.createElement("div");
+                    fileContainer.className = "file";
+                    const url = `https://storage.liscitransmitter.live/${section.content}`;
+                    sectionDiv.appendChild(fileContainer);
+                    renderPDF(url, fileContainer, 2);
+                    break;
+                }
             case "img":
                 const img = document.createElement("img");
                 img.className = "post-image";
                 img.src = `https://storage.liscitransmitter.live/${section.content}`;
                 img.alt = post.title;
-                img.style = `max-width: 100%; height: ${section.size*document.documentElement.clientWidth + "px" || "auto"}`;
-                console.log(section.size*document.documentElement.clientWidth);
+                img.style = `max-width: 100%; height: ${section.size * document.documentElement.clientWidth + "px" || "auto"}`;
+                console.log(section.size * document.documentElement.clientWidth);
                 sectionDiv.appendChild(img);
                 break;
             case "markdown":
@@ -45,7 +70,7 @@ function buildPost(post) {
         }
         sectionContainer.appendChild(sectionDiv);
     });
-    postContainer.appendChild(buildFooter(post));
+    postContainer.appendChild(footer);
     postBox.appendChild(postContainer);
 }
 
