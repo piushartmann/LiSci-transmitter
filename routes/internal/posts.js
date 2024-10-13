@@ -40,19 +40,14 @@ module.exports = (db, s3Client) => {
             return section;
         });
 
-        const summarizedSections = await Promise.all(sanitizedSections.map(async section => {
-            if (section.type === "file") {
-                const openAIResponse = await openAI.summarizePDF("https://storage.liscitransmitter.live/" + section.content);
-                section.summary = openAIResponse;
-            }
-            return section;
-        }));
-
         if (!title || !sections) return res.status(400).send("Missing parameters");
         if (typeof title !== "string") return res.status(400).send("Invalid parameters");
 
-        await db.createPost(req.session.userID, title, summarizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
-        return res.status(200).send("Success");
+        const post = await db.createPost(req.session.userID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
+        const postID = post._id;
+        res.status(200).send("Success");
+        summarizeSections(sanitizedSections, postID);
+        return;
     });
 
     router.post('/updatePost', async (req, res) => {
@@ -71,25 +66,29 @@ module.exports = (db, s3Client) => {
             return section;
         });
 
-        const summarizedSections = await Promise.all(sanitizedSections.map(async section => {
-            if (section.type === "file") {
-                if (!section.summary) {
-                    const openAIResponse = await openAI.summarizePDF("https://storage.liscitransmitter.live/" + section.content);
-                    section.summary = openAIResponse;
-                }
-            }
-            return section;
-        }));
-
         const permissionsBool = permissions === "true";
         console.log(postID, title, sections, permissions);
 
         if (!postID || !title || !sections) return res.status(400).send("Missing parameters");
         if (typeof postID !== "string" || typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
 
-        await db.updatePost(postID, title, summarizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
-        return res.status(200).send("Success");
+        await db.updatePost(postID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
+        res.status(200).send("Success");
+        summarizeSections(sanitizedSections, postID);
+        return;
     })
+
+    function summarizeSections(sections, postID) {
+        sections.forEach(section => {
+            if (section.type === "file") {
+                if (!section.summary){
+                    openAI.summarizePDF("https://storage.liscitransmitter.live/" + section.content).then(summary => {
+                        db.addSummaryToSection(postID, section.id, summary);
+                    });
+                }
+            }
+        });
+    }
 
     router.get('/getPosts', async (req, res) => {
         const permissions = req.session.permissions || [];

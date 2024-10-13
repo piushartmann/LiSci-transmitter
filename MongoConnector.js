@@ -94,6 +94,12 @@ module.exports.MongoConnector = class MongoConnector {
         return await post.save();
     }
 
+    async addSummaryToSection(postID, sectionIndex, summary) {
+        const post = await this.Post.findById(postID);
+        post.sections[sectionIndex].summary = summary;
+        return await post.save();
+    }
+
     async likePost(postID, userID) {
         const post = await this.Post.findById(postID);
         const hasLiked = post.likes.some(like => like.userID.equals(userID));
