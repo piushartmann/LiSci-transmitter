@@ -22,7 +22,7 @@ function buildPost(post) {
                 break;
             case "file":
                 if (window.location.pathname === "/") {
-                    if (!document.getElementById("viewButton")){
+                    if (!document.getElementById("viewButton")) {
                         const viewButton = document.createElement("button");
                         viewButton.className = "button";
                         viewButton.id = "viewButton";
