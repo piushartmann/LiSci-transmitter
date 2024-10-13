@@ -65,15 +65,12 @@ webpush.setVapidDetails(
 const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
-app.use('/', require('./routes/base')(db, pageSize));
-app.use('/internal', require('./routes/internal')(db, s3Client));
-app.use('/api', require('./routes/api')(db, s3Client, pageSize, webpush));
-
-//start server
-if (process.env.KILLSWITCH == 1) {
-    console.log("Server is not running because of killswitch")
-    return;
+if (!process.env.KILLSWITCH == 1) {
+    app.use('/', require('./routes/base')(db, pageSize));
+    app.use('/internal', require('./routes/internal')(db, s3Client));
+    app.use('/api', require('./routes/api')(db, s3Client, pageSize, webpush));
 }
+
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });
