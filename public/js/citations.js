@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async function () {
-    loadCitations();
     const previousAuthors = await loadPreviousAuthors();
     const author = document.getElementById("author");
     autocomplete(author, previousAuthors);
