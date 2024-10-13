@@ -1,3 +1,26 @@
+function buildButton(icon, label, onclick) {
+    let button = document.createElement("button");
+    button.className = "button";
+    button.onclick = onclick;
+
+    let buttonIcon = document.createElement("img");
+    buttonIcon.className = "icon";
+    buttonIcon.src = icon;
+
+    let buttonLabel = document.createElement("p");
+    buttonLabel.className = "button-label";
+    buttonLabel.textContent = label;
+
+    button.appendChild(buttonIcon);
+    button.appendChild(buttonLabel);
+
+    button.icon = buttonIcon;
+    button.label = buttonLabel;
+
+    return button;
+}
+
+
 document.addEventListener("DOMContentLoaded", async function () {
     const previousAuthors = await loadPreviousAuthors();
     const author = document.getElementById("author");
@@ -97,16 +120,12 @@ function buildCitation(citation) {
     citationContainer.appendChild(buttonRow);
 
     if (citation.canEdit) {
-        let deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button";
-        deleteButton.innerHTML = "Delete";
-        deleteButton.onclick = () => deleteCitation(citation._id);
-        buttonRow.appendChild(deleteButton);
 
-        let editButton = document.createElement("button");
-        editButton.className = "edit-button";
-        editButton.innerHTML = "Edit";
-        editButton.onclick = () => editCitation(citation._id);
+        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id));
+
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id));
+
+        buttonRow.appendChild(deleteButton);
         buttonRow.appendChild(editButton);
     }
 
@@ -175,16 +194,12 @@ function editCitation(id) {
     let buttonRow = citationContainer.querySelector('.button-row');
     buttonRow.innerHTML = '';
 
-    let saveButton = document.createElement("button");
-    saveButton.className = "save-button";
-    saveButton.innerHTML = "Save";
-    saveButton.onclick = () => saveCitation(id);
+    let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id));
+
     buttonRow.appendChild(saveButton);
 
-    let cancelButton = document.createElement("button");
-    cancelButton.className = "cancel-button";
-    cancelButton.innerHTML = "Cancel";
-    cancelButton.onclick = () => cancelEditCitation(id, contentText, authorText);
+    let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => cancelEditCitation(id, contentText, authorText));
+
     buttonRow.appendChild(cancelButton);
 }
 
@@ -218,16 +233,12 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     let buttonRow = citationContainer.querySelector('.button-row');
     buttonRow.innerHTML = '';
 
-    let deleteButton = document.createElement("button");
-    deleteButton.className = "delete-button";
-    deleteButton.innerHTML = "Delete";
-    deleteButton.onclick = () => deleteCitation(id);
+    let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id));
+
     buttonRow.appendChild(deleteButton);
 
-    let editButton = document.createElement("button");
-    editButton.className = "edit-button";
-    editButton.innerHTML = "Edit";
-    editButton.onclick = () => editCitation(id);
+    let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id));
+
     buttonRow.appendChild(editButton);
 }
 

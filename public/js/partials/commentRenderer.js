@@ -1,3 +1,25 @@
+function buildButton(icon, label, onclick) {
+    let button = document.createElement("button");
+    button.className = "button";
+    button.onclick = onclick;
+
+    let buttonIcon = document.createElement("img");
+    buttonIcon.className = "icon";
+    buttonIcon.src = icon;
+
+    let buttonLabel = document.createElement("p");
+    buttonLabel.className = "button-label";
+    buttonLabel.textContent = label;
+
+    button.appendChild(buttonIcon);
+    button.appendChild(buttonLabel);
+
+    button.icon = buttonIcon;
+    button.label = buttonLabel;
+
+    return button;
+}
+
 function renderComments(post) {
     const commentModal = document.getElementById('commentModal');
     commentModal.style.display = 'block';
@@ -109,38 +131,14 @@ function buildComment(comment) {
     commentDiv.appendChild(buttonRow);
 
     if (comment.canEdit) {
-        let editButton = document.createElement("button");
-        editButton.className = "edit-button button";
-        editButton.type = "button";
-        editButton.onclick = () => editComment(comment._id);
 
-        let editIcon = document.createElement("img");
-        editIcon.className = "icon";
-        editIcon.src = "/icons/edit.svg";
-
-        let editLabel = document.createElement("p");
-        editLabel.className = "button-label";
-        editLabel.textContent = "Edit";
-
-        editButton.appendChild(editIcon);
-        editButton.appendChild(editLabel);
+        let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(comment._id));
+        editButton.className = 'edit-button button';
 
         buttonRow.appendChild(editButton);
 
-        let deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button button";
-        editButton.type = "button";
-        deleteButton.onclick = () => deleteComment(comment._id);
-        let deleteIcon = document.createElement("img");
-        deleteIcon.className = "icon";
-        deleteIcon.src = "/icons/delete.svg";
-
-        let deleteLabel = document.createElement("p");
-        deleteLabel.className = "button-label";
-        deleteLabel.textContent = "Delete";
-
-        deleteButton.appendChild(deleteIcon);
-        deleteButton.appendChild(deleteLabel);
+        let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(comment._id));
+        deleteButton.className = 'delete-button button';
 
         buttonRow.appendChild(deleteButton);
     }
@@ -172,10 +170,19 @@ function editComment(commentID) {
 
     content.replaceWith(contentInput);
 
-    const buttonRow = commentDiv.querySelector('.button-row');
-    const editButton = buttonRow.querySelector('.edit-button');
-    editButton.innerHTML = 'Save';
-    editButton.onclick = () => saveComment(commentID);
+    let buttonRow = commentDiv.querySelector('.button-row');
+    let editButton = buttonRow.querySelector('.edit-button');
+    let deleteButton = buttonRow.querySelector('.delete-button');
+    editButton.remove();
+    deleteButton.remove();
+
+    let saveButton = buildButton('/icons/save.svg', 'Save', () => saveComment(commentID));
+    saveButton.className = 'save-button button';
+    buttonRow.appendChild(saveButton);
+
+    let cancelButton = buildButton('/icons/cancel.svg', 'Cancel', () => cancelEditComment(commentID, contentText));
+    cancelButton.className = 'cancel-button button';
+    buttonRow.appendChild(cancelButton);
 }
 
 async function saveComment(commentID) {
@@ -190,5 +197,24 @@ async function saveComment(commentID) {
         },
         body: JSON.stringify({ commentID, content }),
     });
+    window.location.reload();
+}
+
+async function cancelEditComment(commentID, contentText) {
+    const commentDiv = document.querySelector(`[data-id="${commentID}"]`);
+    const contentInput = commentDiv.querySelector('.content');
+    contentInput.replaceWith(contentText);
+
+    let buttonRow = commentDiv.querySelector('.button-row');
+    let saveButton = buttonRow.querySelector('.save-button');
+    let cancelButton = buttonRow.querySelector('.cancel-button');
+    saveButton.remove();
+    cancelButton.remove();
+
+    let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(commentID));
+    buttonRow.appendChild(editButton);
+
+    let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(commentID));
+    buttonRow.appendChild(deleteButton);
     window.location.reload();
 }

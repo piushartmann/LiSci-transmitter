@@ -128,8 +128,8 @@ header a {
     margin: 60px 0 0 0;
 }
 
-.submit-login,
-.cancel-button {
+.submit-button-container .submit-login,
+.submit-button-container .cancel-button {
     background-color: transparent;
     border: 2px solid #000;
     padding: 5px 10px;
@@ -137,12 +137,12 @@ header a {
 
 }
 
-.cancel-button {
+.submit-button-container .cancel-button {
     color: red;
     cursor: pointer;
 }
 
-.submit-login {
+.submit-button-container .submit-login {
     color: green;
     cursor: pointer;
 }

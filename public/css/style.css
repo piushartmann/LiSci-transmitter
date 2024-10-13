@@ -134,4 +134,13 @@ a {
         animation: tooltipFadeIn 0.2s forwards;
     }
 
+    .button-label {
+        display: none;
+    }
+
+    .author-name {
+        display: none;
+    }
+
+
 }

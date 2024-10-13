@@ -1,3 +1,25 @@
+function buildButton(icon, label, onclick) {
+    let button = document.createElement("button");
+    button.className = "button";
+    button.onclick = onclick;
+
+    let buttonIcon = document.createElement("img");
+    buttonIcon.className = "icon";
+    buttonIcon.src = icon;
+
+    let buttonLabel = document.createElement("p");
+    buttonLabel.className = "button-label";
+    buttonLabel.textContent = label;
+
+    button.appendChild(buttonIcon);
+    button.appendChild(buttonLabel);
+
+    button.icon = buttonIcon;
+    button.label = buttonLabel;
+
+    return button;
+}
+
 function buildPost(post) {
     const postBox = document.getElementById("postBox");
     let postContainer = document.createElement("div");
@@ -23,22 +45,8 @@ function buildPost(post) {
             case "file":
                 if (window.location.pathname === "/") {
                     if (!document.getElementById("viewButton")) {
-                        const viewButton = document.createElement("button");
-                        viewButton.className = "button";
+                        const viewButton = buildButton("/icons/view.svg", "View", () => window.location.href = `/post/${post._id}`);
                         viewButton.id = "viewButton";
-
-                        const viewIcon = document.createElement("img");
-                        viewIcon.className = "icon";
-                        viewIcon.src = "/icons/view.svg";
-
-                        const viewLabel = document.createElement("p");
-                        viewLabel.className = "button-label";
-                        viewLabel.textContent = "View";
-
-                        viewButton.appendChild(viewIcon);
-                        viewButton.appendChild(viewLabel);
-
-                        viewButton.onclick = () => window.location.href = `/post/${post._id}`;
                         footer.firstChild.appendChild(viewButton);
                     }
                     break;
@@ -144,49 +152,16 @@ function buildFooter(post) {
     let iteractionButtons = document.createElement("div");
     iteractionButtons.className = "flex";
 
-
-
-    let likeButton = document.createElement("button");
-    likeButton.className = "button";
-
-    let likeIcon = document.createElement("img");
-    likeIcon.className = "icon";
+    let likeIcon = null;
 
     if (loggedIn) {
-        likeIcon.src = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
+        likeIcon = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
     }
     else {
-        likeIcon.src = "/icons/like-locked.svg";
+        likeIcon = "/icons/like-locked.svg";
     }
 
-    let likeCounter = document.createElement("p");
-    likeCounter.className = "button-label";
-    likeCounter.textContent = `${likes} Likes`;
-
-    likeButton.appendChild(likeIcon);
-    likeButton.appendChild(likeCounter);
-
-
-
-    let commentButton = document.createElement("button");
-    commentButton.className = "button";
-    commentButton.onclick = () => renderComments(post);
-
-    let commentIcon = document.createElement("img");
-    commentIcon.className = "icon";
-    commentIcon.src = post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg";
-
-    let commentCounter = document.createElement("p");
-    commentCounter.className = "button-label";
-    commentCounter.textContent = `${post.comments.length} Comments`;
-
-    commentButton.appendChild(commentIcon);
-    commentButton.appendChild(commentCounter);
-
-    iteractionButtons.appendChild(likeButton);
-    iteractionButtons.appendChild(commentButton);
-
-    footerDiv.appendChild(iteractionButtons);
+    let likeButton = buildButton(likeIcon, `${likes} Likes`, () => { });
 
     if (loggedIn) {
         likeButton.onclick = async () => {
@@ -198,9 +173,9 @@ function buildFooter(post) {
                     },
                     body: JSON.stringify({ postID: post._id }),
                 });
-                likeCounter.textContent = `${likes + 1} Likes`;
+                likeButton.label.textContent = `${likes + 1} Likes`;
                 likes++;
-                likeIcon.src = "/icons/like-filled.svg";
+                likeButton.icon.src = "/icons/like-filled.svg";
                 liked = true;
             }
             else {
@@ -211,38 +186,30 @@ function buildFooter(post) {
                     },
                     body: JSON.stringify({ postID: post._id }),
                 });
-                likeCounter.textContent = `${likes - 1} Likes`;
+                likeButton.label.textContent = `${likes - 1} Likes`;
                 likes--;
-                likeIcon.src = "/icons/like-unfilled.svg";
+                likeButton.icon.src = "/icons/like-unfilled.svg";
                 liked = false;
             }
         }
     }
 
+    let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} Comments`, () => renderComments(post));
+
+    iteractionButtons.appendChild(likeButton);
+    iteractionButtons.appendChild(commentButton);
+
+    footerDiv.appendChild(iteractionButtons);
+
     if (post.canEdit) {
         let buttonRow = document.createElement("div");
         buttonRow.className = "flex";
 
-        let editButton = document.createElement("button");
-        editButton.className = "edit-button button";
-        editButton.onclick = () => window.location.href = `/edit/${post._id}`;
-
-        let editIcon = document.createElement("img");
-        editIcon.className = "icon";
-        editIcon.src = "/icons/edit.svg";
-
-        let editLabel = document.createElement("p");
-        editLabel.className = "button-label";
-        editLabel.textContent = "Edit";
-
-        editButton.appendChild(editIcon);
-        editButton.appendChild(editLabel);
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`);
 
         buttonRow.appendChild(editButton);
 
-        let deleteButton = document.createElement("button");
-        deleteButton.className = "delete-button button";
-        deleteButton.onclick = async () => {
+        let deleteButton = buildButton("/icons/delete.svg", "Delete", async () => {
             if (confirm("Are you sure you want to delete this post?")) {
                 await fetch(`/internal/deletePost`, {
                     method: "POST",
@@ -254,18 +221,7 @@ function buildFooter(post) {
                 console.log(`Post ${post._id} deleted`);
             }
             window.location.reload();
-        };
-
-        let deleteIcon = document.createElement("img");
-        deleteIcon.className = "icon";
-        deleteIcon.src = "/icons/delete.svg";
-
-        let deleteLabel = document.createElement("p");
-        deleteLabel.className = "button-label";
-        deleteLabel.textContent = "Delete";
-
-        deleteButton.appendChild(deleteIcon);
-        deleteButton.appendChild(deleteLabel);
+        });
 
         buttonRow.appendChild(deleteButton);
 
