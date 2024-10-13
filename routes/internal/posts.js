@@ -73,8 +73,10 @@ module.exports = (db, s3Client) => {
 
         const summarizedSections = await Promise.all(sanitizedSections.map(async section => {
             if (section.type === "file") {
-                const openAIResponse = await openAI.summarizePDF("https://storage.liscitransmitter.live/" + section.content);
-                section.summary = openAIResponse;
+                if (!section.summary) {
+                    const openAIResponse = await openAI.summarizePDF("https://storage.liscitransmitter.live/" + section.content);
+                    section.summary = openAIResponse;
+                }
             }
             return section;
         }));
