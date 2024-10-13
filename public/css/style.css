@@ -55,6 +55,14 @@ body {
     margin-right: 5px;
 }
 
+button {
+    touch-action: manipulation;
+}
+
+a {
+    touch-action: manipulation;
+}
+
 .button .icon {
     width: 25px;
     height: 25px;
@@ -62,7 +70,7 @@ body {
 }
 
 .button-label {
-    cursor: pointer!important;
+    cursor: pointer !important;
 }
 
 .defaultProfilePicture {
@@ -78,9 +86,52 @@ body {
     user-select: none;
 }
 
-.author-info{
+.author-info {
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 10px;
+}
+
+
+.author-profile-pic {
+    position: relative;
+}
+
+.author-profile-pic .author-name-tooltip {
+    visibility: hidden;
+    width: 50px;
+    background-color: rgba(0, 0, 0, 0.388);
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    width: 100px;
+    bottom: 115%;
+    left: 50%;
+    margin-left: -50px;
+    position: absolute;
+    z-index: 1;
+    font-size: 1em;
+    touch-action: manipulation;
+}
+
+.author-profile-pic .author-name-tooltip::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.388) transparent transparent transparent;
+}
+
+@media (max-width: 768px) {
+
+    .author-profile-pic:hover .author-name-tooltip {
+        visibility: visible;
+        animation: tooltipFadeIn 0.2s forwards;
+    }
+
 }

@@ -27,9 +27,11 @@ function buildPost(post) {
                 break;
             case "img":
                 const img = document.createElement("img");
+                img.className = "post-image";
                 img.src = `https://storage.liscitransmitter.live/${section.content}`;
                 img.alt = post.title;
-                img.style = `max-width: 100%; height: ${section.size + "px" || "auto"}`;
+                img.style = `max-width: 100%; height: ${section.size*document.documentElement.clientWidth + "px" || "auto"}`;
+                console.log(section.size*document.documentElement.clientWidth);
                 sectionDiv.appendChild(img);
                 break;
             case "markdown":
@@ -56,20 +58,26 @@ function buildHeader(post) {
         authorDiv.className = "author-info";
 
         let authorName = document.createElement("p");
+        authorName.className = "author-name";
         authorName.textContent = post.userID.username;
         authorName.style = "margin-left: 10px;";
 
         let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "defaultProfilePicture";
+        authorProfilePic.className = "defaultProfilePicture author-profile-pic";
         authorProfilePic.style = `background-color: ${profilePic.content};`;
         authorProfilePic.textContent = post.userID.username.charAt(0).toUpperCase();
+
+        let authorProfilePicName = document.createElement("span");
+        authorProfilePicName.textContent = post.userID.username;
+        authorProfilePicName.className = "author-name-tooltip";
+        authorProfilePic.appendChild(authorProfilePicName);
 
         authorDiv.appendChild(authorName);
         authorDiv.appendChild(authorProfilePic);
 
         let titleDiv = document.createElement("h1");
+        titleDiv.className = "post-title";
         titleDiv.textContent = post.title;
-        titleDiv.style = "display: inline;";
 
         headerDiv.appendChild(titleDiv);
         headerDiv.appendChild(authorDiv);

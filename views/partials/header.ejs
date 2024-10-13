@@ -9,13 +9,11 @@
   <nav class="header-nav">
     <ul>
       <li><a href="/">Home</a></li>
-      <li><a href="/archive">Archiv</a></li>
+      <!-- <li><a href="/archive">Archiv</a></li> -->
       <% if (usertype.includes("classmate")) { %>
       <li><a href="/citations">Zitate</a></li>
       <% } %>
     </ul>
-
-
   </nav>
 
   <div class="header-button">
@@ -25,13 +23,18 @@
 
     <% if (loggedIn) { %>
     <% if (profilePic.type == "default") { %>
-    <p class="defaultProfilePicture" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
+    <p class="defaultProfilePicture profilePicture" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
       <%= username.charAt(0).toUpperCase() %>
     </p>
     <% } %>
     <% } else { %>
     <button onclick="showLoginPopup()">Login</button>
     <% } %>
+
+    <button class="mobileMenuButton" onclick="toggleMobileMenu()">
+      <img src="/icons/menu.svg" alt="Menu">
+    </button>
+
   </div>
 
 
@@ -57,7 +60,7 @@
   <% if (typeof isSettingsPage == "undefined") { %>
   <div class="content">
     <button onclick="window.location.href='/settings'" class="button">
-      <img class="icon" src="icons/settings.svg"></img>
+      <img class="icon" src="/icons/settings.svg"></img>
       <label class="button-label">Settings</label>
     </button>
   </div>
@@ -65,9 +68,27 @@
 
   <div class="content">
     <button onclick="logout()" class="button">
-      <img class="icon" src="icons/logout.svg"></img>
+      <img class="icon" src="/icons/logout.svg"></img>
       <label class="button-label">Logout</label>
     </button>
   </div>
-  
+</div>
+
+<div class="mobileMenu" id="mobileMenu" style="display: none">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <!-- <li><a href="/archive">Archiv</a></li> -->
+    <% if (usertype.includes("classmate")) { %>
+      <li><a href="/citations">Zitate</a></li>
+    <% } %>
+    <% if (usertype.includes("admin") || usertype.includes("writer")) { %>
+      <li><a href="/create">Neuer Post</a></li>
+    <% } %>
+    <% if (loggedIn) { %>
+      <li><a href="/settings">Settings</a></li>
+      <li><a href="#" onclick="logout()">Logout</a></li>
+    <% } else { %>
+      <li><a href="#" onclick="showLoginPopup()">Login</a></li>
+    <% } %>
+  </ul>
 </div>

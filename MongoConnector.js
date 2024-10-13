@@ -396,4 +396,8 @@ module.exports.MongoConnector = class MongoConnector {
         if (preferences) user.preferences = preferences;
         return await user.save();
     }
+
+    async getPreviousAuthors() {
+        return await this.Citation.distinct('author');
+    }
 };

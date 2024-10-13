@@ -19,7 +19,9 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
         const { author, content } = req.body;
+
         console.log(author, content);
+
         if (!author || !content) return res.status(400).send("Missing parameters");
         if (typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
 
@@ -27,7 +29,7 @@ module.exports = (db, s3Client) => {
         const sanitizedAuthor = sanitizeHtml(author);
 
         await db.createCitation(req.session.userID, sanitizedAuthor, sanitizedContent);
-        return res.status(200).redirect('/citations');
+        return res.status(200).send("Success");
     });
 
     router.get('/getCitations', async (req, res) => {
@@ -89,5 +91,15 @@ module.exports = (db, s3Client) => {
         await db.updateCitation(citationID, sanitizedAuthor, sanitizedContent);
         return res.status(200).send("Success");
     });
+
+    router.get('/getPreviousAuthors', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
+
+        const authors = await db.getPreviousAuthors();
+
+        return res.status(200).send(authors);
+    });
+
     return router;
 };

@@ -1,5 +1,8 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     loadCitations();
+    const previousAuthors = await loadPreviousAuthors();
+    const author = document.getElementById("author");
+    autocomplete(author, previousAuthors);
 });
 
 window.onload = function () {
@@ -18,6 +21,11 @@ function loadCitations(page) {
                 buildCitation(citation);
             });
         });
+}
+
+async function loadPreviousAuthors() {
+    const previousAuthors = await fetch('internal/getPreviousAuthors')
+    return await previousAuthors.json();
 }
 
 function buildCitation(citation) {
@@ -48,11 +56,17 @@ function buildCitation(citation) {
         let authorName = document.createElement("p");
         authorName.textContent = citation.userID.username;
         authorName.style = "margin-left: 10px;";
+        authorName.className = "author-name";
 
         let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "defaultProfilePicture";
+        authorProfilePic.className = "defaultProfilePicture author-profile-pic";
         authorProfilePic.style = `background-color: ${profilePic.content};`;
         authorProfilePic.textContent = citation.userID.username.charAt(0).toUpperCase();
+
+        let authorProfilePicName = document.createElement("span");
+        authorProfilePicName.textContent = citation.userID.username;
+        authorProfilePicName.className = "author-name-tooltip";
+        authorProfilePic.appendChild(authorProfilePicName);
 
         authorDiv.appendChild(authorName);
         authorDiv.appendChild(authorProfilePic);
@@ -104,10 +118,29 @@ function submitCitation() {
     author = document.getElementById("author").value;
     content = document.getElementById("content").value;
 
+    function checkChar(char) {
+        bannedChars = ['"', '„', '“']
+        return bannedChars.includes(char);
+    }
+
+    if (checkChar(content.charAt(0))) {
+        content = content.substring(1);
+    }
+    if (checkChar(content.charAt(content.length - 1))) {
+        content = content.substring(0, content.length - 1);
+    }
+
+    console.log(content);
+
     fetch('internal/createCitation', {
         method: 'POST',
-        body: JSON.stringify({ author, content }),
-        enctype: 'x-www-form-urlencoded',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            author: author,
+            content: content
+        }),
     })
         .then(response => {
             if (response.status === 200) {
@@ -197,4 +230,9 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     editButton.innerHTML = "Edit";
     editButton.onclick = () => editCitation(id);
     buttonRow.appendChild(editButton);
+}
+
+function selectUser(user){
+    const author = document.getElementById("author");
+    author.value = user;
 }

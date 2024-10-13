@@ -18,7 +18,7 @@ function renderComments(post) {
     });
 
     const textarea = document.getElementById('commentTextarea');
-    if (!loggedIn){
+    if (!loggedIn) {
         textarea.disabled = true;
         textarea.placeholder = "Please log in to comment";
     }
@@ -69,6 +69,7 @@ function buildComment(comment) {
 
         let authorName = document.createElement("p");
         authorName.textContent = comment.userID.username;
+        authorName.className = "author-name";
         authorName.style = "margin-left: 10px;";
 
         let authorProfilePic = document.createElement("p");
@@ -88,7 +89,7 @@ function buildComment(comment) {
         let authorName = document.createElement("p");
         authorName.textContent = comment.userID.username;
         authorName.style = "margin-left: 10px;";
-        
+
         let authorProfilePic = document.createElement("img");
         authorProfilePic.className = "profilePicture";
         authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
@@ -123,7 +124,7 @@ function buildComment(comment) {
 
         editButton.appendChild(editIcon);
         editButton.appendChild(editLabel);
-        
+
         buttonRow.appendChild(editButton);
 
         let deleteButton = document.createElement("button");

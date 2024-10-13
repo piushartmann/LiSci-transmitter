@@ -25,23 +25,30 @@
     display: flex;
 }
 
-.sentenceStructure #author {
-    width: 25%;
-
+.sentenceStructure .author {
+    width: max(25%, 140px);
 }
 
-.sentenceStructure #content {
-    width: 100%;
+.sentenceStructure .content {
+    width: max(100%, 140px);
 }
 
-.sentenceStructure input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 1em;
+.sentenceStructure .content,
+.sentenceStructure .author {
     margin: 5px;
     margin-bottom: 1vh;
+}
+
+.sentenceStructure .content textarea,
+.sentenceStructure .author textarea {
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    resize: none;
+    height: 40px;
+    overflow: hidden;
+    width: 100%;
 }
 
 
@@ -68,4 +75,35 @@
     position: absolute;
     top: 0px;
     right: 15px;
+}
+
+.autocomplete-items {
+    transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+
+    .sentenceStructure {
+        flex-wrap: wrap;
+    }
+
+    .sentenceStructure .author {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .sentenceStructure .content {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .sentenceStructure p {
+        width: 100%;
+        text-align: center;
+        margin: 5px;
+    }
+
+    .author-name {
+        display: none;
+    }
 }

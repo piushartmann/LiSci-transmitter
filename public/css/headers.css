@@ -84,7 +84,7 @@ header a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
+
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
@@ -103,6 +103,7 @@ header a {
     display: block;
     max-width: 250px;
 }
+
 .login-popup-content input[type=text],
 .login-popup-content input[type=password] {
     width: 100%;
@@ -114,6 +115,7 @@ header a {
     box-sizing: border-box;
     text-align: center;
 }
+
 .login-popup-content input[type=text]:focus,
 .login-popup-content input[type=password]:focus {
     background-color: #f1f1f1;
@@ -127,12 +129,13 @@ header a {
     margin: 60px 0 0 0;
 }
 
-.submit-login, .cancel-button {
+.submit-login,
+.cancel-button {
     background-color: transparent;
     border: 2px solid #000;
     padding: 5px 10px;
     margin: 0 15px 0 15px;
-    
+
 }
 
 .cancel-button {
@@ -164,6 +167,7 @@ header a {
         opacity: 0.5;
         scale: 0;
     }
+
     100% {
         transform: translateY(0);
         opacity: 1;
@@ -181,4 +185,74 @@ header a {
 
 .userMenu .content .button {
     margin-right: 0;
+}
+
+.mobileMenuButton {
+    display: none;
+    border: 0;
+    margin-right: 5px !important;
+}
+
+.mobileMenu {
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: 5vw;
+    z-index: 9;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 8px;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    animation: 0.1s 1 normal forwards fadeIn;
+    padding: 10px;
+}
+
+.mobileMenu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobileMenu li {
+    margin: 10px 0;
+}
+
+.mobileMenu a {
+    color: var(--main-text-color);
+    text-decoration: none;
+    font-size: 1.2em;
+    padding: 10px;
+    display: block;
+    text-align: center;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.mobileMenu a:hover {
+    background-color: #f0f0f0;
+}
+
+
+@media (max-width: 768px) {
+    .header-nav {
+        display: none;
+    }
+    
+    .create-post-button {
+        display: none;
+    }
+    
+    .header-logo a {
+        margin: 0 0 0 10px;
+    }
+
+    .profilePicture {
+        display: none !important;
+    }
+
+    .mobileMenuButton {
+        display: block;
+    }
+
 }

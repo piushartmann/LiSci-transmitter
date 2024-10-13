@@ -191,10 +191,10 @@ function addImageSection(isRecontructed = false) {
             };
             reader.readAsDataURL(file);
             if (!isRecontructed) {
-                sections[section.id] = { type: 'img', content: file, size: section.querySelector(`#preview-${uniqueId}`).clientHeight, id: section.id };
+                sections[section.id] = { type: 'img', content: file, size: section.querySelector(`#preview-${uniqueId}`).clientWidth / section.clientWidth, id: section.id };
                 console.log("1");
             } else {
-                sections[section.id] = { type: 'img', content: sections[section.id].content, size: section.querySelector(`#preview-${uniqueId}`).clientHeight, id: section.id, uploaded: true };
+                sections[section.id] = { type: 'img', content: sections[section.id].content, size: section.querySelector(`#preview-${uniqueId}`).clientWidth / section.clientWidth, id: section.id, uploaded: true };
             }
         }
     });
@@ -203,10 +203,10 @@ function addImageSection(isRecontructed = false) {
         const previewElement = section.querySelector(`#preview-${uniqueId}`);
         if (uploadElement && previewElement) {
             if (!isRecontructed) {
-                sections[section.id] = { type: 'img', content: uploadElement.files[0], size: previewElement.clientHeight, id: section.id };
+                sections[section.id] = { type: 'img', content: uploadElement.files[0], size: previewElement.clientWidth / section.clientWidth, id: section.id };
                 console.log("2");
             } else {
-                sections[section.id] = { type: 'img', content: sections[section.id].content, size: previewElement.clientHeight, id: section.id, uploaded: true };
+                sections[section.id] = { type: 'img', content: sections[section.id].content, size: previewElement.clientWidth / section.clientWidth, id: section.id, uploaded: true };
             }
         }
     });
@@ -217,10 +217,10 @@ function addImageSection(isRecontructed = false) {
     const uploadElement = section.querySelector(`#upload-${uniqueId}`);
     if (uploadElement && previewElement) {
         if (!isRecontructed) {
-            sections[section.id] = { type: 'img', content: uploadElement.files[0], size: previewElement.clientHeight, id: section.id };
+            sections[section.id] = { type: 'img', content: uploadElement.files[0], size: previewElement.clientWidth / section.clientWidth, id: section.id };
             console.log("3");
         } else {
-            sections[section.id] = { type: 'img', content: undefined, size: previewElement.clientHeight, id: section.id, uploaded: true };
+            sections[section.id] = { type: 'img', content: undefined, size: previewElement.clientWidth / section.clientWidth, id: section.id, uploaded: true };
         }
     }
 
