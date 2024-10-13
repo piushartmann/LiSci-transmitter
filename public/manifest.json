@@ -8,5 +8,13 @@
     "name": "Life Science Transmitter",
     "short_name": "Transmitter",
     "scope": "https://liscitransmitter.live",
-    "description": "This is the PWA version of the Life Science Transmitter"
+    "description": "This is the PWA version of the Life Science Transmitter",
+    "icons": [
+        {
+            "purpose": "any",
+            "sizes": "512x512",
+            "src": "/images/appIcon.jpg",
+            "type": "image/png"
+        }
+    ]
 }
