@@ -8,14 +8,14 @@ async function summarizeText(text) {
     const completion = await openAI.chat.completions.create({
         model: "gpt-4o",
         messages: [
-            { role: "system", content: "Gebe eine kurze zusammenfassung auf Deutsch, was in dem Text enhalten ist. Der Text stammt aus einer PDF die zu lang ist um sie in einer Chat app direkt einzubetten. Stattdessen wir sie hinter einem Knop gezeigt, der Benutzer solle aber schon einmal eine Zusammenfassung des Dokumentes bekommen. Fasse den Text also kurz zusammen." },
+            { role: "system", content: "Gebe eine kurze zusammenfassung auf Deutsch, was in dem Text enhalten ist. Der Text stammt aus einer PDF die zu lang ist um sie in einer Chat app direkt einzubetten. Stattdessen wir sie hinter einem Knop gezeigt, der Benutzer solle aber schon einmal eine Zusammenfassung des Dokumentes bekommen. Fasse den Text also kurz zusammen. Es ist klar das es eine Zeitung gibt namens LiSci-Transmitter, das musst du nicht sagen, auch dass sie von Cornelius möller ist nicht relevant. Gebe einfach eine sehr Kurze zusammenfassung was diese Woche in der Zeitung passiert ist." },
             {
                 role: "user",
                 content: text,
             },
         ],
     });
-    
+
     const summary = completion.choices[0].message.content;
     console.log(summary);
     return summary;
