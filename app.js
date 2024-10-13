@@ -70,6 +70,10 @@ app.use('/internal', require('./routes/internal')(db, s3Client));
 app.use('/api', require('./routes/api')(db, s3Client, pageSize, webpush));
 
 //start server
+if (process.env.KILLSWITCH == 1) {
+    console.log("Server is not running because of killswitch")
+    return;
+}
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });

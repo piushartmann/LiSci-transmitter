@@ -65,6 +65,16 @@
 
 .button-row {
     display: flex;
+    justify-content: space-between;
+}
+
+.edit-buttons {
+    display: flex;
+    justify-content: right;
+}
+
+.interaction-buttons {
+    display: flex;
     justify-content: right;
 }
 

@@ -119,17 +119,65 @@ function buildCitation(citation) {
     buttonRow.className = "button-row";
     citationContainer.appendChild(buttonRow);
 
+    let interactionButtons = document.createElement("div");
+    interactionButtons.className = "interaction-buttons";
+    buttonRow.appendChild(interactionButtons);
+
+    let editButtons = document.createElement("div");
+    editButtons.className = "edit-buttons";
+    buttonRow.appendChild(editButtons);
+
+    let liked = citation.liked;
+    let likes = citation.likes.length;
+
+    let likeButton = buildButton(liked ? "/icons/like-unfilled.svg" : "/icons/like-unfilled.svg", "Like", () => {});
+
+    likeButton.onclick = async () => {
+        if (!liked) {
+            await fetch("/internal/likeCitation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ citationID: citation._id }),
+            });
+            likeButton.label.textContent = `${likes + 1} Likes`;
+            likes++;
+            likeButton.icon.src = "/icons/like-filled.svg";
+            liked = true;
+        }
+        else {
+            await fetch("/internal/likeCitation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ citationID: citation._id }),
+            });
+            likeButton.label.textContent = `${likes - 1} Likes`;
+            likes--;
+            likeButton.icon.src = "/icons/like-unfilled.svg";
+            liked = false;
+        }
+    }
+
+    interactionButtons.appendChild(likeButton);
+
     if (citation.canEdit) {
 
         let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id));
 
         let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id));
 
-        buttonRow.appendChild(deleteButton);
-        buttonRow.appendChild(editButton);
+        editButtons.appendChild(deleteButton);
+        editButtons.appendChild(editButton);
     }
 
     citationBox.appendChild(citationContainer);
+}
+
+function likeCitation(id) {
+    
 }
 
 function submitCitation() {
@@ -191,7 +239,7 @@ function editCitation(id) {
     contentDiv.innerHTML = `<textarea class="edit-content">${contentText}</textarea>`;
     authorDiv.innerHTML = `<input type="text" class="edit-author" value="${authorText}">`;
 
-    let buttonRow = citationContainer.querySelector('.button-row');
+    let buttonRow = citationContainer.querySelector('.edit-buttons');
     buttonRow.innerHTML = '';
 
     let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id));
@@ -230,7 +278,7 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     contentDiv.innerHTML = `<p>"${originalContent}"</p>`;
     authorDiv.innerHTML = `<p>-${originalAuthor}</p>`;
 
-    let buttonRow = citationContainer.querySelector('.button-row');
+    let buttonRow = citationContainer.querySelector('.edit-buttons');
     buttonRow.innerHTML = '';
 
     let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id));

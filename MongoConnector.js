@@ -116,6 +116,21 @@ module.exports.MongoConnector = class MongoConnector {
         return { success: true, message: 'Post liked successfully!' };
     }
 
+    async likeCitation(citationID, userID) {
+        const citation = await this.Citation.findById(citationID);
+        const hasLiked = citation.likes.some(like => like.userID.equals(userID));
+
+        if (hasLiked) {
+            citation.likes = citation.likes.filter(like => !like.userID.equals(userID));
+            await citation.save();
+            return { success: true, message: 'Like removed successfully!' };
+        }
+
+        citation.likes.push({ userID, date: Date.now() });
+        await citation.save();
+
+        return { success: true, message: 'Citation liked successfully!' };
+    }
 
     async commentPost(postID, userID, content, permissions) {
         const comment = await this.Comment.create({ userID, content, permissions });

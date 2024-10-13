@@ -52,12 +52,25 @@ module.exports = (db, s3Client) => {
             } else {
                 citationObj.canEdit = false;
             }
+            citationObj.liked = citation.likes.map(like => like.userID.toString()).includes(req.session.userID);
             filteredCitations.push(citationObj);
         });
 
         return res.status(200).send(filteredCitations);
     });
 
+    router.post('/likeCitation', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { citationID } = req.body;
+
+        if (!citationID) return res.status(400).send("Missing parameters");
+        if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
+
+        await db.likeCitation(citationID, req.session.userID);
+
+        return res.status(200).send("Success");
+    });
 
     router.post('/deleteCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
