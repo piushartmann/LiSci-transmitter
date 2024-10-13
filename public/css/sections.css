@@ -193,6 +193,29 @@
     width: inherit;
 }
 
+.AISummary {
+    position: relative;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--post-outline-color);
+    padding: 5px 10px 5px 10px;
+    font-family: "Roboto Mono", monospace;
+    font-optical-sizing: auto;
+    font-size: 0.9em;
+}
+
+.AISummary::before {
+    content: "AI Zusammenfassung";
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    background: var(--label-background-color, #f0f0f0);
+    color: var(--label-text-color, #333);
+    padding: 2px 5px;
+    font-size: 0.8em;
+    border-radius: 4px;
+}
+
 @keyframes tooltipFadeIn {
     from {
         opacity: 0;
@@ -201,11 +224,11 @@
     to {
         opacity: 1;
     }
-    
+
 }
 
 @media (max-width: 768px) {
-    
+
     .post-title {
         font-size: 1.5em;
     }

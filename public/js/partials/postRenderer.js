@@ -44,6 +44,14 @@ function buildPost(post) {
                 break;
             case "file":
                 if (window.location.pathname === "/") {
+
+                    if (section.summary){
+                        const summary = document.createElement("p");
+                        summary.textContent = section.summary;
+                        summary.className = "AISummary";
+                        sectionDiv.appendChild(summary);
+                    }
+                    
                     if (!document.getElementById("viewButton")) {
                         const viewButton = buildButton("/icons/view.svg", "View", () => window.location.href = `/post/${post._id}`);
                         viewButton.id = "viewButton";
@@ -64,7 +72,6 @@ function buildPost(post) {
                 img.src = `https://storage.liscitransmitter.live/${section.content}`;
                 img.alt = post.title;
                 img.style = `max-width: 100%; height: ${section.size * document.documentElement.clientWidth + "px" || "auto"}`;
-                console.log(section.size * document.documentElement.clientWidth);
                 sectionDiv.appendChild(img);
                 break;
             case "markdown":

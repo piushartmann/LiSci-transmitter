@@ -42,8 +42,8 @@
   <div class="login-popup-content">
     <p id="login-popup-title">Login</p>
     <form method="post" action="internal/login">
-      <input type="text" name="username" placeholder="Username">
-      <input type="password" name="password" placeholder="Password">
+      <input type="text" name="username" placeholder="Username" autocomplete="username">
+      <input type="password" name="password" placeholder="Password" autocomplete="current-password">
 
       <div class="submit-button-container">
         <button type="button" class="cancel-button" onclick="hideLoginPopup()">Cancel</button>

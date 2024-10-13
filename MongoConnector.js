@@ -20,7 +20,8 @@ const commentSchema = new Schema({
 
 const sectionSchema = new Schema({
     type: { type: String, required: true },
-    content: { type: String, required: false },
+    content: { type: String, required: true },
+    summary: { type: String, required: false },
     size: { type: Number, required: false }
 });
 
@@ -246,6 +247,23 @@ module.exports.MongoConnector = class MongoConnector {
         });
 
         return restructuredPosts;
+    }
+
+    async markPostAsRead(userID, postID) {
+        const post = await this.Post.findById(postID);
+        if (!post) {
+            console.log('Post with ID ' + postID + ' not found!');
+            return;
+        }
+        if (!post.viewedBy) {
+            post.viewedBy = [userID];
+            return await post.save();
+        }
+        if (!post.viewedBy.includes(userID)) {
+            post.viewedBy.push(userID);
+            return await post.save();
+        }
+        return await post.save();
     }
 
     async getPost(postID) {
