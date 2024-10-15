@@ -1,37 +1,63 @@
 const OpenAI = require("openai");
 const { extractText, getDocumentProxy } = require("unpdf");
+
+//for .env file in development
 const dotenv = require('dotenv');
 dotenv.config({ path: (__dirname + '.env') });
+
 const openAI = new OpenAI(process.env.OPENAI_API_KEY);
+
+const config = require('./config.json');
 
 async function summarizeText(text) {
     const completion = await openAI.chat.completions.create({
         model: "gpt-4o",
         messages: [
-            { role: "system", content: "Gebe eine kurze zusammenfassung auf Deutsch, was in dem Text enhalten ist. Der Text stammt aus einer PDF die zu lang ist um sie in einer Chat app direkt einzubetten. Stattdessen wir sie hinter einem Knop gezeigt, der Benutzer solle aber schon einmal eine Zusammenfassung des Dokumentes bekommen. Fasse den Text also kurz zusammen. Es ist klar das es eine Zeitung gibt namens LiSci-Transmitter, das musst du nicht sagen, auch dass sie von Cornelius möller ist nicht relevant. Gebe einfach eine sehr Kurze zusammenfassung was diese Woche in der Zeitung passiert ist. Halte dich wirklich so kurz wie möglich. Der Text muss nicht immer eine neue Ausgabe sein, erwähne wenn sie es ist sehr sehr kurz! Fasse den gesammten Text in maximal 3 Sätzen zusammen. Alle Personen die die Zeitung lesen, kenn auch die Personen die darin vorkommen, also du musst personen nicht erst vorstellen." },
+            { role: "system", content: config.openAISummarizeTextPrompt },
             {
                 role: "user",
-                content: text,
+                content: String(text),
             },
         ],
     });
 
     const summary = completion.choices[0].message.content;
-    console.log(summary);
     return summary;
 }
 
+async function createTitle(text) {
+    const completion = await openAI.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+            { role: "system", content: config.openAICreateTitlePrompt },
+            {
+                role: "user",
+                content: String(text),
+            },
+        ],
+    });
+
+    const title = completion.choices[0].message.content;
+    return title;
+}
+
 async function summarizePDF(pdfURL) {
+    const text = await extractTextFromPDF(pdfURL);
+    return await summarizeText(text);
+}
+
+async function extractTextFromPDF(pdfURL) {
     const buffer = await fetch(pdfURL).then((res) => res.arrayBuffer());
 
     const pdf = await getDocumentProxy(new Uint8Array(buffer));
 
     const { pages, text } = await extractText(pdf, { mergePages: true });
 
-    return await summarizeText(text);
+    return text;
 }
 
 module.exports = {
     summarizeText,
-    summarizePDF
+    extractTextFromPDF,
+    createTitle,
 };

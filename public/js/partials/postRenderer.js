@@ -5,6 +5,11 @@ function buildPost(post) {
     postContainer.dataset.id = post._id;
     postContainer.appendChild(buildHeader(post));
 
+    let title = document.createElement("h2");
+    title.textContent = post.title;
+    title.className = "post-title";
+    postContainer.appendChild(title);
+
     let sectionContainer = document.createElement("div");
     sectionContainer.className = "section-container";
     postContainer.appendChild(sectionContainer);
@@ -21,29 +26,16 @@ function buildPost(post) {
                 sectionDiv.appendChild(text);
                 break;
             case "file":
-                if (window.location.pathname === "/") {
-
-                    if (section.summary) {
-                        const summary = document.createElement("p");
-                        summary.textContent = section.summary;
-                        summary.className = "AISummary";
-                        sectionDiv.appendChild(summary);
-                    }
-
-                    if (!document.getElementById("viewButton")) {
-                        const viewButton = buildButton("/icons/view.svg", "View", () => window.location.href = `/post/${post._id}`);
-                        viewButton.id = "viewButton";
-                        footer.firstChild.appendChild(viewButton);
-                    }
-                    break;
-                } else {
-                    const fileContainer = document.createElement("div");
-                    fileContainer.className = "file";
-                    const url = `https://storage.liscitransmitter.live/${section.content}`;
-                    sectionDiv.appendChild(fileContainer);
-                    renderPDF(url, fileContainer, 2);
-                    break;
+                if (section.summary) {
+                    const summary = document.createElement("p");
+                    summary.textContent = section.summary;
+                    summary.className = "AISummary";
+                    sectionDiv.appendChild(summary);
                 }
+                const fileButton = buildButton("/icons/view.svg", section.title ? section.title : "View File", () => window.open(`https://storage.liscitransmitter.live/${section.content}`, '_blank'));
+                fileButton.label.classList.add("file-label");
+                sectionDiv.appendChild(fileButton);
+                break;
             case "img":
                 const img = document.createElement("img");
                 img.className = "post-image";

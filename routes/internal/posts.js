@@ -28,7 +28,6 @@ module.exports = (db, s3Client) => {
 
         const { title, sections, permissions } = req.body;
         const permissionsBool = permissions === "true";
-        console.log(title, sections, permissions);
 
         const sanitizedSections = JSON.parse(sections).map(section => {
             if (section.type === "text" || section.type === "markdown") {
@@ -46,6 +45,7 @@ module.exports = (db, s3Client) => {
         const post = await db.createPost(req.session.userID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
         const postID = post._id;
         res.status(200).send("Success");
+        console.log("Created post with Title: " + title);
         summarizeSections(sanitizedSections, postID);
         return;
     });
@@ -74,17 +74,29 @@ module.exports = (db, s3Client) => {
 
         await db.updatePost(postID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
         res.status(200).send("Success");
+        console.log("Updated post with Title: " + title);
         summarizeSections(sanitizedSections, postID);
         return;
     })
 
     function summarizeSections(sections, postID) {
-        sections.forEach(section => {
+        sections.forEach(async section => {
             if (section.type === "file") {
-                if (!section.summary){
-                    openAI.summarizePDF("https://storage.liscitransmitter.live/" + section.content).then(summary => {
+                const fileType = section.content.split('.').pop();
+                let text;
+                if (fileType === "pdf") {
+                    text = await openAI.extractTextFromPDF("https://storage.liscitransmitter.live/" + section.content);
+                }
+
+                if (text) {
+                    if (!section.summary) {
+                        const summary = await openAI.summarizeText(text);
                         db.addSummaryToSection(postID, section.id, summary);
-                    });
+                    }
+                    if (!section.title) {
+                        const title = await openAI.createTitle(text);
+                        db.addTitleToSection(postID, section.id, title);
+                    }
                 }
             }
         });

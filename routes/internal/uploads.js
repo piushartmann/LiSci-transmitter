@@ -83,7 +83,6 @@ module.exports = (db, s3Client) => {
         } catch (error) {
             return res.status(500).send(error.message);
         }
-        console.log(`File uploaded Successfully: ${filename}`);
         return res.status(200).send(filename);
     })
 
@@ -97,7 +96,6 @@ module.exports = (db, s3Client) => {
         } catch (error) {
             return res.status(500).send(error.message);
         }
-        console.log(`Image uploaded Successfully: ${filename}`);
         return res.status(200).send(filename);
     })
 

@@ -84,8 +84,7 @@ function buildComment(comment) {
         buttonRow.appendChild(deleteButton);
     }
 
-
-    commentContainer.appendChild(commentDiv);
+    commentContainer.prepend(commentDiv);
 }
 
 function deleteComment(commentID) {

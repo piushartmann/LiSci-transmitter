@@ -14,6 +14,10 @@
     padding: 0 20px 0 20px;
 }
 
+.section {
+    padding: 10px 0;
+}
+
 .post-header {
     display: flex;
     justify-content: space-between;
@@ -235,5 +239,9 @@
 
     .AISummary {
         display: none;
+    }
+
+    .file-label {
+        display: block;
     }
 }

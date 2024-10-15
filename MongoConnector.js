@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
+const { title } = require('process');
 
 
 const likeSchema = new Schema({
@@ -22,6 +23,7 @@ const sectionSchema = new Schema({
     type: { type: String, required: true },
     content: { type: String, required: true },
     summary: { type: String, required: false },
+    title: { type: String, required: false },
     size: { type: Number, required: false }
 });
 
@@ -97,6 +99,12 @@ module.exports.MongoConnector = class MongoConnector {
     async addSummaryToSection(postID, sectionIndex, summary) {
         const post = await this.Post.findById(postID);
         post.sections[sectionIndex].summary = summary;
+        return await post.save();
+    }
+
+    async addTitleToSection(postID, sectionIndex, title) {
+        const post = await this.Post.findById(postID);
+        post.sections[sectionIndex].title = title;
         return await post.save();
     }
 
