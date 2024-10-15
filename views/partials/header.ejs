@@ -11,6 +11,7 @@
       <% if (usertype.includes("classmate")) { %>
       <li><a href="/citations">Zitate</a></li>
       <% } %>
+      <li><a href="/about">About</a></li>
     </ul>
   </nav>
 
@@ -82,6 +83,7 @@
     <% if (usertype.includes("admin") || usertype.includes("writer")) { %>
       <li><a href="/create">Neuer Post</a></li>
     <% } %>
+    <li><a href="/about">About</a></li>
     <% if (loggedIn) { %>
       <li><a href="/settings">Settings</a></li>
       <li><a href="#" onclick="logout()">Logout</a></li>

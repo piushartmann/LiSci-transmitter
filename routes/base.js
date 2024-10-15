@@ -81,5 +81,11 @@ module.exports = (db) => {
         return res.send("Das Archiv kommt bald!");
     });
 
+    router.get('/about', async (req, res) => {
+        return res.render('about', {
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: req.session.permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic')
+        });
+    });
+
     return router;
 }
