@@ -34,9 +34,10 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         if (!req.session.permissions.includes("admin")) return res.status(403).send("You cannot create a user");
 
-        const { username, password} = req.body;
-        if (!username || !password || !permissions || !preferences) return res.status(400).send("Missing parameters");
-        if (typeof username !== "string" || typeof password !== "string" || typeof permissions !== "object" || typeof preferences !== "object") return res.status(400).send("Invalid parameters");
+        const { username, password } = req.body;
+        
+        if (!username || !password) return res.status(400).send("Missing parameters");
+        if (typeof username !== "string" || typeof password !== "string") return res.status(400).send("Invalid parameters");
 
         await db.createUser(username, password, []);
         return res.status(200).send("Success");

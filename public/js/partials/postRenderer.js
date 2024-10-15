@@ -1,25 +1,3 @@
-function buildButton(icon, label, onclick) {
-    let button = document.createElement("button");
-    button.className = "button";
-    button.onclick = onclick;
-
-    let buttonIcon = document.createElement("img");
-    buttonIcon.className = "icon";
-    buttonIcon.src = icon;
-
-    let buttonLabel = document.createElement("p");
-    buttonLabel.className = "button-label";
-    buttonLabel.textContent = label;
-
-    button.appendChild(buttonIcon);
-    button.appendChild(buttonLabel);
-
-    button.icon = buttonIcon;
-    button.label = buttonLabel;
-
-    return button;
-}
-
 function buildPost(post) {
     const postBox = document.getElementById("postBox");
     let postContainer = document.createElement("div");
@@ -45,13 +23,13 @@ function buildPost(post) {
             case "file":
                 if (window.location.pathname === "/") {
 
-                    if (section.summary){
+                    if (section.summary) {
                         const summary = document.createElement("p");
                         summary.textContent = section.summary;
                         summary.className = "AISummary";
                         sectionDiv.appendChild(summary);
                     }
-                    
+
                     if (!document.getElementById("viewButton")) {
                         const viewButton = buildButton("/icons/view.svg", "View", () => window.location.href = `/post/${post._id}`);
                         viewButton.id = "viewButton";
@@ -93,59 +71,7 @@ function buildHeader(post) {
     let headerDiv = document.createElement("div");
     headerDiv.className = "post-header";
     const profilePic = post.userID.profilePic
-    if (profilePic.type === "default") {
-        let authorDiv = document.createElement("div");
-        authorDiv.className = "author-info";
-
-        let authorName = document.createElement("p");
-        authorName.className = "author-name";
-        authorName.textContent = post.userID.username;
-        authorName.style = "margin-left: 10px;";
-
-        let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "defaultProfilePicture author-profile-pic";
-        authorProfilePic.style = `background-color: ${profilePic.content};`;
-        authorProfilePic.textContent = post.userID.username.charAt(0).toUpperCase();
-
-        let authorProfilePicName = document.createElement("span");
-        authorProfilePicName.textContent = post.userID.username;
-        authorProfilePicName.className = "author-name-tooltip";
-        authorProfilePic.appendChild(authorProfilePicName);
-
-        authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
-
-        let titleDiv = document.createElement("h1");
-        titleDiv.className = "post-title";
-        titleDiv.textContent = post.title;
-
-        headerDiv.appendChild(titleDiv);
-        headerDiv.appendChild(authorDiv);
-    }
-    else if (profilePic.type === "custom") {
-        let authorDiv = document.createElement("div");
-        authorDiv.className = "author-info";
-
-        let authorName = document.createElement("p");
-        authorName.textContent = post.userID.username;
-        authorName.style = "margin-left: 10px;";
-
-        let authorProfilePic = document.createElement("img");
-        authorProfilePic.className = "profilePicture";
-        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
-        authorProfilePic.alt = post.userID.username;
-        headerDiv.appendChild(authorProfilePic);
-
-        authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
-
-        let titleDiv = document.createElement("h1");
-        titleDiv.textContent = post.title;
-        titleDiv.style = "display: inline;";
-
-        headerDiv.appendChild(titleDiv);
-        headerDiv.appendChild(authorDiv);
-    }
+    headerDiv.appendChild(buildProfilePic(profilePic, post.userID.username));
 
     return headerDiv;
 }
@@ -153,57 +79,13 @@ function buildHeader(post) {
 function buildFooter(post) {
     let footerDiv = document.createElement("div");
     footerDiv.className = "post-footer flex";
-    let liked = post.liked === true;
-    let likes = post.likes.length;
 
     let iteractionButtons = document.createElement("div");
     iteractionButtons.className = "flex";
 
-    let likeIcon = null;
-
-    if (loggedIn) {
-        likeIcon = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
-    }
-    else {
-        likeIcon = "/icons/like-locked.svg";
-    }
-
-    let likeButton = buildButton(likeIcon, `${likes} Likes`, () => { });
-
-    if (loggedIn) {
-        likeButton.onclick = async () => {
-            if (!liked) {
-                await fetch("/internal/likePost", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ postID: post._id }),
-                });
-                likeButton.label.textContent = `${likes + 1} Likes`;
-                likes++;
-                likeButton.icon.src = "/icons/like-filled.svg";
-                liked = true;
-            }
-            else {
-                await fetch("/internal/likePost", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ postID: post._id }),
-                });
-                likeButton.label.textContent = `${likes - 1} Likes`;
-                likes--;
-                likeButton.icon.src = "/icons/like-unfilled.svg";
-                liked = false;
-            }
-        }
-    }
-
     let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} Comments`, () => renderComments(post));
 
-    iteractionButtons.appendChild(likeButton);
+    iteractionButtons.appendChild(buildLikeButton("/internal/likePost", post._id, post.liked, post.likes.length, loggedIn));
     iteractionButtons.appendChild(commentButton);
 
     footerDiv.appendChild(iteractionButtons);

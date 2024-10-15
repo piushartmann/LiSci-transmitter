@@ -113,4 +113,14 @@
         text-align: center;
         margin: 5px;
     }
+
+    .username {
+        bottom: 40px;
+        right: 72px;
+    }
+
+    .author-info {
+        position: inherit;
+        bottom: 0;
+    }
 }

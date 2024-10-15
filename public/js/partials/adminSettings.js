@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     addUserButton.onclick = async () => {
         const username = document.getElementById('createUserUsername').value;
-        const password = document.getElementById('createUserPassword').value;
-        
-        await fetch('internal/settings/createUser', {
+        const password = document.getElementById('createUserPasswort').value;
+
+        fetch('internal/settings/createUser', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 username: username,
                 password: password,
             }),
-        });
+        }).then((data) => data.ok ? window.location.reload() : console.log('Failed to create user'));
 
     };
 });

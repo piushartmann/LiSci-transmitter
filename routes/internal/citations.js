@@ -62,12 +62,12 @@ module.exports = (db, s3Client) => {
     router.post('/likeCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
-        const { citationID } = req.body;
+        const { id } = req.body;
 
-        if (!citationID) return res.status(400).send("Missing parameters");
-        if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
+        if (!id) return res.status(400).send("Missing parameters");
+        if (typeof id !== "string") return res.status(400).send("Invalid parameters");
 
-        await db.likeCitation(citationID, req.session.userID);
+        await db.likeCitation(id, req.session.userID);
 
         return res.status(200).send("Success");
     });

@@ -1,25 +1,3 @@
-function buildButton(icon, label, onclick) {
-    let button = document.createElement("button");
-    button.className = "button";
-    button.onclick = onclick;
-
-    let buttonIcon = document.createElement("img");
-    buttonIcon.className = "icon";
-    buttonIcon.src = icon;
-
-    let buttonLabel = document.createElement("p");
-    buttonLabel.className = "button-label";
-    buttonLabel.textContent = label;
-
-    button.appendChild(buttonIcon);
-    button.appendChild(buttonLabel);
-
-    button.icon = buttonIcon;
-    button.label = buttonLabel;
-
-    return button;
-}
-
 function renderComments(post) {
     const commentModal = document.getElementById('commentModal');
     commentModal.style.display = 'block';
@@ -85,44 +63,7 @@ function buildComment(comment) {
     contentContainer.appendChild(userDiv);
 
     const profilePic = comment.userID.profilePic
-    if (profilePic.type === "default") {
-        let authorDiv = document.createElement("div");
-        authorDiv.className = "author-info";
-
-        let authorName = document.createElement("p");
-        authorName.textContent = comment.userID.username;
-        authorName.className = "author-name";
-        authorName.style = "margin-left: 10px;";
-
-        let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "defaultProfilePicture";
-        authorProfilePic.style = `background-color: ${profilePic.content};`;
-        authorProfilePic.textContent = comment.userID.username.charAt(0).toUpperCase();
-
-        authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
-
-        userDiv.appendChild(authorDiv);
-    }
-    else if (profilePic.type === "custom") {
-        let authorDiv = document.createElement("div");
-        authorDiv.className = "author-info";
-
-        let authorName = document.createElement("p");
-        authorName.textContent = comment.userID.username;
-        authorName.style = "margin-left: 10px;";
-
-        let authorProfilePic = document.createElement("img");
-        authorProfilePic.className = "profilePicture";
-        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
-        authorProfilePic.alt = comment.userID.username;
-        headerDiv.appendChild(authorProfilePic);
-
-        authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
-
-        userDiv.appendChild(authorDiv);
-    }
+    userDiv.appendChild(buildProfilePic(profilePic, comment.userID.username));
 
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";

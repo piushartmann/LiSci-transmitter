@@ -1,26 +1,3 @@
-function buildButton(icon, label, onclick) {
-    let button = document.createElement("button");
-    button.className = "button";
-    button.onclick = onclick;
-
-    let buttonIcon = document.createElement("img");
-    buttonIcon.className = "icon";
-    buttonIcon.src = icon;
-
-    let buttonLabel = document.createElement("p");
-    buttonLabel.className = "button-label";
-    buttonLabel.textContent = label;
-
-    button.appendChild(buttonIcon);
-    button.appendChild(buttonLabel);
-
-    button.icon = buttonIcon;
-    button.label = buttonLabel;
-
-    return button;
-}
-
-
 document.addEventListener("DOMContentLoaded", async function () {
     const previousAuthors = await loadPreviousAuthors();
     const author = document.getElementById("author");
@@ -71,49 +48,7 @@ function buildCitation(citation) {
     citationContainer.appendChild(userDiv);
 
     const profilePic = citation.userID.profilePic
-    if (profilePic.type === "default") {
-        let authorDiv = document.createElement("div");
-        authorDiv.className = "author-info";
-
-        let authorName = document.createElement("p");
-        authorName.textContent = citation.userID.username;
-        authorName.style = "margin-left: 10px;";
-        authorName.className = "author-name";
-
-        let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "defaultProfilePicture author-profile-pic";
-        authorProfilePic.style = `background-color: ${profilePic.content};`;
-        authorProfilePic.textContent = citation.userID.username.charAt(0).toUpperCase();
-
-        let authorProfilePicName = document.createElement("span");
-        authorProfilePicName.textContent = citation.userID.username;
-        authorProfilePicName.className = "author-name-tooltip";
-        authorProfilePic.appendChild(authorProfilePicName);
-
-        authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
-
-        userDiv.appendChild(authorDiv);
-    }
-    else if (profilePic.type === "custom") {
-        let authorDiv = document.createElement("div");
-        authorDiv.className = "author-info";
-
-        let authorName = document.createElement("p");
-        authorName.textContent = citation.userID.username;
-        authorName.style = "margin-left: 10px;";
-
-        let authorProfilePic = document.createElement("img");
-        authorProfilePic.className = "profilePicture";
-        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
-        authorProfilePic.alt = citation.userID.username;
-        headerDiv.appendChild(authorProfilePic);
-
-        authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
-
-        userDiv.appendChild(authorDiv);
-    }
+    userDiv.appendChild(buildProfilePic(profilePic, citation.userID.username));
 
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";
@@ -127,41 +62,7 @@ function buildCitation(citation) {
     editButtons.className = "edit-buttons";
     buttonRow.appendChild(editButtons);
 
-    let liked = citation.liked;
-    let likes = citation.likes.length;
-
-    let likeButton = buildButton(liked ? "/icons/like-unfilled.svg" : "/icons/like-unfilled.svg", "Like", () => {});
-
-    likeButton.onclick = async () => {
-        if (!liked) {
-            await fetch("/internal/likeCitation", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ citationID: citation._id }),
-            });
-            likeButton.label.textContent = `${likes + 1} Likes`;
-            likes++;
-            likeButton.icon.src = "/icons/like-filled.svg";
-            liked = true;
-        }
-        else {
-            await fetch("/internal/likeCitation", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ citationID: citation._id }),
-            });
-            likeButton.label.textContent = `${likes - 1} Likes`;
-            likes--;
-            likeButton.icon.src = "/icons/like-unfilled.svg";
-            liked = false;
-        }
-    }
-
-    interactionButtons.appendChild(likeButton);
+    interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length, loggedIn));
 
     if (citation.canEdit) {
 
