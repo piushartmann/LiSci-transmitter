@@ -29,8 +29,14 @@
       </div>
 
       <div class="checkbox-group">
+        <label for="teachersafe">Dürfen Lehrer sehen</label>
         <input type="checkbox" id="teachersafe" value="teachersafe">
-        <label for="teachersafe">Teachersafe</label>
+
+        <% if (canCreateNews) { %>
+          <br>
+          <label for="news">Ist eine neue Zeitung</label>
+          <input type="checkbox" id="news" value="news">
+        <% } %>
       </div>
 
       <div class="edit-section-container" id="edit-section-container">

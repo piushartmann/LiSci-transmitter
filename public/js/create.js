@@ -84,6 +84,8 @@ async function submitPost(save = false) {
 
     const nonEmptySections = removeAllEmptySections();
 
+    const isNews = document.getElementById('news').checked;
+
     if (!title) {
         alert('Please enter a title');
         return;
@@ -100,6 +102,9 @@ async function submitPost(save = false) {
     formData.append('title', title);
     formData.append('sections', JSON.stringify(nonEmptySections));
     formData.append('permissions', teachersafe);
+    if (isNews) {
+        formData.append('type', 'news');
+    }
 
     if (!save) {
         await fetch('/internal/createPost', {

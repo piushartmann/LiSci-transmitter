@@ -80,9 +80,9 @@ module.exports.MongoConnector = class MongoConnector {
         await this.mongoose.connection.dropDatabase();
     }
 
-    async createPost(userID, title, sections, permissions) {
+    async createPost(userID, title, sections, permissions, type) {
         const filteredSections = sections.filter(section => section.content && section.content.trim() !== '');
-        const post = new this.Post({ userID, title, sections: filteredSections, permissions });
+        const post = new this.Post({ userID, title, sections: filteredSections, permissions, type });
         return await post.save();
     }
 
@@ -90,11 +90,12 @@ module.exports.MongoConnector = class MongoConnector {
         return await this.Post.findByIdAndDelete(postID);
     }
 
-    async updatePost(postID, title, sections, permissions) {
+    async updatePost(postID, title, sections, permissions, type) {
         const post = await this.Post.findById(postID);
         post.title = title;
         post.sections = sections;
         post.permissions = permissions;
+        post.type = type;
         return await post.save();
     }
 

@@ -31,7 +31,7 @@ module.exports = (db) => {
 
         return res.render('create', {
             loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            isCreatePage: true
+            isCreatePage: true, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
     });
 
@@ -45,7 +45,7 @@ module.exports = (db) => {
 
         return res.render('create', {
             loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            isCreatePage: true, post: post
+            isCreatePage: true, post: post, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
     });
 

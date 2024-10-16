@@ -27,8 +27,17 @@ module.exports = (db, s3Client) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
 
-        const { title, sections, permissions: postPermissions } = req.body;
+        const { title, sections, permissions: postPermissions, type } = req.body;
         const permissionsBool = postPermissions === "true";
+
+        let postType;
+        if (permissions.includes("admin") || permissions.includes("writer")) {
+            postType = type ? type : "post";
+        }
+        else {
+            postType = "post";
+        }
+        console.log(req.body);
 
         const sanitizedSections = JSON.parse(sections).map(section => {
             if (section.type === "text" || section.type === "markdown") {
@@ -43,7 +52,7 @@ module.exports = (db, s3Client) => {
         if (!title || !sections) return res.status(400).send("Missing parameters");
         if (typeof title !== "string") return res.status(400).send("Invalid parameters");
 
-        const post = await db.createPost(req.session.userID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
+        const post = await db.createPost(req.session.userID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly", postType);
         const postID = post._id;
         res.status(200).send("Success");
         console.log("Created post with Title: " + title);
@@ -56,7 +65,15 @@ module.exports = (db, s3Client) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot update a post");
 
-        const { postID, title, sections, permissions: postPermissions } = req.body;
+        const { postID, title, sections, permissions: postPermissions, type } = req.body;
+
+        let postType;
+        if (permissions.includes("admin") || permissions.includes("writer")) {
+            postType = type ? type : "post";
+        }
+        else {
+            postType = "post";
+        }
 
         const post = await db.getPost(postID);
         if (req.session.userID != post.userID._id.toString()) return res.status(403).send("You cannot update this post");
@@ -77,7 +94,7 @@ module.exports = (db, s3Client) => {
         if (!postID || !title || !sections) return res.status(400).send("Missing parameters");
         if (typeof postID !== "string" || typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
 
-        await db.updatePost(postID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly");
+        await db.updatePost(postID, title, sanitizedSections, permissionsBool ? "Teachersafe" : "classmatesonly", postType);
         res.status(200).send("Success");
         console.log("Updated post with Title: " + title);
         summarizeSections(sanitizedSections, postID);
