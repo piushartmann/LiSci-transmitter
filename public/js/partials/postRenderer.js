@@ -3,12 +3,13 @@ function buildPost(post) {
     let postContainer = document.createElement("div");
     postContainer.className = "post";
     postContainer.dataset.id = post._id;
-    postContainer.appendChild(buildHeader(post));
+    const header = buildHeader(post);
+    postContainer.appendChild(header);
 
     let title = document.createElement("h2");
     title.textContent = post.title;
     title.className = "post-title";
-    postContainer.appendChild(title);
+    header.prepend(title);
 
     let sectionContainer = document.createElement("div");
     sectionContainer.className = "section-container";
@@ -75,7 +76,7 @@ function buildFooter(post) {
     let iteractionButtons = document.createElement("div");
     iteractionButtons.className = "flex";
 
-    let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} Comments`, () => renderComments(post));
+    let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} Comments`, () => renderComments(post), post.comments.length);
 
     iteractionButtons.appendChild(buildLikeButton("/internal/likePost", post._id, post.liked, post.likes.length, loggedIn));
     iteractionButtons.appendChild(commentButton);

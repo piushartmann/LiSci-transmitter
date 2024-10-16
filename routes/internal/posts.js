@@ -24,7 +24,7 @@ module.exports = (db, s3Client) => {
 
     router.post('/createPost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a post");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
 
         const { title, sections, permissions } = req.body;
         const permissionsBool = permissions === "true";
@@ -52,9 +52,12 @@ module.exports = (db, s3Client) => {
 
     router.post('/updatePost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("writer")) return res.status(403).send("You cannot update a post");
+        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("canPost")) return res.status(403).send("You cannot update a post");
 
         const { postID, title, sections, permissions } = req.body;
+
+        const post = await db.getPost(postID);
+        if (req.session.userID != post.userID._id.toString()) return res.status(403).send("You cannot update this post");
 
         const sanitizedSections = JSON.parse(sections).map(section => {
             if (section.type === "text" || section.type === "markdown") {
@@ -107,11 +110,15 @@ module.exports = (db, s3Client) => {
         const isTeacher = !(permissions.includes("classmate"));
         const page = (req.query.page || 1) - 1;
 
-        const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page);
+        const filter = req.query.filter || "all";
+
+        console.log("Getting posts with filter: " + filter);
+
+        const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page, filter);
         let filteredPosts = [];
         posts.forEach(post => {
             let postObj = post;
-            if (permissions.includes("admin") || permissions.includes("writer")) {
+            if (permissions.includes("admin") || post.userID._id.toString() === req.session.userID) {
                 postObj.canEdit = true;
             }
             postObj.liked = post.likes.map(like => like.userID.toString()).includes(req.session.userID);
@@ -150,7 +157,8 @@ module.exports = (db, s3Client) => {
         if (typeof postID !== "string") return res.status(400).send("Invalid parameters");
 
         const post = await db.getPost(postID);
-        if (post.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
+
+        if (post.userID._id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
 
         await db.deletePost(postID);
         return res.status(200).send("Success");

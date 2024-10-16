@@ -1,5 +1,5 @@
 let allUsers = [];
-const allPermissions = ['admin', 'classmate', 'writer', 'push'];
+const allPermissions = ['admin', 'classmate', 'writer', 'push', 'canPost'];
 
 document.addEventListener('DOMContentLoaded', async () => {
     const userAutoComplete = document.getElementById('userAutoComplete');

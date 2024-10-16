@@ -58,6 +58,7 @@ body {
 
 button {
     touch-action: manipulation;
+    user-select: none;
 }
 
 a {
@@ -70,8 +71,14 @@ a {
     margin: 5px;
 }
 
-.button-label {
+.button .label {
     cursor: pointer !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.button .short-label {
+    display: none;
 }
 
 .defaultProfilePicture {
@@ -135,8 +142,12 @@ a {
         animation: tooltipFadeIn 0.2s forwards;
     }
 
-    .button-label {
+    .button .label {
         display: none;
+    }
+
+    .button .short-label {
+        display: block;
     }
 
     .author-name {

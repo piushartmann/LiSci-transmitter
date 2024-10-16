@@ -1,5 +1,6 @@
 function loadPosts(page) {
-    fetch(`internal/getPosts?page=${page}`)
+    filter = document.getElementById("onlyNews").checked ? "news" : "all";
+    fetch(`internal/getPosts?page=${page}&filter=${filter}`)
         .then(response => response.json())
         .then(data => {
             data.forEach(post => {
@@ -36,6 +37,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById("modalClose").addEventListener("click", () => {
         hideComments();
+    });
+
+    document.getElementById("onlyNews").addEventListener("change", () => {
+        const onlyNews = document.getElementById("onlyNews").checked;
+        const postBox = document.getElementById("postBox");
+        postBox.innerHTML = "";
+        loadPosts(1);
     });
 });
 

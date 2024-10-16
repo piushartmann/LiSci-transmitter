@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
 const { title } = require('process');
+const { type } = require('os');
 
 
 const likeSchema = new Schema({
@@ -30,6 +31,7 @@ const sectionSchema = new Schema({
 const postSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
     title: { type: String, required: true },
+    type: { type: String, required: true, default: 'post', enum: ['post', 'news'] },
     sections: [{ type: sectionSchema, required: true }],
     permissions: { type: String, required: true, enum: ['classmatesonly', 'Teachersafe'] },
     timestamp: { type: Date, default: Date.now },
@@ -42,7 +44,7 @@ const userSchema = new Schema({
     username: { type: String, required: true, index: true, unique: true },
     passHash: { type: String, required: true },
     pushSubscription: { type: Object, required: false },
-    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin', 'push'] }],
+    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin', 'push', 'canPost'] }],
     apiKey: { type: String, required: true },
     preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
 });
@@ -218,8 +220,12 @@ module.exports.MongoConnector = class MongoConnector {
         }
     }
 
-    async getPosts(isTeacher, limit = 10, offset = 0) {
+    async getPosts(isTeacher, limit = 10, offset = 0, filter = "all") {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+
+        if (filter !== "all") {
+            query.type = filter;
+        }
 
         function generateRandomProfilePic() {
             return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
