@@ -13,10 +13,19 @@ module.exports = (db) => {
     const citationsPageSize = config.citationsPageSize;
 
     router.get('/', async (req, res) => {
-        const currentPage = req.query.page || 1;
+        let currentPage = req.query.page || 1;
         req.session.views = (req.session.views || 0) + 1;
         const permissions = await db.getUserPermissions(req.session.userID);
-        const pages = Math.ceil(await db.getPostNumber(!(permissions.includes("classmate"))) / postsPageSize);
+        const onlyNews = req.query.onlyNews == "true" || false;
+
+        let pages;
+        if (onlyNews) {
+            pages = Math.ceil(await db.getNewsNumber(!(permissions.includes("classmate"))) / postsPageSize);
+        } else {
+            pages = Math.ceil(await db.getPostNumber(!(permissions.includes("classmate"))) / postsPageSize);
+        }
+
+        if (currentPage > pages) currentPage = 1;
         const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
         return res.render('index', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),

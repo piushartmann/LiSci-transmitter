@@ -5,6 +5,7 @@ const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
 const { title } = require('process');
 const { type } = require('os');
+const { query } = require('express');
 
 
 const likeSchema = new Schema({
@@ -359,6 +360,11 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPostNumber(isTeacher) {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+        return await this.Post.countDocuments(query);
+    }
+
+    async getNewsNumber(isTeacher) {
+        const query = isTeacher ? { permissions: { $ne: 'classmatesonly' }, type: 'news' } : { type: 'news' };
         return await this.Post.countDocuments(query);
     }
 
