@@ -16,7 +16,7 @@
   </nav>
 
   <div class="header-button">
-    <% if (usertype.includes("admin") || usertype.includes("writer")) { %>
+    <% if (usertype.includes("admin") || usertype.includes("canPost")) { %>
     <button class="create-post-button" onclick="window.location.href='/create'">Neuer Post</button>
     <% } %>
 
