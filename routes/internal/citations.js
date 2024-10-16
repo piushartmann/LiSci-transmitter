@@ -34,7 +34,8 @@ module.exports = (db, s3Client) => {
 
     router.get('/getCitations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
 
         const page = (req.query.page || 1) - 1;
 
@@ -47,7 +48,7 @@ module.exports = (db, s3Client) => {
             if (!citation.userID) {
                 return;
             }
-            if (citation.userID._id.toString() === req.session.userID || req.session.permissions.includes("admin")) {
+            if (citation.userID._id.toString() === req.session.userID || permissions.includes("admin")) {
                 citationObj.canEdit = true;
             } else {
                 citationObj.canEdit = false;
@@ -74,6 +75,7 @@ module.exports = (db, s3Client) => {
 
     router.post('/deleteCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
 
         const { citationID } = req.body;
 
@@ -81,7 +83,7 @@ module.exports = (db, s3Client) => {
         if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
 
         const citation = await db.getCitation(citationID);
-        if (citation.userID.id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
+        if (citation.userID.id.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
 
         await db.deleteCitation(citationID);
 
@@ -90,6 +92,7 @@ module.exports = (db, s3Client) => {
 
     router.post('/updateCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
 
         const { citationID, author, content } = req.body;
         const sanitizedContent = sanitizeHtml(content);
@@ -99,7 +102,7 @@ module.exports = (db, s3Client) => {
         if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
 
         const citation = await db.getCitation(citationID);
-        if (citation.userID.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
+        if (citation.userID.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
 
         await db.updateCitation(citationID, sanitizedAuthor, sanitizedContent);
         return res.status(200).send("Success");
@@ -107,7 +110,8 @@ module.exports = (db, s3Client) => {
 
     router.get('/getPreviousAuthors', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!(req.session.permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
 
         const authors = await db.getPreviousAuthors();
 

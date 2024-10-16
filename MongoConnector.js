@@ -187,6 +187,12 @@ module.exports.MongoConnector = class MongoConnector {
         return user;
     }
 
+    async getUserPermissions(userID) {
+        const user = await this.User.findById(userID);
+        if(!user) return [];
+        return user.permissions;
+    }
+
     async loadPostComments(postID) {
         const post = await this.Post.findById(postID)
             .populate('comments')

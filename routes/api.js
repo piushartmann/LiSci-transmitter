@@ -69,11 +69,12 @@ module.exports = (db, pageSize, s3Client, webpush) => {
     router.post('/createPost', async (req, res) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
-        if (!req.session.permissions.includes("writer")) return res.status(403).send("You cannot create a post");
+        const permissions = db.getUserPermissions(user._id) || [];
+        if (!permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
 
-        const { title, content, type, permissions, mediaPath } = req.body;
+        const { title, content, type, postPermissions, mediaPath } = req.body;
         try {
-            const post = await db.createPost(user._id, title, content, type, permissions, mediaPath);
+            const post = await db.createPost(user._id, title, content, type, postPermissions, mediaPath);
             return res.status(200).send("Success");
         }
         catch (error) {
@@ -85,10 +86,10 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
 
-        const { postID, content, permissions } = req.body;
-        console.log(postID, content, permissions);
+        const { postID, content, postPermissions } = req.body;
+        console.log(postID, content, postPermissions);
         try {
-            const comment = await db.commentPost(postID, user._id, content, permissions);
+            const comment = await db.commentPost(postID, user._id, content, postPermissions);
             return res.status(200).send("Success");
         }
         catch (error) {

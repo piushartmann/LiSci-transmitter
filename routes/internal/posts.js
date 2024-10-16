@@ -24,10 +24,11 @@ module.exports = (db, s3Client) => {
 
     router.post('/createPost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
 
-        const { title, sections, permissions } = req.body;
-        const permissionsBool = permissions === "true";
+        const { title, sections, permissions: postPermissions } = req.body;
+        const permissionsBool = postPermissions === "true";
 
         const sanitizedSections = JSON.parse(sections).map(section => {
             if (section.type === "text" || section.type === "markdown") {
@@ -52,9 +53,10 @@ module.exports = (db, s3Client) => {
 
     router.post('/updatePost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
-        if (!req.session.permissions.includes("admin") && !req.session.permissions.includes("canPost")) return res.status(403).send("You cannot update a post");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot update a post");
 
-        const { postID, title, sections, permissions } = req.body;
+        const { postID, title, sections, permissions: postPermissions } = req.body;
 
         const post = await db.getPost(postID);
         if (req.session.userID != post.userID._id.toString()) return res.status(403).send("You cannot update this post");
@@ -69,8 +71,8 @@ module.exports = (db, s3Client) => {
             return section;
         });
 
-        const permissionsBool = permissions === "true";
-        console.log(postID, title, sections, permissions);
+        const permissionsBool = postPermissions === "true";
+        console.log(postID, title, sections, postPermissions);
 
         if (!postID || !title || !sections) return res.status(400).send("Missing parameters");
         if (typeof postID !== "string" || typeof title !== "string" || typeof sections !== "string") return res.status(400).send("Invalid parameters");
@@ -106,13 +108,11 @@ module.exports = (db, s3Client) => {
     }
 
     router.get('/getPosts', async (req, res) => {
-        const permissions = req.session.permissions || [];
+        const permissions = await db.getUserPermissions(req.session.userID);
         const isTeacher = !(permissions.includes("classmate"));
         const page = (req.query.page || 1) - 1;
 
         const filter = req.query.filter || "all";
-
-        console.log("Getting posts with filter: " + filter);
 
         const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page, filter);
         let filteredPosts = [];
@@ -139,7 +139,7 @@ module.exports = (db, s3Client) => {
 
     router.get('/getPost/:id', async (req, res) => {
         const post = await db.getPost(req.params.id);
-        const permissions = req.session.permissions || [];
+        const permissions = await db.getUserPermissions(req.session.userID);
         if (!(permissions.includes("classmate")) && post.permissions === "classmatesonly") return res.status(403).send("You cannot view this post");
 
         if (!post) {
@@ -151,6 +151,7 @@ module.exports = (db, s3Client) => {
 
     router.post('/deletePost', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
 
         const { postID } = req.body;
         if (!postID) return res.status(400).send("Missing parameters");
@@ -158,7 +159,7 @@ module.exports = (db, s3Client) => {
 
         const post = await db.getPost(postID);
 
-        if (post.userID._id.toString() !== req.session.userID && !(req.session.permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
+        if (post.userID._id.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot delete this post");
 
         await db.deletePost(postID);
         return res.status(200).send("Success");

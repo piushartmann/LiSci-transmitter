@@ -31,7 +31,6 @@ module.exports = (db, s3Client) => {
         else {
             req.session.username = user.username;
             req.session.userID = user._id;
-            req.session.permissions = user.permissions;
             req.session.cookie.expires = new Date(Date.now() + oneDay * 30);
             const profilePicPreference = user.preferences.find(preference => preference.key === "profilePic");
             if (profilePicPreference) {
