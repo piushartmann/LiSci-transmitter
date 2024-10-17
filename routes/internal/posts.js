@@ -27,10 +27,10 @@ module.exports = (db, s3Client, webpush) => {
 
     function pushNewPostNotification(post, username, news = false) {
         if (news) {
-            push.sendToEveryone("newNews", 'Neue Zeitung', `${post.title} von ${username}`);
+            push.sendToEveryone("newNews", 'Neue Zeitung', `Neue Zeitung: "${post.title}" von ${username}`);
         }
         else {
-            push.sendToEveryone("newPost", 'Neuer Post', `${post.title} von ${username}`);
+            push.sendToEveryone("newPost", 'Neuer Post', `Neuer Post: "${post.title}" von ${username}`);
         }
     }
 
