@@ -61,3 +61,10 @@ label {
 .pushTypes li ::marker {
     color: #000;
 }
+
+@media (max-width: 768px) {
+    .setting {
+        width: 100%;
+    }
+    
+}
