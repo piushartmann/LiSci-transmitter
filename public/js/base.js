@@ -95,7 +95,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
                     body: JSON.stringify({ id: id }),
                 });
                 likeButton.label.textContent = `${likes + 1} Likes`;
-                likeButton.short.textContent = likes.toString() + 1;
+                likeButton.short.textContent = likes + 1;
                 likes++;
                 likeButton.icon.src = "/icons/like-filled.svg";
                 liked = true;
