@@ -1,7 +1,7 @@
-openapi: '3.0.3'
+openapi: "3.0.3"
 info:
   title: transmitter API
-  version: '1.0'
+  version: "1.0"
 servers:
   - url: http://localhost:8080
     description: Local server
@@ -20,14 +20,14 @@ paths:
             type: string
           description: The API key to validate.
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             text/plain:
               schema:
                 type: string
                 example: Valid username
-        '401':
+        "401":
           description: Invalid API key
   /api/getPosts:
     get:
@@ -55,7 +55,7 @@ paths:
               - news
           description: The filter to apply.
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -78,7 +78,40 @@ paths:
                       type: string
                     likes:
                       type: integer
-        '401':
+        "401":
+          description: Invalid API key
+  /api/getPostPages:
+    get:
+      summary: Get Post Pages
+      description: Retrieves the number of pages of posts.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - all
+              - posts
+              - news
+          description: The filter to apply.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pages:
+                    type: integer
+                    description: The number of pages.
+        "401":
           description: Invalid API key
   /api/getComments:
     get:
@@ -97,7 +130,7 @@ paths:
             type: string
           description: The ID of the post to retrieve comments for.
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
@@ -112,7 +145,7 @@ paths:
                       type: string
                     content:
                       type: string
-        '401':
+        "401":
           description: Invalid API key
   /api/createPost:
     post:
@@ -143,13 +176,13 @@ paths:
                 mediaPath:
                   type: string
       responses:
-        '200':
+        "200":
           description: Successful response
-        '401':
+        "401":
           description: Invalid API key
-        '403':
+        "403":
           description: Forbidden
-        '500':
+        "500":
           description: Internal server error
   /api/createComment:
     post:
@@ -176,11 +209,11 @@ paths:
                 permissions:
                   type: string
       responses:
-        '200':
+        "200":
           description: Successful response
-        '401':
+        "401":
           description: Invalid API key
-        '500':
+        "500":
           description: Internal server error
   /api/likePost:
     post:
@@ -203,11 +236,11 @@ paths:
                 postID:
                   type: string
       responses:
-        '200':
+        "200":
           description: Successful response
-        '401':
+        "401":
           description: Invalid API key
-        '500':
+        "500":
           description: Internal server error
   /api/sendPush:
     post:
@@ -240,13 +273,13 @@ paths:
                 urgency:
                   type: string
       responses:
-        '200':
+        "200":
           description: Successful response
-        '401':
+        "401":
           description: Invalid API key
-        '403':
+        "403":
           description: Forbidden
-        '500':
+        "500":
           description: Internal server error
   /api/createCitation:
     post:
@@ -271,9 +304,9 @@ paths:
                 content:
                   type: string
       responses:
-        '200':
+        "200":
           description: Successful response
-        '401':
+        "401":
           description: Invalid API key
-        '500':
+        "500":
           description: Internal server error

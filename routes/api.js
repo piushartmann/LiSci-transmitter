@@ -62,7 +62,7 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         if (!user) return res.status(401).send("Invalid API key");
 
         const filter = req.query.filter || "all";
-        const pages = Math.ceil(await db.getPostNumber(!user.permissions.includes("classmate")) / postsPageSize);
+        const pages = Math.ceil(await db.getPostNumber(!user.permissions.includes("classmate"), filter) / postsPageSize);
         return res.send({ pages });
     });
 

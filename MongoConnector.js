@@ -358,8 +358,11 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
 
-    async getPostNumber(isTeacher) {
+    async getPostNumber(isTeacher, filter = "all") {
         const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+        if (filter !== "all") {
+            query.type = filter;
+        }
         return await this.Post.countDocuments(query);
     }
 
