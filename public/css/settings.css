@@ -7,7 +7,7 @@
 .setting {
     display: flex;
     justify-content: center;
-    width: 100%;
+    width: 50%;
     margin: 10px 0;
 }
 
@@ -43,4 +43,21 @@ label {
     justify-content: center;
     align-items: center;
     margin: 10px 0;
+}
+
+.enablePushContainer {
+    flex-direction: column;
+}
+
+.pushTypes{
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: flex-start;
+    margin: 10px 0;
+    list-style-type:none;
+}
+
+.pushTypes li ::marker {
+    color: #000;
 }

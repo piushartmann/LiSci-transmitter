@@ -380,6 +380,7 @@ function loadPost(post) {
     console.log(post);
     document.getElementById('title').value = post.title;
     document.getElementById('teachersafe').checked = post.permissions == "Teachersafe";
+    document.getElementById('news').checked = post.type == "news";
 
     post.sections.forEach(section => {
         let newSection;

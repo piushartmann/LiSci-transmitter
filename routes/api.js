@@ -10,7 +10,7 @@ const router = Router();
  * @returns {Router} The router instance.
  */
 
-module.exports = (db, pageSize, s3Client, webpush) => {
+module.exports = (db, s3Client, webpush) => {
     const config = require('../config.json');
     const postsPageSize = config.postsPageSize;
 

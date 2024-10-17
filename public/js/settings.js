@@ -3,7 +3,7 @@ let registration = null;
 document.addEventListener('DOMContentLoaded', async () => {
     await registerServiceWorker();
     button = document.getElementById('enablePush');
-    button.addEventListener('click', enablePush);
+    if (button) button.addEventListener('click', enablePush);
 
     const profilePictureColorPicker = document.getElementById('profilePictureColorPicker');
     const profilePicturePreview = document.getElementById('profilePicturePreview');
@@ -29,7 +29,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.reload();
     });
 
+    const newsPushCheckbox = document.getElementById('newsPushCheckbox');
+    newsPushCheckbox.addEventListener('change', () => {
+        changePushPreference('newsNotifications', newsPushCheckbox.checked);
+    });
+    const postsPushCheckbox = document.getElementById('postsPushCheckbox');
+    postsPushCheckbox.addEventListener('change', () => {
+        changePushPreference('postNotifications', postsPushCheckbox.checked);
+    });
+    const citationPushCheckbox = document.getElementById('citationsPushCheckbox');
+    citationPushCheckbox.addEventListener('change', () => {
+        changePushPreference('citationNotifications', citationPushCheckbox.checked);
+    });
+    const commentPushCheckbox = document.getElementById('commentsPushCheckbox');
+    commentPushCheckbox.addEventListener('change', () => {
+        changePushPreference('commentNotifications', commentPushCheckbox.checked);
+    });
+
 });
+
+function changePushPreference(type, value) {
+    fetch('internal/settings/setPushPreference', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type, value }),
+    });
+}
 
 async function registerServiceWorker() {
     // A service worker must be registered in order to send notifications on iOS

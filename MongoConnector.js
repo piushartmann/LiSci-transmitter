@@ -469,6 +469,10 @@ module.exports.MongoConnector = class MongoConnector {
         return user.pushSubscription;
     }
 
+    async getAllSubscriptions() {
+        return await this.User.find({ pushSubscription: { $exists: true } });
+    }
+
     async setPreference(userID, key, value) {
         const user = await this.User.findById(userID);
         const preferenceIndex = user.preferences.findIndex(pref => pref.key === key);
@@ -487,6 +491,11 @@ module.exports.MongoConnector = class MongoConnector {
         }
         const preference = user.preferences.find(pref => pref.key === key);
         return preference ? preference.value : null;
+    }
+
+    async getPreferences(userID) {
+        const user = await this.User.findById(userID);
+        return user.preferences;
     }
 
     async setProfilePic(type, profilePic, username) {

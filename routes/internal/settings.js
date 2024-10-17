@@ -45,5 +45,23 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    router.post('/setPushPreference', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { type, value } = req.body;
+
+        const valueBool = value == "true" || value == true;
+
+        if (typeof value == "undefined") return res.status(400).send("Missing parameters");
+        if (typeof type !== "string") return res.status(400).send("Invalid parameters");
+
+        const allowedValues = ["newsNotifications", "postNotifications", "citationNotifications", "commentNotifications"];
+
+        if (!allowedValues.includes(type)) return res.status(400).send("Invalid parameters");
+
+        await db.setPreference(req.session.userID, type, valueBool);
+        return res.status(200).send("Success");
+    });
+
     return router;
 };

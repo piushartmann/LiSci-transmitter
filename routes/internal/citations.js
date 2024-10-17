@@ -11,7 +11,7 @@ const router = Router();
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-module.exports = (db, s3Client) => {
+module.exports = (db, s3Client, webpush) => {
     const config = require('../../config.json');
     const citationsPageSize = config.citationsPageSize;
 

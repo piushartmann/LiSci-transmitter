@@ -14,7 +14,6 @@ const MongoConnector = require('./MongoConnector').MongoConnector;
 
 connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
-const pageSize = 10;
 
 //create express app
 const app = express();
@@ -66,9 +65,9 @@ const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
 if (!process.env.KILLSWITCH == 1) {
-    app.use('/', require('./routes/base')(db, pageSize));
-    app.use('/internal', require('./routes/internal')(db, s3Client));
-    app.use('/api', require('./routes/api')(db, s3Client, pageSize, webpush));
+    app.use('/', require('./routes/base')(db));
+    app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
+    app.use('/api', require('./routes/api')(db, s3Client, webpush));
 }
 
 app.listen(port, () => {

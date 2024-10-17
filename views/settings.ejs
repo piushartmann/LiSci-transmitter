@@ -7,8 +7,8 @@
   <title>Settings</title>
   <link rel="stylesheet" href="/css/settings.css">
   <% if (isAdmin) { %>
-   <link rel="stylesheet" href="/css/adminSettings.css">
-   <script src="/js/partials/adminSettings.js"></script>
+  <link rel="stylesheet" href="/css/adminSettings.css">
+  <script src="/js/partials/adminSettings.js"></script>
   <% } %>
 </head>
 
@@ -19,14 +19,37 @@
     <h1>Settings</h1>
     <div class="enablePushContainer setting">
       <label for="enablePush">Push Notifications</label>
+      <% if (enabledPush) { %>
+      <button id="enablePush">Zu diesem Gerät verlagern</button>
+      <div id="pushTypesSettings">
+        <div id="pushTypes" class="pushTypes">
+            <li><input type="checkbox" id="newsPushCheckbox" name="news" value="news" <%= preferences.find(p => p.key === 'newsNotifications')?.value ? 'checked' : '' %>>
+            <label for="news">News</label>
+          </li>
+          <li><input type="checkbox" id="postsPushCheckbox" name="posts" value="posts" <%= preferences.find(p => p.key === 'postNotifications')?.value ? 'checked' : '' %>>
+            <label for="citations">Posts</label>
+          </li>
+          <li>
+            <input type="checkbox" id="citationsPushCheckbox" name="citations" value="citations" <%= preferences.find(p => p.key === 'citationNotifications')?.value ? 'checked' : '' %>>
+            <label for="citations">Citations (coming)</label>
+          </li>
+          <li>
+            <input type="checkbox" id="commentsPushCheckbox" name="comments" value="comments" <%= preferences.find(p => p.key === 'commentNotifications')?.value ? 'checked' : '' %>>
+            <label for="comments">Comments (coming)</label>
+          </li>
+        </div>
+      </div>
+      <% } else { %>
       <button id="enablePush">Enable</button>
+      <% } %>
+
     </div>
 
     <div class="profilePictureContainer setting">
       <label for="head">Pick Profile Picture Color</label>
       <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;"">
         <%= username.charAt(0).toUpperCase() %>
-        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
+        <input type=" color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
       </p>
       <button id="profilePictureColorSubmit">Save</button>
     </div>
@@ -37,7 +60,7 @@
     </div>
 
     <% if (isAdmin) { %>
-     <%- include('./partials/adminSettings.ejs') %>
+    <%- include('./partials/adminSettings.ejs') %>
     <% } %>
   </div>
 

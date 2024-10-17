@@ -3,6 +3,7 @@ const { MongoConnector } = require('../../MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
 const openAI = require('../../openAI');
+const pushLib = require('../../pushNotifications.js');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -12,13 +13,24 @@ const openAI = require('../../openAI');
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-module.exports = (db, s3Client) => {
+module.exports = (db, s3Client, webpush) => {
     const config = require('../../config.json');
     const postsPageSize = config.postsPageSize;
+
+    const push = pushLib(db, webpush);
 
     async function markPostsAsRead(userID, posts) {
         for (let i = 0; i < posts.length; i++) {
             await db.markPostAsRead(userID, posts[i]._id);
+        }
+    }
+
+    function pushNewPostNotification(post, username, news = false) {
+        if (news) {
+            push.sendToEveryone("newNews", 'Neue Zeitung', `${post.title} von ${username}`);
+        }
+        else {
+            push.sendToEveryone("newPost", 'Neuer Post', `${post.title} von ${username}`);
         }
     }
 
@@ -57,6 +69,7 @@ module.exports = (db, s3Client) => {
         res.status(200).send("Success");
         console.log("Created post with Title: " + title);
         summarizeSections(sanitizedSections, postID);
+        pushNewPostNotification(post, req.session.username, postType === "news");
         return;
     });
 
@@ -76,6 +89,7 @@ module.exports = (db, s3Client) => {
         }
 
         const post = await db.getPost(postID);
+        const newsIsNew = post.type !== "news" && postType === "news";
         if (req.session.userID != post.userID._id.toString()) return res.status(403).send("You cannot update this post");
 
         const sanitizedSections = JSON.parse(sections).map(section => {
@@ -98,6 +112,7 @@ module.exports = (db, s3Client) => {
         res.status(200).send("Success");
         console.log("Updated post with Title: " + title);
         summarizeSections(sanitizedSections, postID);
+        if (newsIsNew) pushNewPostNotification(post, req.session.username, postType === "news");
         return;
     })
 
@@ -135,6 +150,9 @@ module.exports = (db, s3Client) => {
         let filteredPosts = [];
         posts.forEach(post => {
             let postObj = post;
+            if (!post.userID) {
+                return;
+            }
             if (permissions.includes("admin") || post.userID._id.toString() === req.session.userID) {
                 postObj.canEdit = true;
             }

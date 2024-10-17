@@ -83,10 +83,11 @@ module.exports = (db) => {
     router.get('/settings', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
+        const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
         return res.render('settings', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"))
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID)
         });
     });
 
