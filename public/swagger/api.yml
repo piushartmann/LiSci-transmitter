@@ -45,6 +45,15 @@ paths:
           schema:
             type: integer
           description: The page number to retrieve.
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - all
+              - posts
+              - news
+          description: The filter to apply.
       responses:
         '200':
           description: Successful response
@@ -192,6 +201,74 @@ paths:
               type: object
               properties:
                 postID:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Invalid API key
+        '500':
+          description: Internal server error
+  /api/sendPush:
+    post:
+      summary: Send Push Notification
+      description: Sends a push notification.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userID:
+                  type: string
+                title:
+                  type: string
+                body:
+                  type: string
+                icon:
+                  type: string
+                badge:
+                  type: string
+                urgency:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: Invalid API key
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+  /api/createCitation:
+    post:
+      summary: Create Citation
+      description: Creates a new citation.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                author:
+                  type: string
+                content:
                   type: string
       responses:
         '200':

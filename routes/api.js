@@ -11,6 +11,8 @@ const router = Router();
  */
 
 module.exports = (db, pageSize, s3Client, webpush) => {
+    const config = require('../config.json');
+    const postsPageSize = config.postsPageSize;
 
     async function checkAPIKey(req) {
         keyHeader = req.headers['x-api-key'];
@@ -37,8 +39,9 @@ module.exports = (db, pageSize, s3Client, webpush) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
 
-        const currentPage = req.query.page || 1;
-        const posts = await db.getPosts(currentPage, pageSize, !user.permissions.includes("classmate"));
+        const currentPage = (req.query.page || 1) - 1;
+        const filter = req.query.filter || "all";
+        const posts = await db.getPosts(!user.permissions.includes("classmate"), postsPageSize, postsPageSize * currentPage, filter);
 
         const filteredPosts = posts.map(post => ({
             id: post._id,
@@ -48,8 +51,19 @@ module.exports = (db, pageSize, s3Client, webpush) => {
             mediaPath: post.mediaPath,
             type: post.type,
             likes: post.likes.length,
+            liked: post.likes.map(like => like.userID._id.toString()).includes(user._id),
+            permissions: post.permissions,
         }));
         return res.send(filteredPosts);
+    });
+
+    router.get('/getPostPages', async (req, res) => {
+        const user = await checkAPIKey(req);
+        if (!user) return res.status(401).send("Invalid API key");
+
+        const filter = req.query.filter || "all";
+        const pages = Math.ceil(await db.getPostNumber(!user.permissions.includes("classmate")) / postsPageSize);
+        return res.send({ pages });
     });
 
     router.get('/getComments', async (req, res) => {
