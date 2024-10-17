@@ -84,7 +84,8 @@ async function submitPost(save = false) {
 
     const nonEmptySections = removeAllEmptySections();
 
-    const isNews = document.getElementById('news').checked;
+    const news = document.getElementById('news');
+    const isNews = news ? news.checked : false;
 
     if (!title) {
         alert('Please enter a title');
@@ -380,7 +381,10 @@ function loadPost(post) {
     console.log(post);
     document.getElementById('title').value = post.title;
     document.getElementById('teachersafe').checked = post.permissions == "Teachersafe";
-    document.getElementById('news').checked = post.type == "news";
+    const news = document.getElementById('news');
+    if (news) {
+        news.checked = post.type == 'news';
+    }
 
     post.sections.forEach(section => {
         let newSection;
