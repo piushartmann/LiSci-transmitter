@@ -142,9 +142,15 @@ module.exports = (db, s3Client, webpush) => {
     router.get('/getPosts', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const isTeacher = !(permissions.includes("classmate"));
-        const page = (req.query.page || 1) - 1;
+        let page = (req.query.page || 1) - 1;
 
         const filter = req.query.filter || "all";
+
+        const totalPosts = await db.getPostNumber(isTeacher, filter);
+
+        if (page * postsPageSize > totalPosts){
+            page = Math.ceil(totalPosts / postsPageSize) - 1;
+        }
 
         const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page, filter);
         let filteredPosts = [];
@@ -169,7 +175,7 @@ module.exports = (db, s3Client, webpush) => {
             filteredPosts.push(postObj);
         });
         markPostsAsRead(req.session.userID, posts);
-        return res.status(200).send(filteredPosts);
+        return res.status(200).send(JSON.stringify({ posts: filteredPosts, totalPosts, pageSize: postsPageSize }));
     });
 
     router.get('/getPost/:id', async (req, res) => {

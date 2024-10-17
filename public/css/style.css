@@ -14,15 +14,27 @@ body {
     background-color: #f0f0f0;
 }
 
-.page-selection {
-    margin: 0 5px;
+.pageSelector {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pageSelector a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
     text-decoration: none;
-    padding: 5px 10px;
-    border: 1px solid #000;
-    border-radius: 5px;
-    width: 0.7%;
-    height: 0.7%;
-    text-align: center;
+    transition: background-color .3s;
+}
+
+.pageSelector a.active {
+    background-color: dodgerblue !important;
+    color: white;
+}
+
+.pageSelector a:hover:not(.active) {
+    background-color: #ddd;
 }
 
 .page-current {
@@ -36,12 +48,6 @@ body {
     transform: rotate(180deg);
     position: absolute;
     display: none;
-}
-
-.pageSelector {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
 }
 
 

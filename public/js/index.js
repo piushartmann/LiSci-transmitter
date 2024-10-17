@@ -2,16 +2,60 @@ async function loadPosts(page, filter) {
     return await fetch(`internal/getPosts?page=${page}&filter=${filter}`);
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+const urlParams = new URLSearchParams(window.location.search);
+const page = urlParams.get('page') || 1;
+const postsRequest = loadPosts(page, "all");
+const newsRequest = loadPosts(page, "news");
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page') || 1;
-    const onlyNewsFilter = urlParams.get('onlyNews') == "true" || false;
+async function renderPosts(selectedPosts) {
+    const postBox = document.getElementById("postBox");
 
-    const posts = await (await loadPosts(page, onlyNewsFilter ? "news" : "all")).json();
-    posts.forEach(post => {
-        buildPost(post);
+    const renderPosts = await selectedPosts;
+    postBox.innerHTML = "";
+    renderPosts.forEach(post => {
+        buildPost(post)
     });
+}
+
+function buildPageSelector(page, totalPages, newsPages, postsPages) {
+    const onlyNewsCheckbox = document.getElementById("onlyNews");
+    const pageSelector = document.getElementById("pageSelector");
+    pageSelector.innerHTML = "";
+
+    if (totalPages <= 1) {
+        return;
+    }
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement("a");
+        pageButton.className = i == page ? "active" : "";
+        pageButton.innerText = i;
+        pageButton.onclick = () => changePage(i, newsPages, postsPages, onlyNewsCheckbox.checked);
+        pageSelector.appendChild(pageButton);
+    }
+
+    return;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const onlyNewsFilter = urlParams.get('onlyNews') == "true" || false;
+    const onlyNewsCheckbox = document.getElementById("onlyNews");
+
+    onlyNewsCheckbox.checked = onlyNewsFilter;
+
+    const newsJson = await (await newsRequest).json();
+    const postsJson = await (await postsRequest).json();
+
+    const news = newsJson.posts;
+    const posts = postsJson.posts;
+
+    const newsPages = Math.ceil(newsJson.totalPosts / newsJson.pageSize);
+    const postsPages = Math.ceil(postsJson.totalPosts / postsJson.pageSize);
+
+    const selectedPosts = onlyNewsFilter ? news : posts;
+    const totalPages = onlyNewsCheckbox.checked ? newsPages : postsPages;
+    renderPosts(selectedPosts);
+    
+    buildPageSelector(page, totalPages, newsPages, postsPages);
 
     if (document.getElementById("prank")) {
         prank();
@@ -36,14 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideComments();
     });
 
-    const onlyNews = document.getElementById("onlyNews");
-    onlyNews.checked = onlyNewsFilter;
-
-    onlyNews.addEventListener("change", async () => {
-        const params = new URLSearchParams(window.location.search);
-        params.set('onlyNews', onlyNews.checked);
-        params.set('page', 1);
-        window.location.href = `${window.location.pathname}?${params.toString()}`;
+    onlyNewsCheckbox.addEventListener("change", async () => {
+        const page = urlParams.get('page') || 1;
+        changePage(page, newsPages, postsPages, onlyNewsCheckbox.checked);
     });
 });
 
@@ -63,8 +102,38 @@ function prank() {
     showPrank();
 }
 
-function changePage(page){
+async function changePage(page, newsPages, postsPages) {
     const params = new URLSearchParams(window.location.search);
     params.set('page', page);
-    window.location.href = `${window.location.pathname}?${params.toString()}`;
+    params.set('onlyNews', document.getElementById("onlyNews").checked);
+    if (history.pushState) {
+        var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + params.toString();
+        window.history.pushState({ path: newurl }, '', newurl);
+
+        const onlyNewsCheckbox = document.getElementById("onlyNews");
+        const totalPages = onlyNewsCheckbox.checked ? newsPages : postsPages;
+
+        if (page > totalPages) {
+            console.log("Page out of bounds");
+            changePage(totalPages, totalPages);
+            return;
+        }
+        const onlyNewsFilter = onlyNewsCheckbox.checked;
+
+        const postsRequest = loadPosts(page, "all");
+        const newsRequest = loadPosts(page, "news");
+
+        const newsJson = await (await newsRequest).json();
+        const postsJson = await (await postsRequest).json();
+    
+        const news = newsJson.posts;
+        const posts = postsJson.posts;
+    
+        const selectedPosts = onlyNewsFilter ? news : posts;
+        renderPosts(selectedPosts);
+
+        buildPageSelector(page, totalPages, newsPages, postsPages);
+    } else {
+        window.location.search = params.toString();
+    }
 }
