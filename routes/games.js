@@ -10,6 +10,8 @@ const router = Router();
 
 module.exports = (db, s3Client, webpush) => {
 
+    let discoverUsers = [];
+
     router.get('*', async (req, res, next) => {
         if (req.session.userID) {
             const permissions = await db.getUserPermissions(req.session.userID);
@@ -23,15 +25,15 @@ module.exports = (db, s3Client, webpush) => {
     router.get('/', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
-        
+
         //later games list will be pulled from db
 
         const games = [
-            {"name": "Tic Tac Toe", "description": "Tic Tac Toe Solo or with Friends", "url": "/games/tic-tac-toe"},
-            {"name": "Connect Four", "description": "Connect Four with Friends", "url": "/games/connect-four"},
-            {"name": "Chess", "description": "Chess with Friends", "url": "/games/chess"},
-            {"name": "Checkers", "description": "Checkers with Friends", "url": "/games/checkers"},
-            {"name": "Battleship", "description": "Battleship with Friends", "url": "/games/battleship"},
+            { "name": "Tic Tac Toe", "description": "Tic Tac Toe Solo or with Friends", "url": "/games/tic-tac-toe" },
+            { "name": "Connect Four", "description": "Connect Four with Friends", "url": "/games/connect-four" },
+            { "name": "Chess", "description": "Chess with Friends", "url": "/games/chess" },
+            { "name": "Checkers", "description": "Checkers with Friends", "url": "/games/checkers" },
+            { "name": "Battleship", "description": "Battleship with Friends", "url": "/games/battleship" },
         ];
 
         return res.render('games/games', {
@@ -39,6 +41,26 @@ module.exports = (db, s3Client, webpush) => {
             games: games
         });
     });
+
+    router.ws('/discover', async (ws, req) => {
+        if (!req.session.userID) return ws.close();
+        const user = await db.getUser(req.session.username);
+        if (!user) return ws.close();
+        discoverUsers.push({ "user": user, "ws": ws });
+
+        sendDiscoveryUpdate();
+
+        ws.on('close', () => {
+            discoverUsers = discoverUsers.filter(u => u.ws !== ws);
+            sendDiscoveryUpdate();
+        });
+    });
+
+    function sendDiscoveryUpdate() {
+        discoverUsers.forEach(user => {
+            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => u.user.username).filter(u => u !== user.user.username) }));
+        });
+    }
 
     //include all game routes
     router.use('/tic-tac-toe', require('./games/tic-tac-toe.js')(db));

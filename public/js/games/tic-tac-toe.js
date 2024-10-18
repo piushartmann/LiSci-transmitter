@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (square.textContent === '') {
                 square.textContent = 'X';
-                
+
                 yourTurn = false;
 
                 fetch('/games/tic-tac-toe/move', {
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        board: Array.from(squares).map(square => square.textContent),
+                        square: squares.indexOf(square),
                     })
                 }).then(async (res) => {
                     if (res.ok) {
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 })
             }
-
         });
     });
 });

@@ -185,7 +185,6 @@ module.exports.MongoConnector = class MongoConnector {
     async getUser(username) {
         const user = await this.User.findOne({ username })
             .populate('preferences');
-        console.log(user);
         return user;
     }
 

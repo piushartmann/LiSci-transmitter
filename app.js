@@ -7,6 +7,8 @@ const { S3Client } = require("@aws-sdk/client-s3");
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const webpush = require('web-push')
+const app = express();
+const ws = require('express-ws')(app);
 
 const oneDay = 24 * 3600 * 1000
 
@@ -16,7 +18,6 @@ connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
 
 //create express app
-const app = express();
 app.set('view engine', 'ejs')
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -44,6 +45,7 @@ app.use(session({
     })
 }));
 
+//connect to storage bucket
 const s3Client = new S3Client({
     region: "fra1",
     endpoint: "https://fra1.digitaloceanspaces.com",
@@ -54,6 +56,7 @@ const s3Client = new S3Client({
     forcePathStyle: false,
 });
 
+//set up webpush
 webpush.setVapidDetails(
     'mailto:pius.hartmann@gmx.de',
     process.env.VAPID_PUBLIC_KEY,
@@ -64,12 +67,10 @@ webpush.setVapidDetails(
 const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
-if (!process.env.KILLSWITCH == 1) {
-    app.use('/', require('./routes/base')(db));
-    app.use('/games', require('./routes/games')(db, s3Client, webpush));
-    app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
-    app.use('/api', require('./routes/api')(db, s3Client, webpush));
-}
+app.use('/', require('./routes/base')(db));
+app.use('/games', require('./routes/games')(db, s3Client, webpush));
+app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
+app.use('/api', require('./routes/api')(db, s3Client, webpush));
 
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);

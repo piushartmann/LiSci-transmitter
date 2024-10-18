@@ -1,6 +1,30 @@
 const { Router } = require('express');
 const router = Router();
+const { spawn } = require('child_process');
 
+function runPythonScript(scriptPath, args) {
+
+    // Use child_process.spawn method from 
+    // child_process module and assign it to variable
+    const pyProg = spawn('python', [scriptPath].concat(args));
+
+    // Collect data from script and print to console
+    let data = '';
+    pyProg.stdout.on('data', (stdout) => {
+        console.log(`stdout: ${stdout}`);
+    });
+
+    // Print errors to console, if any
+    pyProg.stderr.on('data', (stderr) => {
+        console.log(`stderr: ${stderr}`);
+    });
+
+    // When script is finished, print collected data
+    pyProg.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+        console.log(data);
+    });
+}
 
 module.exports = (db) => {
 
@@ -15,16 +39,11 @@ module.exports = (db) => {
 
     router.post('/move', async (req, res) => {
 
-        const { board } = req.body;
+        const { square } = req.body;
 
-        let attempts = 0;
-        newPosition = Math.floor(Math.random() * 9);
-        while (board[newPosition] !== "" && attempts < 8) {
-            newPosition = Math.floor(Math.random() * 9);
-            attempts++;
-        }
+        runPythonScript('games/ttt-ai.py', [JSON.stringify(square)]);
 
-        return res.status(200).send(JSON.stringify({ square: newPosition }));
+        return res.status(200).send(JSON.stringify({ square: 9 }));
 
     });
 

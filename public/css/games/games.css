@@ -1,7 +1,7 @@
 .gameBox {
     position: absolute;
     top: 10%;
-    width: 100%;
+    width: 90%;
     display: flex;
     justify-content: center;
     align-items: center;
