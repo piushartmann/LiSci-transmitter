@@ -66,6 +66,7 @@ const db = new MongoConnector("transmitter", connectionString);
 //use routes
 if (!process.env.KILLSWITCH == 1) {
     app.use('/', require('./routes/base')(db));
+    app.use('/games', require('./routes/games')(db, s3Client, webpush));
     app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
     app.use('/api', require('./routes/api')(db, s3Client, webpush));
 }

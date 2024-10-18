@@ -1,0 +1,23 @@
+.gameBox {
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--post-outline-color);
+    background: var(--post-background-color);
+    width: 200px;
+    height: 200px;
+}

@@ -45,7 +45,7 @@ const userSchema = new Schema({
     username: { type: String, required: true, index: true, unique: true },
     passHash: { type: String, required: true },
     pushSubscription: { type: Object, required: false },
-    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin', 'push', 'canPost'] }],
+    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin', 'push', 'canPost', 'games'] }],
     apiKey: { type: String, required: true },
     preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
 });

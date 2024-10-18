@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <%- include("../partials/baseHead.ejs") %>
+  <title>Games</title>
+  <link rel="stylesheet" href="/css/games/games.css">
+  <script src="/js/games/games.js"></script>
+</head>
+
+<body>
+  <%- include("../partials/header.ejs") %>
+
+  <div class="gameBox">
+
+    <% for( let i = 0; i < games.length; i++ ) { %>
+      <div class="game">
+        <h2><%= games[i].name %></h2>
+        <p> <%= games[i].description %> </p>
+        <a href="<%= games[i].url %>">Play</a>
+      </div>
+    <% } %>
+
+  </div>
+
+</body>
+
+</html>
