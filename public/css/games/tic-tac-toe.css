@@ -27,15 +27,57 @@
     background: var(--post-background-color);
 }
 
+.inner.game {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: none;
+    aspect-ratio: initial;
+    border: none;
+}
+
+.square.won {
+    background-color: #388538;
+}
+
+.game.won {
+    z-index: -1;
+}
+
+.game.lost {
+    z-index: -1;
+}
+
+.square.lost {
+    background-color: #ad3d3d;
+}
+
+.inner.square {
+    border-width: 1px;
+}
+
 .square {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    font-size: 100%;
     cursor: pointer;
     border-width: 5px;
     border-color: var(--post-outline-color);
     background: var(--post-background-color);
+}
+
+.playable .icon {
+    width: 90%;
+}
+
+.square:not(.playable) > .icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70%;
+    height: 70%;
+    transform: translate(-20%);
 }
 
 .top {

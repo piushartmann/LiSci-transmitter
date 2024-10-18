@@ -59,6 +59,13 @@ const citationSchema = new Schema({
     comments: [{ type: ObjectId, ref: 'Comment' }]
 });
 
+const gameSchema = new Schema({
+    players: [{ type: ObjectId, ref: 'User', required: true, index: true }],
+    type: { type: String, required: true },
+    gameState: { type: Object, required: false },
+    timestamp: { type: Date, default: Date.now },
+});
+
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
     hash.update(password);
@@ -75,6 +82,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.User = this.mongoose.model('User', userSchema);
         this.Comment = this.mongoose.model('Comment', commentSchema);
         this.Citation = this.mongoose.model('Citation', citationSchema);
+        this.Game = this.mongoose.model('Game', gameSchema);
     }
 
     async dropDatabase() { //be careful intended for debugging
@@ -518,5 +526,27 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPreviousAuthors() {
         return await this.Citation.distinct('author');
+    }
+
+    async createGame(players, type, gameState){
+        players = players.map(id => new ObjectId(id));
+
+        const game = new this.Game({ players, type, gameState });
+        return await game.save();
+    }
+
+    async getGame(gameID){
+        try {
+            return await this.Game.findById(gameID);
+        }
+        catch (error){
+            return null;
+        }
+    }
+
+    async updateGameState(gameID, gameState){
+        const game = await this.Game.findById(gameID);
+        game.gameState = gameState;
+        return await game.save();
     }
 };

@@ -1,30 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const { spawn } = require('child_process');
-
-function runPythonScript(scriptPath, args) {
-
-    // Use child_process.spawn method from 
-    // child_process module and assign it to variable
-    const pyProg = spawn('python', [scriptPath].concat(args));
-
-    // Collect data from script and print to console
-    let data = '';
-    pyProg.stdout.on('data', (stdout) => {
-        console.log(`stdout: ${stdout}`);
-    });
-
-    // Print errors to console, if any
-    pyProg.stderr.on('data', (stderr) => {
-        console.log(`stderr: ${stderr}`);
-    });
-
-    // When script is finished, print collected data
-    pyProg.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-        console.log(data);
-    });
-}
+const tttAI = require('../../games/ttt-ai');
 
 module.exports = (db) => {
 
@@ -37,13 +13,46 @@ module.exports = (db) => {
         });
     });
 
+    router.post('/startGame', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const { opponent } = req.body;
+        let players;
+        if (!opponent) {
+            players = [req.session.userID];
+        }
+        else {
+            players = [req.session.userID, opponent];
+        }
+        const board = tttAI.generate_empty_board();
+        const game = await db.createGame(players, 'tic-tac-toe', board);
+        if (!game) {
+            return res.status(400).send("Error creating game");
+        }
+        return res.status(200).send(JSON.stringify({ gameID: game._id }));
+    });
+
     router.post('/move', async (req, res) => {
 
-        const { square } = req.body;
+        const { gameID, index } = req.body;
 
-        runPythonScript('games/ttt-ai.py', [JSON.stringify(square)]);
+        if (!gameID || !index) return res.status(400).send("Missing parameters");
+        const game = await db.getGame(gameID);
+        if (!game) return res.status(404).send("Game not found");
+        if (!game.players.includes(req.session.userID)) return res.status(403).send("You are not in this game");
 
-        return res.status(200).send(JSON.stringify({ square: 9 }));
+        let board = game.gameState;
+
+        console.log("Game: ", (Math.floor(index / 9)) + 1)
+        console.log("Square: ", (index % 9) + 1)
+
+        board = tttAI.do_game_selection(board, (Math.floor(index / 9)))
+        board = tttAI.do_square_selection(board, index % 9)
+
+        board = tttAI.find_best_move(board);
+
+        await db.updateGameState(gameID, board);
+
+        return res.status(200).send(JSON.stringify({ board: board }));
 
     });
 
