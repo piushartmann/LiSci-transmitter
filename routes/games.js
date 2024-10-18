@@ -13,10 +13,10 @@ module.exports = (db, s3Client, webpush) => {
     router.get('*', async (req, res, next) => {
         if (req.session.userID) {
             const permissions = await db.getUserPermissions(req.session.userID);
-            if (!permissions.includes("games")) res.redirect('/');
+            if (!permissions.includes("games")) return res.redirect('/');
             next();
         } else {
-            res.redirect('/login');
+            return res.redirect('/');
         }
     });
 
