@@ -10,17 +10,20 @@ const STATUS_OWON = -1;
 const STATUS_XWON = 1;
 const STATUS_DRAW = 2;
 
+const STD_DEPTH = 5
+const MAX_EVAL = 10;
+
 const winning_idecies_table = [
     // Rows
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
-
+    
     // Columns
     [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
-
+    
     // Diagonals
     [0, 4, 8],
     [2, 4, 6]
@@ -28,14 +31,14 @@ const winning_idecies_table = [
 
 function generate_empty_board() {
     let board = [];
-
-    for (var i = 0; i < 9; i++) {
-        board.push([0, 0, 0, 0, 0, 0, 0, 0, 0, STATUS_ONGOING])
+    
+    for (var i=0; i<9; i++) {
+        board.push([0,0,0,0,0,0,0,0,0,STATUS_ONGOING])
     }
 
-    board.push(STATUS_ONGOING);
-    board.push(TURN_X);
-    board.push(-1)
+    board[STATUS_INDEX] = STATUS_ONGOING;
+    board[TURN_INDEX] = TURN_X;
+    board[NEXT_GAME_INDEX] = -1;
 
     return board;
 }
@@ -46,48 +49,47 @@ function is_board_expecting_game_selection(board) {
 
 function game_selection_possibilities(board) {
     let possibilities = [];
-    board.forEach((game, index) => {
-        if (game[STATUS_INDEX] === STATUS_ONGOING) {
-            possibilities.push(index);
+    for (var i=0; i<9; i++) {
+        if (board[i][STATUS_INDEX] === STATUS_ONGOING) {
+            possibilities.push(i);
         }
-    });
+    }
     return possibilities;
 }
 
 function do_game_selection(board, index) {
     board[NEXT_GAME_INDEX] = index;
-
-    return board;
 }
 
 function square_selection_possibilities(board) {
     next_game = board[NEXT_GAME_INDEX];
     let possibilities = [];
 
-    board[next_game].forEach((square, index) => {
-        if (square === 0) {
-            possibilities.push(index);
+    for (var i=0; i<9; i++) {
+        if (board[next_game][i] === 0) {
+            possibilities.push(i);
         }
-    });
+    }
     return possibilities;
 }
 
 function check_game_state(game, turn) {
     let has_won = 0;
-    winning_idecies_table.forEach(pattern => {
+    winning_idecies_table.every(pattern => {
         let n1 = pattern[0];
         let n2 = pattern[1];
         let n3 = pattern[2];
-        if (game[n1] === game[n2] && game[n1] === game[n3] && game[n1] === turn) {
+        if ((game[n1] === game[n2]) && (game[n1] === game[n3]) && (game[n1] === turn)) {
             has_won = turn;
-            return;
+            return false;
         }
+        return true;
     });
     if (has_won !== 0) {
         return has_won;
     }
 
-    if (!game.includes(STATUS_ONGOING)) {
+    if (!game.slice(0,9).includes(STATUS_ONGOING)) {
         return STATUS_DRAW;
     }
     return STATUS_ONGOING;
@@ -95,11 +97,12 @@ function check_game_state(game, turn) {
 
 function check_board_state(board) {
     let game_statuses = [];
-    for (var i = 0; i < 9; i++) {
+    for (var i=0; i<9; i++) {
         game_statuses.push(board[i][STATUS_INDEX]);
     }
 
-    return check_game_state(game_statuses, board[TURN_INDEX]);
+    let state = check_game_state(game_statuses, -board[TURN_INDEX]);
+    return state;
 }
 
 function do_square_selection(board, index) {
@@ -125,24 +128,72 @@ function do_square_selection(board, index) {
         board_state = check_board_state(board);
         board[STATUS_INDEX] = board_state;
     }
-
-    board[TURN_INDEX] = -turn;
-
-    return board;
 }
 
-function find_best_move(board) {
-    if (is_board_expecting_game_selection(board)) {
-        let possibilities = game_selection_possibilities(board);
-        let random = possibilities[Math.floor(Math.random() * (possibilities.length - 1))];
-        do_game_selection(board, random);
+function evaluate_board(board) {
+    let value = 0;
+
+    for (var i=0; i<9; i++) {
+        if (board[i][STATUS_INDEX] !== 2) {
+            value+= board[i][STATUS_INDEX]
+        }
     }
 
-    let possibilities = square_selection_possibilities(board);
-    let random = possibilities[Math.floor(Math.random() * (possibilities.length - 1))];
-    do_square_selection(board, random);
+    return value;
+}
 
-    return board;
+function find_best_move(board, depth=STD_DEPTH) {
+
+    if (board[STATUS_INDEX] === STATUS_DRAW) {
+        return [0];
+    } else if (board[STATUS_INDEX] !== STATUS_ONGOING) {
+        return [board[STATUS_INDEX] * MAX_EVAL];
+    }
+
+    if (depth <= 0) {
+        return [evaluate_board(board)];
+    }
+
+    let possibilities;
+    let is_board_level;
+    if (is_board_expecting_game_selection(board)) {
+        is_board_level = true;
+        possibilities = game_selection_possibilities(board);
+    } else {
+        is_board_level = false;
+        possibilities = square_selection_possibilities(board);
+    }
+
+    let turn = board[TURN_INDEX];
+
+    let best_eval = -turn*(MAX_EVAL+1);
+    let move = -1;
+    possibilities.forEach(index => {
+        let new_board = board.map(innerArray => {
+            if (innerArray.constructor === Array) {
+                return innerArray.slice();
+            }
+            return innerArray;
+            
+        });
+
+        if (is_board_level) {
+            do_game_selection(new_board, index);
+        } else {
+            do_square_selection(new_board, index);
+        }
+        evaluation = find_best_move(new_board, depth-1)[0];
+
+        if (turn == TURN_X && evaluation > best_eval) {
+            move = index;
+            best_eval = evaluation;
+        } else if (turn == TURN_O && evaluation < best_eval) {
+            move = index;
+            best_eval = evaluation;
+        }
+    });
+
+    return [best_eval, move, is_board_level];
 }
 
 module.exports = {
