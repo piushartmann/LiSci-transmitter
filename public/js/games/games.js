@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function discoverPlayer(game) {
-    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover/${game}`);
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
     ws.onopen = () => {
         console.log('Connected to server');
     }
@@ -44,6 +44,8 @@ function discoverPlayer(game) {
             buildDiscoveryList(users, game);
         }
         else if (data.type === 'gameAccept') {
+            console.log('Game accept received');
+            console.log(data);
             if (invited.includes(data.user)) {
                 window.location.href = `/games/${data.game}/${data.gameID}`;
             }
@@ -115,13 +117,7 @@ function invitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    fetch(`/games/invitePlayer`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ game, player })
-    });
+    ws.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
 }
 
 function uninvitePlayer(game, player) {
@@ -129,41 +125,7 @@ function uninvitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    fetch(`/games/uninvitePlayer`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ game, player })
-    });
-}
-
-function acceptInvite(game, player) {
-    console.log("Accepting invite");
-    console.log(game);
-    console.log(player);
-
-    fetch(`/games/${game}/startGame`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ opponent:player })
-    }).then(async (res) => {
-        if (res.ok) {
-            const data = await res.json();
-
-            fetch(`/games/acceptInvite`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ game, player, gameID: data.gameID })
-            });
-
-            window.location.href = `/games/${game}/${data.gameID}`;
-        }
-    });
+    ws.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
 }
 
 function discoverOtherPlayers(game) {

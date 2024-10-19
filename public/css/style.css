@@ -187,6 +187,113 @@ a {
     animation: animatezoom 0.3s
 }
 
+/* Container for the game request */
+.game-request {
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    animation: fadeIn 0.4s ease-in-out;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  
+  /* Header section of the game request */
+  .game-request-header {
+    background-color: #007bff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #ffffff;
+  }
+  
+  .game-request-title {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  
+  .game-request-close {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: none;
+  }
+  
+  .game-request-close:hover {
+    transform: rotate(90deg);
+  }
+  
+  /* Content of the game request */
+  .game-request-content {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .game-request-text {
+    font-size: 1em;
+    margin-bottom: 20px;
+    color: #333333;
+  }
+  
+  /* Buttons container */
+  .game-request-buttons {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  /* Button styles */
+  .game-request-buttons button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    color: #000000;
+  }
+  
+  /* Accept button */
+  .game-request-buttons .accept-button {
+    background-color: #28a745;
+  }
+  
+  .game-request-buttons .accept-button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+  }
+  
+  /* Decline button */
+  .game-request-buttons .decline-button {
+    background-color: #dc3545;
+  }
+  
+  .game-request-buttons .decline-button:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+  }
+  
+  /* Keyframes for fade-in animation */
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+
 
 @-webkit-keyframes animatezoom {
     from {

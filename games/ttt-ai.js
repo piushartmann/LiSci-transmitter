@@ -59,6 +59,8 @@ function game_selection_possibilities(board) {
 
 function do_game_selection(board, index) {
     board[NEXT_GAME_INDEX] = index;
+
+    return board;
 }
 
 function square_selection_possibilities(board) {
@@ -128,6 +130,8 @@ function do_square_selection(board, index) {
         board_state = check_board_state(board);
         board[STATUS_INDEX] = board_state;
     }
+
+    return board;
 }
 
 function evaluate_board(board) {

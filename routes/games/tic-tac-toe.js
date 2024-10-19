@@ -63,7 +63,6 @@ module.exports = (db) => {
                     const squareIndex = index % 9;
                     const playerIndex = game.players.indexOf(req.session.userID) === 0 ? 1 : -1;
 
-                    
                     //make players move
                     if (!index) return;
 
@@ -106,8 +105,6 @@ module.exports = (db) => {
                     const gameIndex = Math.floor(index / 9);
                     const squareIndex = index % 9;
 
-                    console.log(playerIndex);
-
                     //make PLayers move
                     if (!index) return;
 
@@ -116,6 +113,8 @@ module.exports = (db) => {
                     if (!checkGameIsLegal(board, gameIndex)) return;
 
                     board = tttAI.do_game_selection(board, gameIndex)
+
+                    console.log(board);
 
                     if (!checkSquareIsLegal(board, squareIndex)) return;
 
@@ -155,7 +154,6 @@ module.exports = (db) => {
             console.log("Not your turn");
             return false;
         }
-
         return true;
     }
 
@@ -166,9 +164,7 @@ module.exports = (db) => {
                 console.log("Invalid game selection");
                 return false;
             }
-
         }
-
         return true;
     }
 
@@ -178,7 +174,6 @@ module.exports = (db) => {
             console.log("Invalid square selection");
             return false;
         }
-
         return true;
     }
 
