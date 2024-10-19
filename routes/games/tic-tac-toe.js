@@ -51,6 +51,7 @@ module.exports = (db) => {
         connections.push({ userID: req.session.userID, ws: ws });
 
         if (game.players.length === 1) {
+            //singleplayer
             ws.on('message', async (msg) => {
                 const message = JSON.parse(msg);
                 if (message.type === "move") {
@@ -94,6 +95,7 @@ module.exports = (db) => {
             });
         }
         else {
+            //multiplayer
             ws.on('message', async (msg) => {
                 const message = JSON.parse(msg);
                 if (message.type === "move") {
