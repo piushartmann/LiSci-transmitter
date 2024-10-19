@@ -31,10 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             if (!square.classList.contains('set')) {
-
-                yourTurn = false;
-
-                ws.send(JSON.stringify({"type": "move", "index": squares.indexOf(square)}));
+                ws.send(JSON.stringify({ "type": "move", "index": squares.indexOf(square) }));
             }
         });
     });
@@ -59,12 +56,11 @@ function addInnerBoards(game, depth) {
 }
 
 
-function updateBoard(board, playerIndex) {
+function updateBoard(board, player, nextGame) {
     const squares = document.getElementsByClassName('playable');
     const mainGame = document.getElementById('game');
     const mainSquares = Array.from(mainGame.children);
     const games = Array.from(document.getElementsByClassName('game'));
-    const mainPlayer = playerIndex === 1 ? 1 : -1;
 
     console.log(board);
 
@@ -72,6 +68,7 @@ function updateBoard(board, playerIndex) {
         for (let j = 0; j < 9; j++) {
             const square = squares[i * 9 + j];
             const actioned = board[i][j] !== 0;
+
             if (actioned) {
                 if (!square.classList.contains('set')) {
                     square.classList.add('set');
@@ -80,6 +77,17 @@ function updateBoard(board, playerIndex) {
                 }
             }
         }
+
+        if (board[i][9] === 0) {
+            if (nextGame !== i && nextGame !== -1) {
+                mainSquares[i].classList.add('not-selectable');
+            }
+            else {
+                mainSquares[i].classList.remove('not-selectable');
+            }
+
+        }
+
         if (board[i][9] === 1) {
             if (mainSquares[i].classList.contains('won')) {
                 continue;
@@ -96,7 +104,7 @@ function updateBoard(board, playerIndex) {
             addIcon(mainSquares[i], '/icons/games/ttt-circle.svg');
         }
     }
-    if (board[10] === mainPlayer) {
+    if (board[10] === player) {
         yourTurn = true;
     }
 }
@@ -109,7 +117,7 @@ function addIcon(parent, src) {
 }
 
 function deleteGame() {
-    
+
     confirm("Are you sure you want to delete this game?") ? fetch('/games/tic-tac-toe/deleteGame', {
         method: 'POST',
         headers: {
@@ -125,7 +133,7 @@ function deleteGame() {
     }) : null;
 }
 
-function connectToWS(gameID){
+function connectToWS(gameID) {
     const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/tic-tac-toe/${gameID}`);
     ws.onopen = () => {
         console.log('Connected to server');
@@ -133,7 +141,8 @@ function connectToWS(gameID){
     ws.onmessage = (event) => {
         data = JSON.parse(event.data);
         if (data.type === 'board') {
-            updateBoard(data.board, data.player);
+            updateBoard(data.board, data.player, data.nextGame);
+            console.log(data.nextGame);
         }
     }
     ws.onclose = () => {

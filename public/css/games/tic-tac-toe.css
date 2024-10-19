@@ -24,7 +24,6 @@
     padding: 10px;
     border-radius: 8px;
     border: 1px solid var(--post-outline-color);
-    background: var(--post-background-color);
 }
 
 .icon {
@@ -67,7 +66,6 @@
     font-size: 100%;
     border-width: 5px;
     border-color: var(--post-outline-color);
-    background: var(--post-background-color);
 }
 
 .playable{
@@ -118,6 +116,12 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
+}
+
+.not-selectable {
+    opacity: 0.8;
+    pointer-events: none;
+    background-color: rgb(255 0 0 / 10%)
 }
 
 @media (max-width: 768px) {

@@ -187,6 +187,7 @@ a {
     animation: animatezoom 0.3s
 }
 
+
 @-webkit-keyframes animatezoom {
     from {
         -webkit-transform: scale(0)

@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 const tttAI = require('../../games/ttt-ai');
+const base = require('../base');
 
 let connections = [];
 
@@ -57,16 +58,39 @@ module.exports = (db) => {
 
                     let board = game.gameState;
                     let index = message.index;
+
+                    const gameIndex = Math.floor(index / 9);
+                    const squareIndex = index % 9;
+                    const playerIndex = game.players.indexOf(req.session.userID) === 0 ? 1 : -1;
+
+                    
+                    //make players move
                     if (!index) return;
 
-                    board = tttAI.do_game_selection(board, (Math.floor(index / 9)))
-                    board = tttAI.do_square_selection(board, index % 9)
+                    if (!checkIsPlayersTurn(board, playerIndex)) return;
 
+                    if (!checkGameIsLegal(board, gameIndex)) return;
+
+                    board = tttAI.do_game_selection(board, gameIndex)
+
+                    if (!checkSquareIsLegal(board, squareIndex)) return;
+
+                    board = tttAI.do_square_selection(board, squareIndex)
+
+                    // set Next Game choice free if appropriate
+                    if (!tttAI.is_board_expecting_game_selection(board)) {
+                        const possibilities = tttAI.game_selection_possibilities(board);
+                        if (!possibilities.includes(board[tttAI.NEXT_GAME_INDEX])) {
+                            board[tttAI.NEXT_GAME_INDEX] = -1;
+                        }
+                    }
+
+                    // make AI move
                     board = tttAI.find_best_move(board);
 
                     await db.updateGameState(gameID, board);
 
-                    ws.send(JSON.stringify({ type: "board", board: board, player: game.players.indexOf(req.session.userID) }));
+                    ws.send(JSON.stringify({ type: "board", board: board, player: playerIndex, nextGame: board[tttAI.NEXT_GAME_INDEX] }));
                 }
             });
         }
@@ -78,19 +102,40 @@ module.exports = (db) => {
 
                     let board = game.gameState;
                     let index = message.index;
+
+                    const gameIndex = Math.floor(index / 9);
+                    const squareIndex = index % 9;
+
+                    console.log(playerIndex);
+
+                    //make PLayers move
                     if (!index) return;
 
-                    console.log("Move: " + index);
+                    if (!checkIsPlayersTurn(board, playerIndex)) return;
 
-                    board = tttAI.do_game_selection(board, (Math.floor(index / 9)))
-                    board = tttAI.do_square_selection(board, index % 9)
+                    if (!checkGameIsLegal(board, gameIndex)) return;
+
+                    board = tttAI.do_game_selection(board, gameIndex)
+
+                    if (!checkSquareIsLegal(board, squareIndex)) return;
+
+                    board = tttAI.do_square_selection(board, squareIndex)
+
+                    // set Next Game choice free if appropriate
+                    if (!tttAI.is_board_expecting_game_selection(board)) {
+                        const possibilities = tttAI.game_selection_possibilities(board);
+                        if (!possibilities.includes(board[tttAI.NEXT_GAME_INDEX])) {
+                            board[tttAI.NEXT_GAME_INDEX] = -1;
+                        }
+                    }
 
                     await db.updateGameState(gameID, board);
 
                     game.players.forEach(player => {
                         let playerWS = connections.find(c => c.userID === player.toString());
+                        const playerIndex = game.players.indexOf(player) === 0 ? 1 : -1;
                         if (playerWS) {
-                            playerWS.ws.send(JSON.stringify({ type: "board", board: board, player: game.players.indexOf(player) }));
+                            playerWS.ws.send(JSON.stringify({ type: "board", board: board, player: playerIndex, nextGame: board[tttAI.NEXT_GAME_INDEX] }));
                         }
                     });
                 }
@@ -100,9 +145,42 @@ module.exports = (db) => {
         ws.on('close', () => {
             connections = connections.filter(c => c.ws !== ws);
         });
-
-        ws.send(JSON.stringify({ type: "board", board: game.gameState, player: game.players.indexOf(req.session.userID) }));
+        const playerIndex = game.players.indexOf(req.session.userID) === 0 ? 1 : -1;
+        ws.send(JSON.stringify({ type: "board", board: game.gameState, player: playerIndex, nextGame: game.gameState[tttAI.NEXT_GAME_INDEX] }));
     });
+
+    function checkIsPlayersTurn(board, playerIndex) {
+        // Check if it is the player's turn
+        if (board[tttAI.TURN_INDEX] !== playerIndex) {
+            console.log("Not your turn");
+            return false;
+        }
+
+        return true;
+    }
+
+    function checkGameIsLegal(board, gameIndex) {
+        // Check if the game selection is valid
+        if (!tttAI.is_board_expecting_game_selection(board)) {
+            if (board[tttAI.NEXT_GAME_INDEX] !== gameIndex) {
+                console.log("Invalid game selection");
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+    function checkSquareIsLegal(board, squareIndex) {
+        // Check if the square selection is valid
+        if (!tttAI.square_selection_possibilities(board).includes(squareIndex)) {
+            console.log("Invalid square selection");
+            return false;
+        }
+
+        return true;
+    }
 
     router.post('/deleteGame', async (req, res) => {
         const { gameID } = req.body;

@@ -15,12 +15,12 @@ const winning_idecies_table = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
-    
+
     // Columns
     [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
-    
+
     // Diagonals
     [0, 4, 8],
     [2, 4, 6]
@@ -28,9 +28,9 @@ const winning_idecies_table = [
 
 function generate_empty_board() {
     let board = [];
-    
-    for (var i=0; i<9; i++) {
-        board.push([0,0,0,0,0,0,0,0,0,STATUS_ONGOING])
+
+    for (var i = 0; i < 9; i++) {
+        board.push([0, 0, 0, 0, 0, 0, 0, 0, 0, STATUS_ONGOING])
     }
 
     board.push(STATUS_ONGOING);
@@ -95,7 +95,7 @@ function check_game_state(game, turn) {
 
 function check_board_state(board) {
     let game_statuses = [];
-    for (var i=0; i<9; i++) {
+    for (var i = 0; i < 9; i++) {
         game_statuses.push(board[i][STATUS_INDEX]);
     }
 
@@ -134,13 +134,13 @@ function do_square_selection(board, index) {
 function find_best_move(board) {
     if (is_board_expecting_game_selection(board)) {
         let possibilities = game_selection_possibilities(board);
-        let random = possibilities[Math.floor(Math.random() * (possibilities.length-1))];
-        do_game_selection(board,random);
+        let random = possibilities[Math.floor(Math.random() * (possibilities.length - 1))];
+        do_game_selection(board, random);
     }
 
     let possibilities = square_selection_possibilities(board);
-    let random = possibilities[Math.floor(Math.random() * (possibilities.length-1))];
-    do_square_selection(board,random);
+    let random = possibilities[Math.floor(Math.random() * (possibilities.length - 1))];
+    do_square_selection(board, random);
 
     return board;
 }
@@ -152,5 +152,7 @@ module.exports = {
     do_game_selection,
     square_selection_possibilities,
     do_square_selection,
-    find_best_move
+    find_best_move,
+    NEXT_GAME_INDEX,
+    TURN_INDEX,
 };
