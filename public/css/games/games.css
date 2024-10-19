@@ -21,3 +21,11 @@
     width: 200px;
     height: 200px;
 }
+
+.invited {
+    background-color: #f0f0f0;
+}
+
+.invitedBy {
+    background-color: aquamarine;
+}

@@ -196,9 +196,15 @@ module.exports.MongoConnector = class MongoConnector {
         return user;
     }
 
+    async getUserByID(userID) {
+        const user = await this.User.findById(userID)
+            .populate('preferences');
+        return user;
+    }
+
     async getUserPermissions(userID) {
         const user = await this.User.findById(userID);
-        if(!user) return [];
+        if (!user) return [];
         return user.permissions;
     }
 
@@ -528,23 +534,31 @@ module.exports.MongoConnector = class MongoConnector {
         return await this.Citation.distinct('author');
     }
 
-    async createGame(players, type, gameState){
+    async createGame(players, type, gameState) {
         players = players.map(id => new ObjectId(id));
 
         const game = new this.Game({ players, type, gameState });
         return await game.save();
     }
 
-    async getGame(gameID){
+    async getGame(gameID) {
         try {
             return await this.Game.findById(gameID);
         }
-        catch (error){
+        catch (error) {
             return null;
         }
     }
 
-    async updateGameState(gameID, gameState){
+    async getGamesFromUsers(userIDs) {
+        return await this.Game.find({ players: { $all: userIDs.map(id => new ObjectId(id)) } });
+    }
+
+    async deleteGame(gameID) {
+        return await this.Game.findByIdAndDelete(gameID);
+    }
+
+    async updateGameState(gameID, gameState) {
         const game = await this.Game.findById(gameID);
         game.gameState = gameState;
         return await game.save();

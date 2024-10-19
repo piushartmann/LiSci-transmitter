@@ -29,11 +29,7 @@ module.exports = (db, s3Client, webpush) => {
         //later games list will be pulled from db
 
         const games = [
-            { "name": "Tic Tac Toe", "description": "Tic Tac Toe Solo or with Friends", "url": "/games/tic-tac-toe" },
-            { "name": "Connect Four", "description": "Connect Four with Friends", "url": "/games/connect-four" },
-            { "name": "Chess", "description": "Chess with Friends", "url": "/games/chess" },
-            { "name": "Checkers", "description": "Checkers with Friends", "url": "/games/checkers" },
-            { "name": "Battleship", "description": "Battleship with Friends", "url": "/games/battleship" },
+            { "title": "Tic Tac Toe", "description": "Tic Tac Toe Solo or with Friends", "name": "tic-tac-toe", "multiplayer": true, "singleplayer": true },
         ];
 
         return res.render('games/games', {
@@ -42,23 +38,77 @@ module.exports = (db, s3Client, webpush) => {
         });
     });
 
-    router.ws('/discover', async (ws, req) => {
+    router.ws('/discover/:game', async (ws, req) => {
         if (!req.session.userID) return ws.close();
         const user = await db.getUser(req.session.username);
         if (!user) return ws.close();
-        discoverUsers.push({ "user": user, "ws": ws });
 
-        sendDiscoveryUpdate();
+        const game = req.params.game;
+
+        discoverUsers.push({ "user": user, "ws": ws, "game": game });
+
+        sendDiscoveryUpdate(game);
 
         ws.on('close', () => {
             discoverUsers = discoverUsers.filter(u => u.ws !== ws);
-            sendDiscoveryUpdate();
+            sendDiscoveryUpdate(game);
         });
     });
 
-    function sendDiscoveryUpdate() {
+    router.post('/invitePlayer', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const { game: gameName, player } = req.body;
+
+        const opponent = await db.getUserByID(player);
+        if (!opponent) return res.status(400).send("Player not found");
+
+        const user = await db.getUserByID(req.session.userID);
+        if (!user) return res.status(400).send("Game User not found");
+
+
+        const playerWS = discoverUsers.find(u => u.user.id === player);
+        if (!playerWS) return res.status(400).send("Player not online");
+
+        playerWS.ws.send(JSON.stringify({ "type": "gameInvite", "user": req.session.userID, "game": gameName, "gameID": "1234" }));
+
+        return res.status(200).send("Invite sent");
+    });
+
+    router.post('/uninvitePlayer', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const { game: gameName, player } = req.body;
+
+        const opponent = await db.getUserByID(player);
+        if (!opponent) return res.status(400).send("Player not found");
+
+        const user = await db.getUserByID(req.session.userID);
+
+        const playerWS = discoverUsers.find(u => u.user.id === player);
+
+        if (!playerWS) return res.status(400).send("Player not online");
+
+        playerWS.ws.send(JSON.stringify({ "type": "gameUninvite", "user": req.session.userID, "game": gameName }));
+    });
+
+    router.post('/acceptInvite', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const { game, player, gameID } = req.body;
+
+        const opponent = await db.getUserByID(player);
+        if (!opponent) return res.status(400).send("Player not found");
+
+        const user = await db.getUserByID(req.session.userID);
+
+        const playerWS = discoverUsers.find(u => u.user.id === player);
+
+        if (!playerWS) return res.status(400).send("Player not online");
+
+        playerWS.ws.send(JSON.stringify({ "type": "gameAccept", "user": req.session.userID, "game": game, "gameID": gameID }));
+    });
+
+    function sendDiscoveryUpdate(game) {
         discoverUsers.forEach(user => {
-            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => u.user.username).filter(u => u !== user.user.username) }));
+            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.filter(u => u.game === game).map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username) }));
         });
     }
 

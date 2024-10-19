@@ -1,4 +1,5 @@
-let yourTurn = true;
+let yourTurn = false;
+let gameID = null;
 
 const gameHTML = `<div class="inner game">
 <div class="inner square top left"></div>
@@ -17,6 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const game = document.getElementById('game');
     addInnerBoards(game, 1);
 
+    const urlParts = window.location.pathname.split('/');
+    gameID = urlParts[urlParts.length - 1];
+
+    const ws = connectToWS(gameID);
+
+
     const squares = Array.from(document.getElementsByClassName('playable'));
     squares.forEach(square => {
         square.addEventListener('click', () => {
@@ -24,28 +31,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             if (!square.classList.contains('set')) {
-                square.classList.add('set');
-                let icon = document.createElement('img');
-                icon.src = '/icons/games/ttt-cross.svg';
-                icon.className = 'icon';
-                square.appendChild(icon);
 
                 yourTurn = false;
 
-                fetch('/games/tic-tac-toe/move', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        gameID: "6712bc555478c7311a8dbd4b",
-                        index: squares.indexOf(square),
-                    })
-                }).then(async (res) => {
-                    if (res.ok) {
-                        updateBoard((await res.json()).board);
-                    }
-                })
+                ws.send(JSON.stringify({"type": "move", "index": squares.indexOf(square)}));
             }
         });
     });
@@ -70,13 +59,15 @@ function addInnerBoards(game, depth) {
 }
 
 
-function updateBoard(board) {
+function updateBoard(board, playerIndex) {
     const squares = document.getElementsByClassName('playable');
     const mainGame = document.getElementById('game');
     const mainSquares = Array.from(mainGame.children);
     const games = Array.from(document.getElementsByClassName('game'));
+    const mainPlayer = playerIndex === 1 ? 1 : -1;
 
-    console.log(games);
+    console.log(board);
+
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             const square = squares[i * 9 + j];
@@ -84,7 +75,8 @@ function updateBoard(board) {
             if (actioned) {
                 if (!square.classList.contains('set')) {
                     square.classList.add('set');
-                    addIcon(square, board[i][j] === 1 ? '/icons/games/ttt-cross.svg' : '/icons/games/ttt-circle.svg');
+                    number = board[i][j];
+                    addIcon(square, number === 1 ? '/icons/games/ttt-cross.svg' : '/icons/games/ttt-circle.svg');
                 }
             }
         }
@@ -104,7 +96,9 @@ function updateBoard(board) {
             addIcon(mainSquares[i], '/icons/games/ttt-circle.svg');
         }
     }
-    yourTurn = true;
+    if (board[10] === mainPlayer) {
+        yourTurn = true;
+    }
 }
 
 function addIcon(parent, src) {
@@ -112,4 +106,38 @@ function addIcon(parent, src) {
     icon.src = src;
     icon.className = 'icon';
     parent.appendChild(icon);
+}
+
+function deleteGame() {
+    
+    confirm("Are you sure you want to delete this game?") ? fetch('/games/tic-tac-toe/deleteGame', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            gameID: gameID,
+        })
+    }).then(async (res) => {
+        if (res.ok) {
+            window.location.href = '/games';
+        }
+    }) : null;
+}
+
+function connectToWS(gameID){
+    const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/tic-tac-toe/${gameID}`);
+    ws.onopen = () => {
+        console.log('Connected to server');
+    }
+    ws.onmessage = (event) => {
+        data = JSON.parse(event.data);
+        if (data.type === 'board') {
+            updateBoard(data.board, data.player);
+        }
+    }
+    ws.onclose = () => {
+        console.log('Disconnected from server');
+    }
+    return ws;
 }

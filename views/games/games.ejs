@@ -14,16 +14,33 @@
   <div class="gameBox">
 
     <% for( let i = 0; i < games.length; i++ ) { %>
-      <div class="game">
-        <h2><%= games[i].name %></h2>
-        <p> <%= games[i].description %> </p>
-        <a href="<%= games[i].url %>">Play</a>
-      </div>
+    <div class="game">
+      <h2><%= games[i].title %></h2>
+      <p> <%= games[i].description %> </p>
+      <% if (games[i].singleplayer) { %>
+      <button onclick="playSinglePlayer('<%= games[i].name %>')">Play alone</button>
+      <% } %>
+      <% if (games[i].multiplayer) { %>
+      <button class="connectButton" onclick="discoverOtherPlayers('<%= games[i].name %>')">Search for other Players</button>
+      <% } %>
+    </div>
     <% } %>
 
   </div>
 
-  <div id="playerConnections">
+  <div id="connectionModal" class="modal">
+    <span id="modalClose" class="close" title="Close Modal">&times;</span>
+
+    <form class="modal-content animate">
+
+      <h1 id="title">Mit wem möchtest du dich verbinden?</h1>
+
+      <div id="playerConnections">
+
+      </div>
+
+    </form>
+  </div>
 
   </div>
 
