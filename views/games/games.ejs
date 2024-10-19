@@ -15,13 +15,13 @@
 
     <% for( let i = 0; i < games.length; i++ ) { %>
     <div class="game">
-      <h2><%= games[i].title %></h2>
+      <h2><%= games[i].name %></h2>
       <p> <%= games[i].description %> </p>
       <% if (games[i].singleplayer) { %>
-      <button onclick="playSinglePlayer('<%= games[i].name %>')">Play alone</button>
+      <button onclick="playSinglePlayer('<%= games[i].url %>')">Play alone</button>
       <% } %>
       <% if (games[i].multiplayer) { %>
-      <button class="connectButton" onclick="discoverOtherPlayers('<%= games[i].name %>')">Search for other Players</button>
+      <button class="connectButton" onclick="discoverOtherPlayers('<%= games[i].url %>')">Search for other Players</button>
       <% } %>
     </div>
     <% } %>

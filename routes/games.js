@@ -3,8 +3,6 @@ const { MongoConnector } = require('../MongoConnector');
 const { GetBucketPolicyStatusCommand } = require('@aws-sdk/client-s3');
 const router = Router();
 
-const tttAI = require('../games/ttt-ai.js');
-
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
@@ -12,9 +10,13 @@ const tttAI = require('../games/ttt-ai.js');
 */
 
 module.exports = (db, s3Client, webpush) => {
-    
+
+    const config = require('../config.json');
+
     let discoverUsers = [];
     let invites = [];
+
+    const games = config.games;
 
     router.get('*', async (req, res, next) => {
         if (req.session.userID) {
@@ -29,12 +31,6 @@ module.exports = (db, s3Client, webpush) => {
     router.get('/', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
-
-        //later games list will be pulled from db
-
-        const games = [
-            { "title": "Tic Tac Toe", "description": "Tic Tac Toe Solo or with Friends", "name": "tic-tac-toe", "multiplayer": true, "singleplayer": true },
-        ];
 
         return res.render('games/games', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
@@ -78,7 +74,7 @@ module.exports = (db, s3Client, webpush) => {
                 invites = invites.filter(i => i !== invitation);
 
                 if (!invites.find(i => i.user === message.user && i.to === req.session.userID)) return;
-                
+
                 const game = await startGame(message.game, [req.session.userID, message.user]);
 
                 const player = discoverUsers.find(u => u.user.id === message.user);
@@ -111,8 +107,8 @@ module.exports = (db, s3Client, webpush) => {
         });
     }
 
-    function startGame(game, players){
-        switch(game){
+    function startGame(game, players) {
+        switch (game) {
             case "tic-tac-toe":
                 return startTTT(players);
             default:
@@ -120,8 +116,10 @@ module.exports = (db, s3Client, webpush) => {
         }
     }
 
-    async function startTTT(players){
-        
+    async function startTTT(players) {
+
+        const tttAI = require('../games/ttt-ai.js');
+
         const ongoingGame = await db.getGamesFromUsers(players);
         if (ongoingGame[0]) {
             return ongoingGame[0]._id;
@@ -137,7 +135,9 @@ module.exports = (db, s3Client, webpush) => {
     }
 
     //include all game routes
-    router.use('/tic-tac-toe', require('./games/tic-tac-toe.js')(db));
+    games.forEach(game => {
+        router.use("/"+game.url, require(game.router)(db));
+    });
 
     return router;
 }

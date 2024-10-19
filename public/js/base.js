@@ -167,17 +167,17 @@ function iosPWASplash(t, e = "white") {
         }
 }
 
-function gamesDiscoverable() {
-    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
-    ws.onopen = () => {
+function makeDiscoverable() {
+    gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
+    gamesWS.onopen = () => {
         console.log('Connected to server');
     }
-    ws.onmessage = (event) => {
+    gamesWS.onmessage = (event) => {
         console.log(event.data);
         const data = JSON.parse(event.data);
         if (data.type === 'invite') {
             console.log('Game invite received');
-            document.body.appendChild(buildGameRequest(ws, data.game, data.user, data.username));
+            document.body.appendChild(buildGameRequest(gamesWS, data.game, data.user, data.username));
         }
         else if (data.type === 'uninvite') {
             console.log('Game uninvite received');
@@ -191,8 +191,13 @@ function gamesDiscoverable() {
             console.log(data);
             window.location.href = `/games/${data.game}/${data.gameID}`;
         }
+        else if (data.type === 'discover') {
+            if (typeof buildDiscoveryList === 'function') {
+                buildDiscoveryList(data.users, data.game);
+            }
+        }
     }
-    ws.onclose = () => {
+    gamesWS.onclose = () => {
         console.log('Disconnected from server');
     }
 
@@ -214,7 +219,7 @@ function gamesDiscoverable() {
 
         let gameRequestText = document.createElement('p');
         gameRequestText.className = 'game-request-text';
-        gameRequestText.textContent = `${username} hat dich zu einem Spiel ${game} eingeladen.`;	
+        gameRequestText.textContent = `${username} hat dich zu einem Spiel ${game} eingeladen.`;
 
         let gameRequestButtons = document.createElement('div');
         gameRequestButtons.className = 'game-request-buttons';
@@ -243,9 +248,14 @@ function gamesDiscoverable() {
         return gameRequest;
     }
 
-    return ws;
+    return gamesWS;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    gamesDiscoverable();
+    makeDiscoverable();
+});
+
+window.addEventListener("focus", () => {
+    if (typeof gamesWS !== 'undefined') return;
+    gamesWS.connect();
 });

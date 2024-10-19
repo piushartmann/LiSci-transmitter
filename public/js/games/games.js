@@ -1,4 +1,4 @@
-let ws = null;
+let gamesWS = null;
 let invited = [];
 let invites = [];
 let users = [];
@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function discoverPlayer(game) {
-    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
-    ws.onopen = () => {
+    gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
+    gamesWS.onopen = () => {
         console.log('Connected to server');
     }
-    ws.onmessage = (event) => {
+    gamesWS.onmessage = (event) => {
         data = JSON.parse(event.data);
         if (data.type === 'discover') {
             users = data.users;
@@ -51,12 +51,12 @@ function discoverPlayer(game) {
             }
         }
     }
-    ws.onclose = () => {
+    gamesWS.onclose = () => {
         console.log('Disconnected from server');
         const playerConnections = document.getElementById('playerConnections');
         playerConnections.innerHTML = '';
     }
-    return ws;
+    return gamesWS;
 }
 
 function buildDiscoveryList(players, game) {
@@ -117,7 +117,7 @@ function invitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    ws.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
+    gamesWS.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
 }
 
 function uninvitePlayer(game, player) {
@@ -125,7 +125,7 @@ function uninvitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    ws.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
+    gamesWS.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
 }
 
 function discoverOtherPlayers(game) {
@@ -141,5 +141,5 @@ function hideDiscovery() {
     const connectionModal = document.getElementById('connectionModal');
     connectionModal.style.display = 'none';
 
-    ws.close();
+    gamesWS.close();
 }
