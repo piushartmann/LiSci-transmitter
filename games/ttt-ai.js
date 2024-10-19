@@ -237,6 +237,24 @@ function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL
     return [best_eval, move, is_board_level];
 }
 
+function get_best_move(board, depth=STD_DEPTH) {
+    const [_, move, is_board_level] = find_best_move(board, depth);
+    let new_board = board.map(innerArray => {
+        if (innerArray.constructor === Array) {
+            return innerArray.slice();
+        }
+        return innerArray;
+    });
+
+    if (is_board_level) {
+        do_game_selection(new_board, move);
+    } else {
+        do_square_selection(new_board, move);
+    }
+
+    return new_board;
+}
+
 module.exports = {
     generate_empty_board,
     get_best_move,
