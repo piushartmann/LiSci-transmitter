@@ -190,6 +190,12 @@ function makeDiscoverable() {
             console.log(data);
             window.location.href = `/games/${data.game}/${data.gameID}`;
         }
+        else if (data.type === 'decline') {
+            console.log('Game decline received');
+            if (typeof inviteDeclined === 'function') {
+                inviteDeclined(data.user);
+            }
+        }
         else if (data.type === 'discover') {
             if (typeof buildDiscoveryList === 'function') {
                 buildDiscoveryList(data.users, data.game);

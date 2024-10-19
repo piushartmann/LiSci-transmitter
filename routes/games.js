@@ -78,13 +78,24 @@ module.exports = (db, s3Client, webpush) => {
 
                 const game = await startGame(message.game, [req.session.userID, message.user]);
 
-                const player = discoverUsers.find(u => u.user.id === message.user);
-                if (!player) return;
-                player.ws.send(JSON.stringify({ "type": "accept", "game": message.game, "gameID": game }));
-
-                const otherPlayer = discoverUsers.find(u => u.user.id === req.session.userID);
+                const otherPlayer = discoverUsers.find(u => u.user.id === message.user);
                 if (!otherPlayer) return;
                 otherPlayer.ws.send(JSON.stringify({ "type": "accept", "game": message.game, "gameID": game }));
+
+                const player = discoverUsers.find(u => u.user.id === req.session.userID);
+                if (!player) return;
+                player.ws.send(JSON.stringify({ "type": "accept", "game": message.game, "gameID": game }));
+            }
+            else if (message.type === "decline") {
+
+                const invitation = { "game": message.game, "user": message.user, "to": req.session.userID };
+                invites = invites.filter(i => i !== invitation);
+
+                if (!invites.find(i => i.user === message.user && i.to === req.session.userID)) return;
+
+                const otherPlayer = discoverUsers.find(u => u.user.id === message.user);
+                if (!otherPlayer) return;
+                otherPlayer.ws.send(JSON.stringify({ "type": "decline", "user": req.session.userID }));
             }
         });
 

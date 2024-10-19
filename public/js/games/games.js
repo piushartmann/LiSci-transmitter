@@ -24,39 +24,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-function discoverPlayer(game) {
-    gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
-    gamesWS.onopen = () => {
-        console.log('Connected to server');
-    }
-    gamesWS.onmessage = (event) => {
-        data = JSON.parse(event.data);
-        if (data.type === 'discover') {
-            users = data.users;
-            buildDiscoveryList(users, game);
-        }
-        else if (data.type === 'gameInvite') {
-            invites.push({ "user": data.user, "game": data.gameID });
-            buildDiscoveryList(users, game);
-        }
-        else if (data.type === 'gameUninvite') {
-            invites = invites.filter(i => i.user !== data.user);
-            buildDiscoveryList(users, game);
-        }
-        else if (data.type === 'gameAccept') {
-            console.log('Game accept received');
-            console.log(data);
-            if (invited.includes(data.user)) {
-                window.location.href = `/games/${data.game}/${data.gameID}`;
+function buildDiscoveryList(players, game) {
+    const playerConnections = document.getElementById('playerConnections');
+    playerConnections.innerHTML = '';
+    players.forEach(player => {
+        const playerElement = buildButton("icons/games/connect.svg", player.username, () => {
+            if (invited.includes(player.userID)) {
+                playerElement.classList.remove('invited');
+                invited = invited.filter(p => p !== player.userID);
+                uninvitePlayer(game, player.userID);
             }
+            else {
+                if (invites.find(i => i.user === player.userID)) {
+                    acceptInvite(game, player.userID);
+                } else {
+                    playerElement.classList.add('invited');
+                    invited.push(player.userID);
+                    invitePlayer(game, player.userID);
+                }
+            }
+
+        }, player.username);
+
+        if (invited.includes(player.userID)) {
+            playerElement.classList.add('invited');
         }
+
+        if (invites.find(i => i.user === player.userID)) {
+            playerElement.classList.add('invitedBy');
+        }
+
+        playerElement.classList.add('player');
+        playerElement.type = 'button';
+        playerElement.dataset.userid = player.userID;
+        playerConnections.appendChild(playerElement);
+    });
+}
+
+function inviteDeclined(userID) {
+    const player = document.querySelector(`.player[data-userid="${userID}"]`);
+    console.log(player);
+    if (player) {
+        invited = invited.filter(p => p !== player.userID);
+        player.classList.remove('invited');
     }
-    gamesWS.onclose = () => {
-        console.log('Disconnected from server');
-        const playerConnections = document.getElementById('playerConnections');
-        playerConnections.innerHTML = '';
-    }
-    return gamesWS;
 }
 
 function playSinglePlayer(game) {
@@ -103,6 +114,4 @@ function discoverOtherPlayers(game) {
 function hideDiscovery() {
     const connectionModal = document.getElementById('connectionModal');
     connectionModal.style.display = 'none';
-
-    gamesWS.close();
 }
