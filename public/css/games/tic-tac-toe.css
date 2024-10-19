@@ -1,6 +1,6 @@
 .gameBox {
     position: absolute;
-    top: 100px;
+    top: 130px;
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -122,6 +122,19 @@
     opacity: 0.8;
     pointer-events: none;
     background-color: rgb(255 0 0 / 10%)
+}
+
+.gameHead {
+    text-align: center;
+    font-size: 2em;
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.gameHead img {
+    width: 45px;
 }
 
 @media (max-width: 768px) {

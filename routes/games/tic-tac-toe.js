@@ -116,8 +116,6 @@ module.exports = (db) => {
 
                     board = tttAI.do_game_selection(board, gameIndex)
 
-                    console.log(board);
-
                     if (!checkSquareIsLegal(board, squareIndex)) return;
 
                     board = tttAI.do_square_selection(board, squareIndex)

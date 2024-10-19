@@ -61,6 +61,8 @@ function updateBoard(board, player, nextGame) {
     const mainGame = document.getElementById('game');
     const mainSquares = Array.from(mainGame.children);
     const games = Array.from(document.getElementsByClassName('game'));
+    const turnDescription = document.getElementById('turnDescription');
+    const currentSymbol = document.getElementById('currentSymbol');
 
     console.log(board);
 
@@ -86,7 +88,7 @@ function updateBoard(board, player, nextGame) {
                 mainSquares[i].classList.remove('not-selectable');
             }
         }
-        else{
+        else {
             mainSquares[i].classList.remove('not-selectable');
         }
 
@@ -107,7 +109,13 @@ function updateBoard(board, player, nextGame) {
         }
     }
     if (board[10] === player) {
+        turnDescription.innerText = "Dein Zug";
+        currentSymbol.src = player === 1 ? '/icons/games/ttt-cross.svg' : '/icons/games/ttt-circle.svg';
         yourTurn = true;
+    } else {
+        turnDescription.innerText = "Warte auf Gegner";
+        currentSymbol.src = player === 1 ? '/icons/games/ttt-circle.svg' : '/icons/games/ttt-cross.svg';
+        yourTurn = false;
     }
 }
 
