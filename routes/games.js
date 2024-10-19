@@ -115,7 +115,7 @@ module.exports = (db, s3Client, webpush) => {
 
     function sendDiscoveryUpdate() {
         discoverUsers.forEach(user => {
-            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username) }));
+            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username)}));
         });
     }
 

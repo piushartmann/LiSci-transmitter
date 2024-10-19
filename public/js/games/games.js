@@ -2,6 +2,7 @@ let gamesWS = null;
 let invited = [];
 let invites = [];
 let users = [];
+let discoverGame = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-function buildDiscoveryList(players, game) {
+function buildDiscoveryList(players) {
     const playerConnections = document.getElementById('playerConnections');
     playerConnections.innerHTML = '';
     players.forEach(player => {
@@ -32,15 +33,15 @@ function buildDiscoveryList(players, game) {
             if (invited.includes(player.userID)) {
                 playerElement.classList.remove('invited');
                 invited = invited.filter(p => p !== player.userID);
-                uninvitePlayer(game, player.userID);
+                uninvitePlayer(discoverGame, player.userID);
             }
             else {
                 if (invites.find(i => i.user === player.userID)) {
-                    acceptInvite(game, player.userID);
+                    acceptInvite(discoverGame, player.userID);
                 } else {
                     playerElement.classList.add('invited');
                     invited.push(player.userID);
-                    invitePlayer(game, player.userID);
+                    invitePlayer(discoverGame, player.userID);
                 }
             }
 
@@ -65,7 +66,7 @@ function inviteDeclined(userID) {
     const player = document.querySelector(`.player[data-userid="${userID}"]`);
     console.log(player);
     if (player) {
-        invited = invited.filter(p => p !== player.userID);
+        invited = invited.filter(p => p !== userID);
         player.classList.remove('invited');
     }
 }
@@ -109,9 +110,12 @@ function discoverOtherPlayers(game) {
     const connectionModal = document.getElementById('connectionModal');
     connectionModal.style.display = 'block';
 
+    discoverGame = game;
 }
 
 function hideDiscovery() {
     const connectionModal = document.getElementById('connectionModal');
     connectionModal.style.display = 'none';
+
+    discoverGame = null;
 }
