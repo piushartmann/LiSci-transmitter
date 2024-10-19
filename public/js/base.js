@@ -173,7 +173,6 @@ function makeDiscoverable() {
         console.log('Connected to server');
     }
     gamesWS.onmessage = (event) => {
-        console.log(event.data);
         const data = JSON.parse(event.data);
         if (data.type === 'invite') {
             console.log('Game invite received');

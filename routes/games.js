@@ -70,6 +70,7 @@ module.exports = (db, s3Client, webpush) => {
             }
 
             else if (message.type === "accept") {
+
                 const invitation = { "game": message.game, "user": message.user, "to": req.session.userID };
                 invites = invites.filter(i => i !== invitation);
 

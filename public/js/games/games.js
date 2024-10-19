@@ -59,42 +59,6 @@ function discoverPlayer(game) {
     return gamesWS;
 }
 
-function buildDiscoveryList(players, game) {
-    const playerConnections = document.getElementById('playerConnections');
-    playerConnections.innerHTML = '';
-    players.forEach(player => {
-        const playerElement = buildButton("icons/games/connect.svg", player.username, () => {
-            if (invited.includes(player.userID)) {
-                playerElement.classList.remove('invited');
-                invited = invited.filter(p => p !== player.userID);
-                uninvitePlayer(game, player.userID);
-            }
-            else {
-                if (invites.find(i => i.user === player.userID)) {
-                    acceptInvite(game, player.userID);
-                } else {
-                    playerElement.classList.add('invited');
-                    invited.push(player.userID);
-                    invitePlayer(game, player.userID);
-                }
-            }
-
-        }, player.username);
-
-        if (invited.includes(player.userID)) {
-            playerElement.classList.add('invited');
-        }
-
-        if (invites.find(i => i.user === player.userID)) {
-            playerElement.classList.add('invitedBy');
-        }
-
-        playerElement.classList.add('player');
-        playerElement.type = 'button';
-        playerConnections.appendChild(playerElement);
-    });
-}
-
 function playSinglePlayer(game) {
     console.log("Playing single player");
     console.log(game);
@@ -130,7 +94,6 @@ function uninvitePlayer(game, player) {
 
 function discoverOtherPlayers(game) {
     console.log("Discovering other players");
-    discoverPlayer(game);
 
     const connectionModal = document.getElementById('connectionModal');
     connectionModal.style.display = 'block';
