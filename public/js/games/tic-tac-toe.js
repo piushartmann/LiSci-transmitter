@@ -85,7 +85,9 @@ function updateBoard(board, player, nextGame) {
             else {
                 mainSquares[i].classList.remove('not-selectable');
             }
-
+        }
+        else{
+            mainSquares[i].classList.remove('not-selectable');
         }
 
         if (board[i][9] === 1) {

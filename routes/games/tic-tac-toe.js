@@ -85,7 +85,7 @@ module.exports = (db) => {
                     }
 
                     // make AI move
-                    board = tttAI.find_best_move(board);
+                    board = tttAI.get_best_move(board);
 
                     await db.updateGameState(gameID, board);
 

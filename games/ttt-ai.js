@@ -147,7 +147,6 @@ function evaluate_board(board) {
 }
 
 function find_best_move(board, depth=STD_DEPTH) {
-
     if (board[STATUS_INDEX] === STATUS_DRAW) {
         return [0];
     } else if (board[STATUS_INDEX] !== STATUS_ONGOING) {
@@ -170,7 +169,7 @@ function find_best_move(board, depth=STD_DEPTH) {
 
     let turn = board[TURN_INDEX];
 
-    let best_eval = -turn*(MAX_EVAL+1);
+    let best_eval = -turn * (MAX_EVAL + 1);
     let move = -1;
     possibilities.forEach(index => {
         let new_board = board.map(innerArray => {
@@ -178,7 +177,6 @@ function find_best_move(board, depth=STD_DEPTH) {
                 return innerArray.slice();
             }
             return innerArray;
-            
         });
 
         if (is_board_level) {
@@ -186,7 +184,7 @@ function find_best_move(board, depth=STD_DEPTH) {
         } else {
             do_square_selection(new_board, index);
         }
-        evaluation = find_best_move(new_board, depth-1)[0];
+        let evaluation = find_best_move(new_board, depth - 1)[0];
 
         if (turn == TURN_X && evaluation > best_eval) {
             move = index;
@@ -200,14 +198,32 @@ function find_best_move(board, depth=STD_DEPTH) {
     return [best_eval, move, is_board_level];
 }
 
+function get_best_move(board, depth=STD_DEPTH) {
+    const [_, move, is_board_level] = find_best_move(board, depth);
+    let new_board = board.map(innerArray => {
+        if (innerArray.constructor === Array) {
+            return innerArray.slice();
+        }
+        return innerArray;
+    });
+
+    if (is_board_level) {
+        do_game_selection(new_board, move);
+    } else {
+        do_square_selection(new_board, move);
+    }
+
+    return new_board;
+}
+
 module.exports = {
     generate_empty_board,
+    get_best_move,
     is_board_expecting_game_selection,
     game_selection_possibilities,
     do_game_selection,
     square_selection_possibilities,
     do_square_selection,
-    find_best_move,
     NEXT_GAME_INDEX,
     TURN_INDEX,
 };
