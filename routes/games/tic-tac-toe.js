@@ -109,6 +109,9 @@ module.exports = (db) => {
                     //make PLayers move
                     if (!index) return;
 
+                     //if game is over do nothing
+                     if (board[tttAI.STATUS_INDEX] == -1) return;
+
                     if (!checkIsPlayersTurn(board, playerIndex)) return;
 
                     if (!checkGameIsLegal(board, gameIndex)) return;

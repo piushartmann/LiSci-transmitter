@@ -180,6 +180,8 @@ function evaluate_board(board) {
 
 function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL+1) {
 
+    if (!board) return;
+
     if (board[STATUS_INDEX] === STATUS_DRAW) {
         return [0];
     } else if (board[STATUS_INDEX] !== STATUS_ONGOING) {
@@ -246,6 +248,7 @@ function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL
 }
 
 function get_best_move(board, depth=STD_DEPTH) {
+    if (!board) return;
     const [_, move, is_board_level] = find_best_move(board, depth);
     let new_board = board.map(innerArray => {
         if (innerArray.constructor === Array) {
