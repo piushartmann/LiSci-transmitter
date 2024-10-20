@@ -1,3 +1,5 @@
+let currentPage = 1;
+
 document.addEventListener("DOMContentLoaded", async function () {
     const previousAuthors = await loadPreviousAuthors();
     const author = document.getElementById("author");
@@ -10,6 +12,7 @@ window.onload = function () {
     const page = urlParams.get('page') || 1;
 
     loadCitations(page);
+    currentPage = page;
 }
 
 function loadCitations(page) {
@@ -195,3 +198,18 @@ function selectUser(user){
     const author = document.getElementById("author");
     author.value = user;
 }
+
+let scrollTimeout;
+
+window.addEventListener('scroll', () => {
+    if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+    }
+
+    scrollTimeout = setTimeout(() => {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+            currentPage++;
+            loadCitations(currentPage);
+        }
+    }, 100);
+});
