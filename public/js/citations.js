@@ -36,52 +36,77 @@ function buildCitation(citation) {
     citationContainer.className = "citation";
     citationContainer.setAttribute("data-id", citation._id);
 
-    let sectionDiv = document.createElement("div");
-    sectionDiv.className = "content";
-    sectionDiv.innerHTML = `<p>"${citation.content}"</p>`;
-    citationContainer.appendChild(sectionDiv);
-
-    let authorDiv = document.createElement("div");
-    authorDiv.className = "author";
-    authorDiv.innerHTML = `<p>-${citation.author}</p>`;
-    citationContainer.appendChild(authorDiv);
-
     let userDiv = document.createElement("div");
     userDiv.className = "username";
-    citationContainer.appendChild(userDiv);
 
-    const profilePic = citation.userID.profilePic
+    const profilePic = citation.userID.profilePic;
     userDiv.appendChild(buildProfilePic(profilePic, citation.userID.username));
+
+    let sectionDiv = document.createElement("div");
+    let authorDiv = document.createElement("div");
+    let contextDiv = document.createElement("div");
+    if (citation.context.length > 1) {
+        contextDiv = document.createElement("div");
+        contextDiv.className = "context";
+        citation.context.forEach(contextItem => {
+            let contextItemDiv = document.createElement("div");
+            contextItemDiv.className = "context-item";
+            let authorDiv = document.createElement("div");
+            authorDiv.className = "context-author";
+            authorDiv.innerText = contextItem.author+":";
+
+            let contentDiv = document.createElement("div");
+            contentDiv.className = "context-content";
+            contentDiv.innerText = contextItem.content;
+
+            contextItemDiv.appendChild(authorDiv);
+            contextItemDiv.appendChild(contentDiv);
+            contextDiv.appendChild(contextItemDiv);
+        });
+
+    } else {
+        sectionDiv = document.createElement("div");
+        sectionDiv.className = "content";
+        sectionDiv.innerHTML = `<p>"${citation.content}"</p>`;
+
+        authorDiv = document.createElement("div");
+        authorDiv.className = "author";
+        authorDiv.innerHTML = `<p>-${citation.author}</p>`;
+    }
+
 
     let buttonRow = document.createElement("div");
     buttonRow.className = "button-row";
-    citationContainer.appendChild(buttonRow);
 
     let interactionButtons = document.createElement("div");
     interactionButtons.className = "interaction-buttons";
-    buttonRow.appendChild(interactionButtons);
 
     let editButtons = document.createElement("div");
     editButtons.className = "edit-buttons";
-    buttonRow.appendChild(editButtons);
 
     interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length, loggedIn));
 
     if (citation.canEdit) {
-
         let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id));
-
         let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id));
 
         editButtons.appendChild(deleteButton);
         editButtons.appendChild(editButton);
     }
 
+    citationContainer.appendChild(contextDiv);
+    citationContainer.appendChild(sectionDiv);
+    citationContainer.appendChild(authorDiv);
+    citationContainer.appendChild(userDiv);
+    citationContainer.appendChild(buttonRow);
+    buttonRow.appendChild(interactionButtons);
+    buttonRow.appendChild(editButtons);
+
     citationBox.appendChild(citationContainer);
 }
 
 function likeCitation(id) {
-    
+
 }
 
 function submitCitation() {
@@ -194,7 +219,7 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     buttonRow.appendChild(editButton);
 }
 
-function selectUser(user){
+function selectUser(user) {
     const author = document.getElementById("author");
     author.value = user;
 }
@@ -211,5 +236,5 @@ window.addEventListener('scroll', () => {
             currentPage++;
             loadCitations(currentPage);
         }
-    }, 100);
+    }, 50);
 });

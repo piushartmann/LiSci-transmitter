@@ -50,10 +50,16 @@ const userSchema = new Schema({
     preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
 });
 
+const citationContextSchema = new Schema({
+    author: { type: String, required: true },
+    content: { type: String, required: true }
+});
+
 const citationSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
     author: { type: String, required: true },
     content: { type: String, required: true },
+    context: [{ type: citationContextSchema, required: false }],
     timestamp: { type: Date, default: Date.now },
     likes: [likeSchema],
     comments: [{ type: ObjectId, ref: 'Comment' }]
@@ -407,6 +413,11 @@ module.exports.MongoConnector = class MongoConnector {
         return await citation.save();
     }
 
+    async createCitationWithContext(userID, author, content, context, timestamp) {
+        const citation = new this.Citation({ userID, author, content, context, timestamp: timestamp || Date.now() });
+        return await citation.save();
+    }
+
     async getCitations(limit = 10, offset = 0) {
 
         const citations = await this.Citation.find()
@@ -551,11 +562,11 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async getGamesFromUsers(userIDs) {
-        return await this.Game.find({ 
-            players: { 
-            $size: userIDs.length, 
-            $all: userIDs.map(id => new ObjectId(id)) 
-            } 
+        return await this.Game.find({
+            players: {
+                $size: userIDs.length,
+                $all: userIDs.map(id => new ObjectId(id))
+            }
         });
     }
 

@@ -14,6 +14,19 @@
     width: 87%;
 }
 
+.context-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.context-content {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    width: 87%;
+}
+
 .citation .author {
     font-style: italic;
 }
