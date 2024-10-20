@@ -77,17 +77,13 @@ module.exports = (db) => {
 
                     board = tttAI.do_square_selection(board, squareIndex)
 
-                    // set Next Game choice free if appropriate
-                    if (!tttAI.is_board_expecting_game_selection(board)) {
-                        const possibilities = tttAI.game_selection_possibilities(board);
-                        if (!possibilities.includes(board[tttAI.NEXT_GAME_INDEX])) {
-                            board[tttAI.NEXT_GAME_INDEX] = -1;
-                        }
-                    }
+                    board = correctGameChoiceIndex(board);
 
                     // make AI move
                     board = tttAI.get_best_move(board);
 
+                    board = correctGameChoiceIndex(board);
+                    
                     await db.updateGameState(gameID, board);
 
                     ws.send(JSON.stringify({ type: "board", board: board, player: playerIndex, nextGame: board[tttAI.NEXT_GAME_INDEX] }));
@@ -120,13 +116,7 @@ module.exports = (db) => {
 
                     board = tttAI.do_square_selection(board, squareIndex)
 
-                    // set Next Game choice free if appropriate
-                    if (!tttAI.is_board_expecting_game_selection(board)) {
-                        const possibilities = tttAI.game_selection_possibilities(board);
-                        if (!possibilities.includes(board[tttAI.NEXT_GAME_INDEX])) {
-                            board[tttAI.NEXT_GAME_INDEX] = -1;
-                        }
-                    }
+                    board = correctGameChoiceIndex(board);
 
                     await db.updateGameState(gameID, board);
 
@@ -175,6 +165,17 @@ module.exports = (db) => {
             return false;
         }
         return true;
+    }
+
+    function correctGameChoiceIndex(board) {
+        // Correct the game choice index if it is invalid
+        if (!tttAI.is_board_expecting_game_selection(board)) {
+            const possibilities = tttAI.game_selection_possibilities(board);
+            if (!possibilities.includes(board[tttAI.NEXT_GAME_INDEX])) {
+                board[tttAI.NEXT_GAME_INDEX] = -1;
+            }
+        }
+        return board;
     }
 
     router.post('/deleteGame', async (req, res) => {

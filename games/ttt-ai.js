@@ -250,9 +250,10 @@ function get_best_move(board, depth=STD_DEPTH) {
     });
 
     if (is_board_level) {
-        do_game_selection(new_board, move);
+        new_board = do_game_selection(new_board, move);
+        new_board = do_square_selection(new_board, move);
     } else {
-        do_square_selection(new_board, move);
+        new_board = do_square_selection(new_board, move);
     }
 
     return new_board;
