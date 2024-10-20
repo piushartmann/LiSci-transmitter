@@ -1,4 +1,6 @@
 <header>
+
+
   <a class="header-logo" href="/">
     <img src="/images/logo.png" alt="Logo">
   </a>
@@ -12,7 +14,7 @@
       <li><a href="/citations">Zitate</a></li>
       <% } %>
       <% if (usertype.includes("games")) { %>
-        <li><a href="/games">Games</a></li>
+      <li><a href="/games">Games</a></li>
       <% } %>
       <li><a href="/about">About</a></li>
     </ul>
@@ -39,8 +41,11 @@
 
   </div>
 
+  <div class="pwaBar" id="pwaBar">
+  </div>
 
 </header>
+
 
 <div class="login-popup" id="loginPopup">
   <div class="login-popup-content">
@@ -89,7 +94,7 @@
     <% } %>
 
     <% if (usertype.includes("games")) { %>
-      <li><a href="/games">Games</a></li>
+    <li><a href="/games">Games</a></li>
     <% } %>
 
     <li><a href="/about">About</a></li>

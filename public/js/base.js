@@ -256,8 +256,25 @@ function makeDiscoverable() {
     return gamesWS;
 }
 
+function addPWABar() {
+    const pwaBarHeight = pwaBar.offsetHeight;
+    document.querySelectorAll('*').forEach(element => {
+        const computedStyle = window.getComputedStyle(element);
+        if (computedStyle.position === 'absolute') {
+            const currentTop = parseInt(computedStyle.top, 10) || 0;
+            element.style.top = `${currentTop + pwaBarHeight}px`;
+        }
+    });
+}
+
+const isInStandaloneMode = () =>
+    (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
+
 document.addEventListener('DOMContentLoaded', async () => {
     makeDiscoverable();
+    if (isInStandaloneMode()) {
+        addPWABar();
+    }
 });
 
 window.addEventListener("focus", () => {
