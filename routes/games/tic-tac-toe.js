@@ -55,13 +55,14 @@ module.exports = (db) => {
             ws.on('message', async (msg) => {
                 const message = JSON.parse(msg);
                 if (message.type === "move") {
+                    
+                    let game = await db.getGame(gameID);
+                    
+                    let board = game.gameState;
 
                     console.log(board);
-
-                    let game = await db.getGame(gameID);
-
-                    let board = game.gameState;
                     let index = message.index;
+
 
                     const gameIndex = Math.floor(index / 9);
                     const squareIndex = index % 9;
@@ -102,12 +103,13 @@ module.exports = (db) => {
                 const message = JSON.parse(msg);
                 if (message.type === "move") {
 
-                    console.log(board);
-
                     let game = await db.getGame(gameID);
-
+                    
                     let board = game.gameState;
+
+                    console.log(board);
                     let index = message.index;
+
 
                     const gameIndex = Math.floor(index / 9);
                     const squareIndex = index % 9;
