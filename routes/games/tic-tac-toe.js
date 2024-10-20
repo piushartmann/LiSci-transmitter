@@ -55,6 +55,9 @@ module.exports = (db) => {
             ws.on('message', async (msg) => {
                 const message = JSON.parse(msg);
                 if (message.type === "move") {
+
+                    console.log(board);
+
                     let game = await db.getGame(gameID);
 
                     let board = game.gameState;
@@ -98,6 +101,9 @@ module.exports = (db) => {
             ws.on('message', async (msg) => {
                 const message = JSON.parse(msg);
                 if (message.type === "move") {
+
+                    console.log(board);
+
                     let game = await db.getGame(gameID);
 
                     let board = game.gameState;

@@ -49,6 +49,7 @@ function is_board_expecting_game_selection(board) {
 }
 
 function game_selection_possibilities(board) {
+    if (!board) return;
     let possibilities = [];
     for (var i=0; i<9; i++) {
         if (board[i][STATUS_INDEX] === STATUS_ONGOING) {
@@ -59,11 +60,13 @@ function game_selection_possibilities(board) {
 }
 
 function do_game_selection(board, index) {
+    if (!board) return;
     board[NEXT_GAME_INDEX] = index;
     return board;
 }
 
 function square_selection_possibilities(board) {
+    if (!board) return;
     next_game = board[NEXT_GAME_INDEX];
     let possibilities = [];
 
@@ -76,6 +79,7 @@ function square_selection_possibilities(board) {
 }
 
 function get_game_states(board) {
+    if (!board) return;
     let game_states = [];
     for (var i=0; i<9; i++) {
         game_states.push(board[i][STATUS_INDEX]);
@@ -98,6 +102,7 @@ function check_game_state(game, turn) {
 }
 
 function check_board_state(board) {
+    if (!board) return;
     let game_states = get_game_states(board);
 
     let state = check_game_state(game_states, -board[TURN_INDEX]);
@@ -159,6 +164,7 @@ function evaluation_of_pairs(game) {
 }
 
 function evaluate_board(board) {
+    if (!board) return;
     let value = 0;
 
     let game_states = get_game_states(board);
@@ -258,10 +264,10 @@ function get_best_move(board, depth=STD_DEPTH) {
     });
 
     if (is_board_level) {
-        new_board = do_game_selection(new_board, move);
+        new_board = do_game_selection(new_board, move) || board;
         new_board = do_square_selection(new_board, move) || board;
     } else {
-        new_board = do_square_selection(new_board, move);
+        new_board = do_square_selection(new_board, move) || board;
     }
 
     return new_board;
