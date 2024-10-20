@@ -44,6 +44,7 @@ function generate_empty_board() {
 }
 
 function is_board_expecting_game_selection(board) {
+    if (!board) return;
     return board[NEXT_GAME_INDEX] == -1;
 }
 
@@ -255,7 +256,7 @@ function get_best_move(board, depth=STD_DEPTH) {
 
     if (is_board_level) {
         new_board = do_game_selection(new_board, move);
-        new_board = do_square_selection(new_board, move);
+        new_board = do_square_selection(new_board, move) || board;
     } else {
         new_board = do_square_selection(new_board, move);
     }
@@ -273,4 +274,5 @@ module.exports = {
     do_square_selection,
     NEXT_GAME_INDEX,
     TURN_INDEX,
+    STATUS_INDEX,
 };
