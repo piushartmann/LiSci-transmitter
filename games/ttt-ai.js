@@ -104,8 +104,12 @@ function check_board_state(board) {
 }
 
 function do_square_selection(board, index) {
-    current_game = board[NEXT_GAME_INDEX];
-    turn = board[TURN_INDEX];
+    const current_game = board[NEXT_GAME_INDEX];
+    const turn = board[TURN_INDEX];
+
+    if (!board) return;
+    if (index === undefined || index === null) return;
+    if (current_game === undefined || current_game === null || !board[current_game]) return;
 
     board[current_game][index] = turn;
 
