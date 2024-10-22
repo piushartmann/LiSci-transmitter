@@ -46,10 +46,12 @@ function generate_empty_board() {
 }
 
 function is_board_expecting_game_selection(board) {
+    if (!board) return;
     return board[NEXT_GAME_INDEX] == -1;
 }
 
 function game_selection_possibilities(board) {
+    if (!board) return;
     let possibilities = [];
     for (var i=0; i<9; i++) {
         if (board[i][STATUS_INDEX] === STATUS_ONGOING) {
@@ -60,7 +62,9 @@ function game_selection_possibilities(board) {
 }
 
 function do_game_selection(board, index) {
+    if (!board) return;
     board[NEXT_GAME_INDEX] = index;
+    return board;
 }
 
 function square_selection_possibilities(board) {
@@ -76,6 +80,7 @@ function square_selection_possibilities(board) {
 }
 
 function get_game_states(board) {
+    if (!board) return;
     let game_states = [];
     for (var i=0; i<9; i++) {
         game_states.push(board[i][STATUS_INDEX]);
@@ -98,6 +103,7 @@ function check_game_state(game, turn) {
 }
 
 function check_board_state(board) {
+    if (!board) return;
     let game_states = get_game_states(board);
 
     let state = check_game_state(game_states, -board[TURN_INDEX]);
@@ -105,8 +111,12 @@ function check_board_state(board) {
 }
 
 function do_square_selection(board, index) {
-    current_game = board[NEXT_GAME_INDEX];
-    turn = board[TURN_INDEX];
+    const current_game = board[NEXT_GAME_INDEX];
+    const turn = board[TURN_INDEX];
+
+    if (!board) return;
+    if (index === undefined || index === null) return;
+    if (current_game === undefined || current_game === null || !board[current_game]) return;
 
     board[current_game][index] = turn;
 
@@ -127,6 +137,8 @@ function do_square_selection(board, index) {
         board_state = check_board_state(board);
         board[STATUS_INDEX] = board_state;
     }
+
+    return board;
 }
 
 function evaluation_of_pairs(game) {
@@ -183,6 +195,7 @@ function evaluation_of_pairs_with_heat_map(game) {
 }
 
 function evaluate_board(board) {
+    if (!board) return;
     let value = 0;
 
     let game_states = get_game_states(board);
@@ -206,7 +219,8 @@ function evaluate_board(board) {
 }
 
 function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL+1) {
-
+    if (!board) return;
+    
     if (board[STATUS_INDEX] === STATUS_DRAW) {
         return [0];
     } else if (board[STATUS_INDEX] !== STATUS_ONGOING) {
