@@ -143,6 +143,26 @@ function deleteGame() {
     }) : null;
 }
 
+function gameOver(status) {
+    const banner = document.getElementById('gameOverBanner');
+    const bannerText = document.getElementById('gameOverText');
+    const bannerIcon = document.getElementById('gameOverIcon');
+
+    if (status === 1) {
+        bannerText.innerText = "Du hast gewonnen!";
+        bannerIcon.src = '/icons/games/ttt-cross.svg';
+    } else if (status === -1) {
+        bannerText.innerText = "Du hast verloren!";
+        bannerIcon.src = '/icons/games/ttt-circle.svg';
+    }
+    else {
+        bannerText.innerText = "Unentschieden!";
+        bannerIcon.src = '/icons/games/ttt-tie.svg';
+    }
+
+    banner.style.display = 'flex';
+}
+
 function connectToWS(gameID) {
     const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/tic-tac-toe/${gameID}`);
     ws.onopen = () => {
@@ -152,7 +172,9 @@ function connectToWS(gameID) {
         data = JSON.parse(event.data);
         if (data.type === 'board') {
             updateBoard(data.board, data.player, data.nextGame);
-            console.log(data.nextGame);
+            if (data.board[9] !== 0) {
+                gameOver(data.board[9]);
+            }
         }
     }
     ws.onclose = () => {

@@ -137,6 +137,36 @@
     width: 45px;
 }
 
+.gameOverBanner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 60vw;
+    height: 60vh;
+    max-height: 60vmin;
+}
+
+.gameOverBanner span {
+    font-size: 1.5em;
+}
+
+.gameOverBanner img {
+    width: 50px;
+    height: 50px;
+}
+
 @media (max-width: 768px) {
     .reset {
         transform: translate(0, 60px);

@@ -20,12 +20,12 @@ const winning_idecies_table = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
-    
+
     // Columns
     [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
-    
+
     // Diagonals
     [0, 4, 8],
     [2, 4, 6]
@@ -33,9 +33,9 @@ const winning_idecies_table = [
 
 function generate_empty_board() {
     let board = [];
-    
-    for (var i=0; i<9; i++) {
-        board.push([0,0,0,0,0,0,0,0,0,STATUS_ONGOING])
+
+    for (var i = 0; i < 9; i++) {
+        board.push([0, 0, 0, 0, 0, 0, 0, 0, 0, STATUS_ONGOING])
     }
 
     board[STATUS_INDEX] = STATUS_ONGOING;
@@ -53,7 +53,7 @@ function is_board_expecting_game_selection(board) {
 function game_selection_possibilities(board) {
     if (!board) return;
     let possibilities = [];
-    for (var i=0; i<9; i++) {
+    for (var i = 0; i < 9; i++) {
         if (board[i][STATUS_INDEX] === STATUS_ONGOING) {
             possibilities.push(i);
         }
@@ -71,7 +71,7 @@ function square_selection_possibilities(board) {
     next_game = board[NEXT_GAME_INDEX];
     let possibilities = [];
 
-    for (var i=0; i<9; i++) {
+    for (var i = 0; i < 9; i++) {
         if (board[next_game][i] === 0) {
             possibilities.push(i);
         }
@@ -82,7 +82,7 @@ function square_selection_possibilities(board) {
 function get_game_states(board) {
     if (!board) return;
     let game_states = [];
-    for (var i=0; i<9; i++) {
+    for (var i = 0; i < 9; i++) {
         game_states.push(board[i][STATUS_INDEX]);
     }
     return game_states;
@@ -96,7 +96,7 @@ function check_game_state(game, turn) {
         }
     }
 
-    if (!game.slice(0,9).includes(STATUS_ONGOING)) {
+    if (!game.slice(0, 9).includes(STATUS_ONGOING)) {
         return STATUS_DRAW;
     }
     return STATUS_ONGOING;
@@ -166,7 +166,7 @@ function evaluation_of_pairs(game) {
 
 function evaluation_of_pairs_with_heat_map(game) {
     let value = 0;
-    let heat_map = [1,1,1,1,1,1,1,1,1]
+    let heat_map = [1, 1, 1, 1, 1, 1, 1, 1, 1]
 
     for (const pattern of winning_idecies_table) {
         const [n1, n2, n3] = pattern;
@@ -202,25 +202,25 @@ function evaluate_board(board) {
 
     for (const state of game_states) {
         if (state !== 2) {
-            value+= state * (MAX_EVAL / 10);
+            value += state * (MAX_EVAL / 10);
         }
     }
 
     let [board_pairs_value, board_heat_map] = evaluation_of_pairs_with_heat_map(game_states);
     // the heat_map marks games that would decide the entire game
-    value+= board_pairs_value * (MAX_EVAL / 50);
+    value += board_pairs_value * (MAX_EVAL / 50);
 
-    for (var i=0; i<9; i++) {
+    for (var i = 0; i < 9; i++) {
         // to encourage working on games that would decide the entire game pairs are valued more there
-        value+= Math.min(evaluation_of_pairs(board[i]), 3) * board_heat_map[i];
+        value += Math.min(evaluation_of_pairs(board[i]), 3) * board_heat_map[i];
     }
 
     return value;
 }
 
-function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL+1) {
+function find_best_move(board, depth = STD_DEPTH, alpha = -MAX_EVAL - 1, beta = MAX_EVAL + 1) {
     if (!board) return;
-    
+
     if (board[STATUS_INDEX] === STATUS_DRAW) {
         return [0];
     } else if (board[STATUS_INDEX] !== STATUS_ONGOING) {
@@ -243,7 +243,7 @@ function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL
 
     let turn = board[TURN_INDEX];
 
-    let best_eval = -turn*(MAX_EVAL+1);
+    let best_eval = -turn * (MAX_EVAL + 1);
     let move = -1;
     possibilities.every(index => {
         let new_board = board.map(innerArray => {
@@ -251,7 +251,7 @@ function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL
                 return innerArray.slice();
             }
             return innerArray;
-            
+
         });
 
         let evaluation;
@@ -260,7 +260,7 @@ function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL
             evaluation = find_best_move(new_board, depth, alpha, beta)[0];
         } else {
             do_square_selection(new_board, index);
-            evaluation = find_best_move(new_board, depth-1, alpha, beta)[0];
+            evaluation = find_best_move(new_board, depth - 1, alpha, beta)[0];
         }
 
         if (evaluation === best_eval && Math.floor(Math.random() * possibilities.length) === 0) { // randomness
@@ -289,7 +289,7 @@ function find_best_move(board, depth=STD_DEPTH, alpha=-MAX_EVAL-1, beta=MAX_EVAL
     return [best_eval, move, is_board_level];
 }
 
-function get_best_move(board, depth=STD_DEPTH) {
+function get_best_move(board, depth = STD_DEPTH) {
     if (!board) return;
     const [_, move, is_board_level] = find_best_move(board, depth);
     let new_board = board.map(innerArray => {
@@ -320,4 +320,8 @@ module.exports = {
     NEXT_GAME_INDEX,
     TURN_INDEX,
     STATUS_INDEX,
+    STATUS_ONGOING,
+    STATUS_OWON,
+    STATUS_XWON,
+    STATUS_DRAW,
 };

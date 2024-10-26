@@ -50,100 +50,51 @@ module.exports = (db) => {
 
         connections.push({ userID: req.session.userID, ws: ws });
 
-        if (game.players.length === 1) {
-            //singleplayer
-            ws.on('message', async (msg) => {
-                const message = JSON.parse(msg);
-                if (message.type === "move") {
-                    
-                    let game = await db.getGame(gameID);
-                    
-                    let board = game.gameState;
+        ws.on('message', async (msg) => {
+            const message = JSON.parse(msg);
+            if (message.type === "move") {
 
-                    console.log(board);
-                    let index = message.index;
+                let game = await db.getGame(gameID);
+                let board = game.gameState;
+                let index = message.index;
 
+                if (!index) return;
 
-                    const gameIndex = Math.floor(index / 9);
-                    const squareIndex = index % 9;
-                    const playerIndex = game.players.indexOf(req.session.userID) === 0 ? 1 : -1;
+                // Check if the game is over and the player is trying to make a move (shouldn't happen)
+                if (board[tttAI.STATUS_INDEX] !== tttAI.STATUS_ONGOING) return;
 
-                    //make players move
-                    if (!index) return;
+                const gameIndex = Math.floor(index / 9);
+                const squareIndex = index % 9;
+                const playerIndex = game.players.indexOf(req.session.userID) === 0 ? 1 : -1;
 
-                    //if game is over do nothing
-                    if (board[tttAI.STATUS_INDEX] == -1) return;
+                if (!checkIsPlayersTurn(board, playerIndex) || !checkGameIsLegal(board, gameIndex)) return;
 
-                    if (!checkIsPlayersTurn(board, playerIndex)) return;
+                board = tttAI.do_game_selection(board, gameIndex);
+                if (!checkSquareIsLegal(board, squareIndex)) return;
 
-                    if (!checkGameIsLegal(board, gameIndex)) return;
+                board = tttAI.do_square_selection(board, squareIndex);
+                board = correctGameChoiceIndex(board);
 
-                    board = tttAI.do_game_selection(board, gameIndex)
+                await db.updateGameState(gameID, board);
 
-                    if (!checkSquareIsLegal(board, squareIndex)) return;
+                // send the updated board to the players
+                game.players.forEach(player => {
+                    let playerWS = connections.find(c => c.userID === player.toString());
+                    const playerIndex = game.players.indexOf(player) === 0 ? 1 : -1;
+                    if (playerWS) {
+                        playerWS.ws.send(JSON.stringify({ type: "board", board: board, player: playerIndex, nextGame: board[tttAI.NEXT_GAME_INDEX] }));
+                    }
+                });
 
-                    board = tttAI.do_square_selection(board, squareIndex)
-
-                    board = correctGameChoiceIndex(board);
-
-                    // make AI move
+                if (game.players.length === 1) {
                     board = tttAI.get_best_move(board);
-
                     board = correctGameChoiceIndex(board);
-                    
                     await db.updateGameState(gameID, board);
 
                     ws.send(JSON.stringify({ type: "board", board: board, player: playerIndex, nextGame: board[tttAI.NEXT_GAME_INDEX] }));
                 }
-            });
-        }
-        else {
-            //multiplayer
-            ws.on('message', async (msg) => {
-                const message = JSON.parse(msg);
-                if (message.type === "move") {
-
-                    let game = await db.getGame(gameID);
-                    
-                    let board = game.gameState;
-
-                    console.log(board);
-                    let index = message.index;
-
-
-                    const gameIndex = Math.floor(index / 9);
-                    const squareIndex = index % 9;
-
-                    //make PLayers move
-                    if (!index) return;
-
-                     //if game is over do nothing
-                     if (board[tttAI.STATUS_INDEX] == -1) return;
-
-                    if (!checkIsPlayersTurn(board, playerIndex)) return;
-
-                    if (!checkGameIsLegal(board, gameIndex)) return;
-
-                    board = tttAI.do_game_selection(board, gameIndex)
-
-                    if (!checkSquareIsLegal(board, squareIndex)) return;
-
-                    board = tttAI.do_square_selection(board, squareIndex)
-
-                    board = correctGameChoiceIndex(board);
-
-                    await db.updateGameState(gameID, board);
-
-                    game.players.forEach(player => {
-                        let playerWS = connections.find(c => c.userID === player.toString());
-                        const playerIndex = game.players.indexOf(player) === 0 ? 1 : -1;
-                        if (playerWS) {
-                            playerWS.ws.send(JSON.stringify({ type: "board", board: board, player: playerIndex, nextGame: board[tttAI.NEXT_GAME_INDEX] }));
-                        }
-                    });
-                }
-            });
-        }
+            }
+        });
 
         ws.on('close', () => {
             connections = connections.filter(c => c.ws !== ws);
