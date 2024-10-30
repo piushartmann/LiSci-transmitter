@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <%- include("partials/baseHead.ejs") %>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="<%= css %>">
+  <script src="<%= js %>"></script>
+</head>
+
+<body>
+  <%- include("partials/header.ejs") %>
+
+  <%- include(gameEjs) %>
+
+</body>
+
+</html>

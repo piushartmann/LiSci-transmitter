@@ -17,10 +17,52 @@ const MongoConnector = require('./MongoConnector').MongoConnector;
 connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
 
+const gamesDirectory = path.join(__dirname, "games")
+
+let gameConfig = [];
+
+const files = fs.readdirSync(gamesDirectory);
+files.forEach(function (file, index) {
+    const fileDir = path.join(gamesDirectory, file);
+    const stat = fs.statSync(fileDir);
+
+    if (stat.isDirectory()) {
+        const innerFiles = fs.readdirSync(fileDir);
+        innerFiles.forEach(function (innerFile, innerIndex) {
+            if (innerFile === "manifest.json") {
+                const manifest = JSON.parse(fs.readFileSync(path.join(fileDir, innerFile)));
+                //console.log(manifest);
+                if (!(manifest.enabled==false)) {
+                    gameConfig.push(manifest);
+                }
+            }
+        });
+    }
+});
+
+gameConfig.sort((a, b) => a.priority - b.priority)
+gameConfig.reverse()
+
+console.log(gameConfig);
+
 //create express app
 app.set('view engine', 'ejs')
-app.set('views', path.join(__dirname, 'views'));
+
+app.use(function (req, res, next) {
+    let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views/partials')]
+    gameConfig.forEach(config => {
+        if (req.path.includes(config.url)) views.push(path.join(__dirname, 'games/' + config.url + (config.views || '/views')));
+    })
+    app.set('views', views);
+    next()
+})
+
 app.use(express.static(path.join(__dirname, 'public')));
+
+gameConfig.forEach(config => {
+    app.use(express.static(path.join(__dirname, 'games/' + config.url + (config.public || '/public'))));
+})
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -68,7 +110,7 @@ const db = new MongoConnector("transmitter", connectionString);
 
 //use routes
 app.use('/', require('./routes/base')(db));
-app.use('/games', require('./routes/games')(db, s3Client, webpush));
+app.use('/games', require('./routes/games')(db, s3Client, webpush, gameConfig));
 app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
 app.use('/api', require('./routes/api')(db, s3Client, webpush));
 

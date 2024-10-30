@@ -9,14 +9,10 @@ const router = Router();
  * @returns {Router} The router instance.
 */
 
-module.exports = (db, s3Client, webpush) => {
-
-    const config = require('../config.json');
+module.exports = (db, s3Client, webpush, gameConfigs) => {
 
     let discoverUsers = [];
     let invites = [];
-
-    const games = config.games;
 
     router.get('*', async (req, res, next) => {
         if (req.session.userID) {
@@ -32,9 +28,9 @@ module.exports = (db, s3Client, webpush) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
 
-        return res.render('games/games', {
+        return res.render('games', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            games: games
+            games: gameConfigs
         });
     });
 
@@ -115,40 +111,84 @@ module.exports = (db, s3Client, webpush) => {
 
     function sendDiscoveryUpdate() {
         discoverUsers.forEach(user => {
-            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username)}));
+            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username) }));
         });
     }
 
     function startGame(game, players) {
-        switch (game) {
-            case "tic-tac-toe":
-                return startTTT(players);
-            default:
-                return null;
-        }
+        console.log("Starting Game")
+        gameConfigs.forEach(config => {
+            if (config.url == game) {
+                return config.logic.newGame(db, players)
+            }
+        })
+        return null
     }
 
-    async function startTTT(players) {
-
-        const tttAI = require('../games/ttt-ai.js');
-
-        const ongoingGame = await db.getGamesFromUsers(players);
-        if (ongoingGame[0]) {
-            return ongoingGame[0]._id;
+    gameConfigs.forEach(game => {
+        try {
+            game.relativePath = "../games/" + game.url + "/"
+            game.routerInstance = require(game.relativePath + (game.router || 'router.js'))(db)
+            game.logicInstance = require(game.relativePath + (game.logic || 'logic.js'))
+        } catch (error) {
+            console.error("Error getting Router or Logic instances for Game: '" + game.name + "'\n" + error.message + "\n" + error.stack.split("\n")[1])
         }
+    });
 
-        const board = tttAI.generate_empty_board();
-        const game = await db.createGame(players, 'tic-tac-toe', board);
-        if (!game) {
-            return null;
-        }
+    gameConfigs.forEach(gameConfig => {
 
-        return game._id;
-    }
+        if (!gameConfig.routerInstance) return;
+
+        gameConfig.routerInstance.get('*', async (req, res, next) => {
+            if (!req.session.userID) return res.status(401).send("Not logged in");
+
+            const permissions = await db.getUserPermissions(req.session.userID);
+            if (!permissions.includes("games")) return res.status(403).send("You cant access Games.")
+            next()
+        })
+
+        gameConfig.routerInstance.get('/:gameID', async (req, res) => {
+            const permissions = await db.getUserPermissions(req.session.userID);
+
+            return res.render("game", {
+                loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: (gameConfig.css || "/" + gameConfig.url + ".css"), js: (gameConfig.js || "/" + gameConfig.url + ".js")
+            });
+        });
+
+        gameConfig.routerInstance.post('/startGame', async (req, res) => {
+            const { opponent } = req.body;
+
+            let players;
+            if (!opponent) {
+                players = [req.session.userID];
+            }
+            else {
+                players = [req.session.userID, opponent];
+            }
+
+            const gameID = await gameConfig.logicInstance.newGame(db, players)
+
+            return res.status(200).send(JSON.stringify({ gameID: gameID }));
+        });
+
+        gameConfig.routerInstance.post('/deleteGame', async (req, res) => {
+            const { gameID } = req.body;
+            if (!gameID) return res.status(400).send("Missing parameters");
+            const game = await db.getGame(gameID);
+            if (!game) return res.status(404).send("Game not found");
+            if (!game.players.includes(req.session.userID)) return res.status(403).send("You are not in this game");
+
+            gameConfig.logicInstance.deleteGame(db, gameID)
+
+            return res.status(200).send("Game deleted");
+        });
+    })
 
     //include all game routes
-    games.forEach(game => {
-        router.use("/"+game.url, require(game.router)(db));
+    gameConfigs.forEach(gameConfig => {
+        if (!gameConfig.routerInstance) return;
+        router.use("/" + gameConfig.url, gameConfig.routerInstance);
     });
 
     return router;

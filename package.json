@@ -20,7 +20,6 @@
     "web-push": "^3.6.7"
   },
   "scripts": {
-    "test": "node test.js",
     "start": "node app.js"
   }
 }

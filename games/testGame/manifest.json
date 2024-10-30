@@ -1,0 +1,10 @@
+{
+    "url": "testGame",
+    "name": "Das Test Game",
+    "description": "Nur ein test Spiel",
+    "singleplayer": true,
+    "multiplayer": false,
+    "ejs": "test.ejs",
+    "priority": 10,
+    "enabled": false
+}
