@@ -63,5 +63,17 @@ module.exports = (db, s3Client) => {
         return res.status(200).send("Success");
     });
 
+    router.post('/setLanguage', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { language } = req.body;
+
+        if (typeof language == "undefined") return res.status(400).send("Missing parameters");
+        if (typeof language !== "string") return res.status(400).send("Invalid parameters");
+
+        await db.setPreference(req.session.userID, "language", language);
+        return res.status(200).send("Success");
+    });
+
     return router;
 };

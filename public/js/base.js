@@ -1,4 +1,4 @@
-function buildButton(icon, fallback, onclick, languageContent, languageContentShort, counter) {
+function buildButton(icon, fallback, onclick, languageContent, languageContentShort, counter = false) {
 
     let button = document.createElement("button");
     button.className = "button";
@@ -10,10 +10,11 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
 
     let buttonLabel = document.createElement("p");
     buttonLabel.className = "label";
+
     if (!counter) {
         buttonLabel.textContent = fallback;
-        if (typeof languageContentShort !== "undefined") {
-            buttonLabel.dataset.langContent = languageContentShort;
+        if (typeof languageContent !== "undefined") {
+            buttonLabel.dataset.langContent = languageContent;
         }
     } else {
         buttonLabel.textContent = languageContent;
@@ -25,17 +26,9 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
     if (typeof languageContentShort !== "undefined") {
         let shortLabel = document.createElement("p");
         shortLabel.className = "short-label";
+
         if (!counter) {
-            if (typeof languageContentShort !== "undefined") {
-                shortLabel.dataset.langContent = languageContentShort;
-            } else {
-                if (typeof languageContent !== "undefined") {
-                    shortLabel.dataset.langContent = languageContent;
-                }
-                else {
-                    shortLabel.textContent = fallback;
-                }
-            }
+            shortLabel.dataset.langContent = languageContentShort;
         } else {
             shortLabel.textContent = languageContentShort;
         }
@@ -97,7 +90,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
 
     let likeIcon;
 
-    let likeLabel = resolveLanguageContent("counter_likes") || "Likes";
+    let likeLabel = resolveLanguageContent("interaction likes") || "Likes";
 
     if (loggedIn) {
         likeIcon = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
@@ -201,6 +194,7 @@ function makeDiscoverable() {
         if (data.type === 'invite') {
             console.log('Game invite received');
             document.body.appendChild(buildGameRequest(gamesWS, data.game, data.user, data.username));
+            loadLanguage();
         }
         else if (data.type === 'uninvite') {
             console.log('Game uninvite received');
@@ -240,6 +234,7 @@ function makeDiscoverable() {
         let gameRequestTitle = document.createElement('p');
         gameRequestTitle.className = 'game-request-title';
         gameRequestTitle.textContent = 'Spiel Einladung';
+        gameRequestTitle.dataset.langContent = 'games request title';
 
         gameRequestHeader.appendChild(gameRequestTitle);
 
@@ -250,6 +245,9 @@ function makeDiscoverable() {
         gameRequestText.className = 'game-request-text';
         gameRequestText.textContent = `${username} hat dich zu einem Spiel ${game} eingeladen.`;
 
+        gameRequestText.dataset.langContent = 'games request message';
+        gameRequestText.dataset.langArguments = JSON.stringify({ "username": username, "game": game });
+
         let gameRequestButtons = document.createElement('div');
         gameRequestButtons.className = 'game-request-buttons';
 
@@ -258,12 +256,12 @@ function makeDiscoverable() {
 
             ws.send(JSON.stringify({ type: 'accept', "user": user, "game": game }));
 
-        }, 'game_request_accept');
+        }, 'games request accept');
 
         let gameRequestDecline = buildButton('/icons/close.svg', 'Decline', () => {
             ws.send(JSON.stringify({ type: 'decline', "user": user }));
             gameRequest.remove();
-        }, 'game_request_decline');
+        }, 'games request decline');
 
         gameRequestButtons.appendChild(gameRequestAccept);
         gameRequestButtons.appendChild(gameRequestDecline);
@@ -361,61 +359,41 @@ function applyLanguage(languageFile, redraw = false) {
         convertedItems = [];
     }
     let totalChanges = 0;
-    const langContent = Array.from(document.querySelectorAll('[data-lang-content]')).filter(element => !convertedItems.includes(element));
-    totalChanges += langContent.length;
-    langContent.forEach(element => {
-        const key = element.getAttribute('data-lang-content');
-        const dirs = key.split(' ');
-        let json = languageFile
-        try {
-            dirs.forEach(dir => {
-                json = json[dir];
-            });
-        }
-        catch (e) {
-            console.warn(`Could not find language content for ${key}`);
-        }
-        element.textContent = json;
-        convertedItems.push(element);
-    });
 
-    const langContentValue = Array.from(document.querySelectorAll('[data-lang-content-value]')).filter(element => !convertedItems.includes(element));
-    totalChanges += langContentValue.length;
-    langContentValue.forEach(element => {
-        const key = element.getAttribute('data-lang-content-value');
-        const dirs = key.split(' ');
-        let json = languageFile
-        try {
-            dirs.forEach(dir => {
-                json = json[dir];
-            });
-        }
-        catch (e) {
-            console.warn(`Could not find language content for ${key}`);
-        }
-        element.value = json;
-        convertedItems.push(element);
-    });
+    function applyLanguageToString(query, input) {
+        const elements = Array.from(document.querySelectorAll("[" + query + "]")).filter(element => !convertedItems.includes(element));
+        totalChanges += elements.length;
+        elements.forEach(element => {
+            const key = element.getAttribute(query);
+            const dirs = key.split(' ');
+            let json = languageFile
+            try {
+                dirs.forEach(dir => {
+                    json = json[dir];
+                });
+            }
+            catch (e) {
+                console.warn(`Could not find language content for ${key}`);
+            }
 
-    const langContentPlaceholder = Array.from(document.querySelectorAll('[data-lang-content-placeholder]')).filter(element => !convertedItems.includes(element));
-    totalChanges += langContentPlaceholder.length;
-    langContentPlaceholder.forEach(element => {
-        const key = element.getAttribute('data-lang-content-placeholder');
-        const dirs = key.split(' ');
-        let json = languageFile
-        try {
-            dirs.forEach(dir => {
-                json = json[dir];
-            });
-        }
-        catch (e) {
-            console.warn(`Could not find language content for ${key}`);
-        }
-        element.placeholder = json;
-        convertedItems.push(element);
-    });
+            const arguments = element.getAttribute(`data-lang-arguments`);
+            if (arguments) {
+                const args = JSON.parse(arguments);
+                Object.keys(args).forEach(arg => {
+                    json = json.replace(`{${arg}}`, args[arg]);
+                });
+            }
 
-    console.log(`Applied ${totalChanges} language changes`);
+            element[input] = json;
+            convertedItems.push(element);
+        });
+
+        console.log(`Applied ${totalChanges} language changes`);
+    }
+
+    applyLanguageToString("data-lang-content", "textContent");
+    applyLanguageToString("data-lang-content-value", "value");
+    applyLanguageToString("data-lang-content-placeholder", "placeholder");
 }
 
 function resolveLanguageContent(key) {

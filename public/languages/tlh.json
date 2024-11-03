@@ -1,0 +1,96 @@
+{
+    "header": {
+        "home": "juH",
+        "citations": "tlhaw'DIyuS",
+        "games": "ghIlghameSvaD jatlh",
+        "about": "'antu'",
+        "create": "ngem",
+        "settings": "'aw'",
+        "logout": "yoS",
+        "login": "QonoS"
+    },
+    "login_form": {
+        "username": "qaStaHvIS",
+        "password": "polonyuS",
+        "cancel": "qIl"
+    },
+    "comment_modal": {
+        "title": "Ha'DIbaH",
+        "new_comment": "be'nI'wI' je.",
+        "submit": "naDev yIra'rup",
+        "comment_placeholder": "quvHa'ghach vIleghpu'be' 'e' vImaS!"
+    },
+    "interaction": {
+        "edit": "tlha'",
+        "delete": "Dotlh",
+        "save": "choq",
+        "cancel": "qIl",
+        "likes": "parHa'",
+        "comments": "Ha'DIbaH"
+    },
+    "citations": {
+        "new": {
+            "title": "tlhogh",
+            "sentence": {
+                "0": "cha'maH",
+                "1": "Jatlh",
+                "2": "tlhaq",
+                "3": "."
+            },
+            "submit": "lIy"
+        },
+        "title": "tlhaw'DIyuS"
+    },
+    "sections": {
+        "file_view_fallback": "taHqeq"
+    },
+    "settings": {
+        "title": "'aw'",
+        "push": {
+            "title": "bISaHbe'chugh yIvuSQo'",
+            "title_to_this_device": "yIvoqQo', bIH yIwuvQo', bIH yIbuSQo'",
+            "checkboxes": {
+                "news": "De'",
+                "posts": "pe'vIl",
+                "citations": "DameH mIw vIta'meH",
+                "comments": "DapoyqangmoHmeH ghoS."
+            }
+        },
+        "pick_profile_picture": "nuvpu' ghotpu'",
+        "api_key": "tlhIngan",
+        "language": "Hol"
+    },
+    "admin_settings": {
+        "title": "'amerIjqu'",
+        "create_user": {
+            "title": "Qip",
+            "username": "qaStaHvIS",
+            "password": "polonyuS",
+            "create": "chenmoH"
+        },
+        "edit_user": {
+            "title": "tera'ngan",
+            "username": "qaStaHvIS"
+        }
+    },
+    "games": {
+        "request": {
+            "title": "qa'",
+            "message": "} {} { DaneH'a'?",
+            "accept": "laj",
+            "decline": "Sab"
+        },
+        "selector": {
+            "play_singleplayer": "yIQong",
+            "search_for_others": "'e' lajqangwI'",
+            "modal": {
+                "title": "ghIt"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": "'aw'"
+            }
+        }
+    }
+}

@@ -18,10 +18,10 @@
       <h2><%= games[i].name %></h2>
       <p> <%= games[i].description %> </p>
       <% if (games[i].singleplayer) { %>
-      <button onclick="playSinglePlayer('<%= games[i].url %>')" data-lang-content="games_play_singleplayer">Play alone</button>
+      <button onclick="playSinglePlayer('<%= games[i].url %>')" data-lang-content="games selector play_singleplayer">Play alone</button>
       <% } %>
       <% if (games[i].multiplayer) { %>
-      <button class="connectButton" onclick="discoverOtherPlayers('<%= games[i].url %>')" data-lang-content="games_play_search_for_others">Search for other Players</button>
+      <button class="connectButton" onclick="discoverOtherPlayers('<%= games[i].url %>')" data-lang-content="games selector search_for_others">Search for other Players</button>
       <% } %>
     </div>
     <% } %>
@@ -33,7 +33,7 @@
 
     <form class="modal-content animate">
 
-      <h1 id="title" data-lang-content="games_connection_modal_title">Mit wem möchtest du dich verbinden?</h1>
+      <h1 id="title" data-lang-content="games selector modal title">Mit wem möchtest du dich verbinden?</h1>
 
       <div id="playerConnections">
 

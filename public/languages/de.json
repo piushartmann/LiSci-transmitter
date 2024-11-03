@@ -20,26 +20,30 @@
         "submit": "Kommentieren",
         "comment_placeholder": "Das ist ja das lustigste was ich jemals gesehen habe!"
     },
-    "post": {
+    "interaction": {
         "edit": "Bearbeiten",
-        "delete": "Löschen"
+        "delete": "Löschen",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "likes": "Likes",
+        "comments": "Kommentare"
     },
-    "comment_edit": "Bearbeiten",
-    "comment_delete": "Löschen",
-    "comment_save": "Speichern",
-    "comment_cancel": "Abbrechen",
-    "counter_likes": "Likes",
-    "counter_comments": "Kommentare",
-    "citation_save": "Speichern",
-    "citation_cancel": "Abbrechen",
-    "citation_delete": "Löschen",
-    "citation_edit": "Bearbeiten",
-    "game_request_accept": "Annehmen",
-    "game_request_decline": "Ablehnen",
-    "sections_file_view_fallback": "Datei Anschauen",
-    "games_play_singleplayer": "Singleplayer",
-    "games_play_search_for_others": "Suche nach anderen Spielern",
-    "games_connection_modal_title": "Mit wem möchtest du dich verbinden?",
+    "citations": {
+        "new": {
+            "title": "Ein neues Zitat einreichen",
+            "sentence": {
+                "0": "Herr Treetzen",
+                "1": "hat",
+                "2": "ein lustiges Zitat",
+                "3": "gesagt."
+            },
+            "submit": "Absenden"
+        },
+        "title": "Zitate"
+    },
+    "sections": {
+        "file_view_fallback": "Datei anzeigen"
+    },
     "settings": {
         "title": "Einstellungen",
         "push": {
@@ -53,7 +57,8 @@
             }
         },
         "pick_profile_picture": "Profilbildfarbe auswählen",
-        "api_key": "API Key"
+        "api_key": "API Key",
+        "language": "Sprache"
     },
     "admin_settings": {
         "title": "Admin Einstellungen",
@@ -69,6 +74,19 @@
         }
     },
     "games": {
+        "request": {
+            "title": "Spielanfrage",
+            "message": "Möchtest du {game} gegen {username} spielen?",
+            "accept": "Annehmen",
+            "decline": "Ablehnen"
+        },
+        "selector": {
+            "play_singleplayer": "Singleplayer",
+            "search_for_others": "Suche nach anderen Spielern",
+            "modal": {
+                "title": "Spiel auswählen"
+            }
+        },
         "sudoku": {
             "modal": {
                 "title": "Einstellungen"

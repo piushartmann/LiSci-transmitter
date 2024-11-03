@@ -46,6 +46,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         changePushPreference('commentNotifications', commentPushCheckbox.checked);
     });
 
+    const languageSelect = document.getElementById('language');
+    languageSelect.addEventListener('change', async () => {
+        if (localStorage.getItem('language') !== languageSelect.value) {
+            localStorage.setItem('language', languageSelect.value);
+            await fetch('internal/settings/setLanguage', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ language: languageSelect.value }),
+            });
+            window.location.reload();
+        }
+    });
+
 });
 
 function changePushPreference(type, value) {

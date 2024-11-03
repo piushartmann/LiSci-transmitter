@@ -1,39 +1,96 @@
 {
-    "settings_title": "Settings",
-    "header_home": "Home",
-    "header_citations": "Citations",
-    "header_games": "Games",
-    "header_about": "About",
-    "header_create": "New Post",
-    "header_settings": "Settings",
-    "header_logout": "Logout",
-    "header_login": "Login",
-    "generic_cancel": "Cancel",
-    "generic_save": "Save",
-    "generic_delete": "Delete",
-    "generic_edit": "Edit",
-    "form_username": "Username",
-    "form_password": "Password",
-    "commentModal_title": "Comments",
-    "commentModal_new_comment": "Write a new comment:",
-    "commentModal_submit": "Comment",
-    "commentModal_comment_placeholder": "This is the funniest thing I've ever seen!",
-    "post_edit": "Edit",
-    "post_delete": "Delete",
-    "comment_edit": "Edit",
-    "comment_delete": "Delete",
-    "comment_save": "Save",
-    "comment_cancel": "Cancel",
-    "counter_likes": "Likes",
-    "counter_comments": "Comments",
-    "citation_save": "Save",
-    "citation_cancel": "Cancel",
-    "citation_delete": "Delete",
-    "citation_edit": "Edit",
-    "game_request_accept": "Accept",
-    "game_request_decline": "Decline",
-    "sections_file_view_fallback": "View File",
-    "games_play_singleplayer": "Singleplayer",
-    "games_play_search_for_others": "Search for others",
-    "games_connection_modal_title": "Who do you want to connect with?"
+    "header": {
+        "home": "Home",
+        "citations": "Citations",
+        "games": "Games",
+        "about": "About",
+        "create": "New Post",
+        "settings": "Settings",
+        "logout": "Logout",
+        "login": "Login"
+    },
+    "login_form": {
+        "username": "Username",
+        "password": "Password",
+        "cancel": "Cancel"
+    },
+    "comment_modal": {
+        "title": "Comments",
+        "new_comment": "Make a new comment:",
+        "submit": "Comment",
+        "comment_placeholder": "Thats the funniest thing I've ever seen!"
+    },
+    "interaction": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "likes": "Likes",
+        "comments": "Comments"
+    },
+    "citations": {
+        "new": {
+            "title": "Make a new Citation",
+            "sentence": {
+                "0": "Herr Treetzen",
+                "1": "said",
+                "2": "a funny quote",
+                "3": "."
+            },
+            "submit": "Submit"
+        },
+        "title": "Citations"
+    },
+    "sections": {
+        "file_view_fallback": "Datei anzeigen"
+    },
+    "settings": {
+        "title": "Settings",
+        "push": {
+            "title": "Push-Notifications",
+            "title_to_this_device": "Push-Notifications to this device",
+            "checkboxes": {
+                "news": "News",
+                "posts": "Posts",
+                "citations": "Citations (coming soon)",
+                "comments": "Comments (coming soon)"
+            }
+        },
+        "pick_profile_picture": "Pick profile picture color",
+        "api_key": "API Key",
+        "language": "Language"
+    },
+    "admin_settings": {
+        "title": "Admin Settings",
+        "create_user": {
+            "title": "Create User",
+            "username": "Username",
+            "password": "Password",
+            "create": "Create"
+        },
+        "edit_user": {
+            "title": "Edit User",
+            "username": "Username"
+        }
+    },
+    "games": {
+        "request": {
+            "title": "Game Request",
+            "message": "Do you want to play {game} with {user}?",
+            "accept": "Accept",
+            "decline": "Decline"
+        },
+        "selector": {
+            "play_singleplayer": "Singleplayer",
+            "search_for_others": "Search for other players",
+            "modal": {
+                "title": "Select Game"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": "Settings"
+            }
+        }
+    }
 }

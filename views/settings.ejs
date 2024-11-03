@@ -23,7 +23,7 @@
       <button id="enablePush" data-lang-content="settings push title_to_this_device">Zu diesem Gerät verlagern</button>
       <div id="pushTypesSettings">
         <div id="pushTypes" class="pushTypes">
-            <li><input type="checkbox" id="newsPushCheckbox" name="news" value="news" <%= preferences.find(p => p.key === 'newsNotifications')?.value ? 'checked' : '' %>>
+          <li><input type="checkbox" id="newsPushCheckbox" name="news" value="news" <%= preferences.find(p => p.key === 'newsNotifications')?.value ? 'checked' : '' %>>
             <label for="news" data-lang-content="settings push checkboxes news">News</label>
           </li>
           <li><input type="checkbox" id="postsPushCheckbox" name="posts" value="posts" <%= preferences.find(p => p.key === 'postNotifications')?.value ? 'checked' : '' %>>
@@ -59,10 +59,19 @@
       <input type="text" value="<%= apiKey %>" id="apiKey">
     </div>
 
-    <% if (isAdmin) { %>
-    <%- include('./partials/adminSettings.ejs') %>
-    <% } %>
-  </div>
+    <div class="languageContainer setting">
+      <label for="language" data-lang-content="settings language">Language</label>
+      <select id="language">
+        <option value="de" <%= preferences.find(p => p.key === 'language')?.value === 'de' ? 'selected' : '' %>>Deutsch</option>
+        <option value="en" <%= preferences.find(p => p.key === 'language')?.value === 'en' ? 'selected' : '' %>>English</option>
+        <option value="tlh" <%= preferences.find(p => p.key === 'language')?.value === 'tlh' ? 'selected' : '' %>>Klingon</option>
+      </select>
+    </div>
+
+      <% if (isAdmin) { %>
+      <%- include('./partials/adminSettings.ejs') %>
+      <% } %>
+    </div>
 
 </body>
 

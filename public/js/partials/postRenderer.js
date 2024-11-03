@@ -36,7 +36,7 @@ function buildPost(post) {
                 let titleFallback = "View File";
                 if (localStorage.getItem('languageFile')) {
                     const languageFile = JSON.parse(localStorage.getItem('languageFile'));
-                    titleFallback = languageFile["sections_file_view_fallback"];
+                    titleFallback = languageFile["sections file_view_fallback"];
                 }
                 const fileButton = buildButton("/icons/view.svg", section.title ? section.title : titleFallback, () => window.open(`https://storage.liscitransmitter.live/${section.content}`, '_blank'));
                 fileButton.label.classList.add("file-label");
@@ -81,7 +81,7 @@ function buildFooter(post) {
     let iteractionButtons = document.createElement("div");
     iteractionButtons.className = "flex";
 
-    let commentLabel = resolveLanguageContent("counter_comments") || "Comments";
+    let commentLabel = resolveLanguageContent("interaction comments") || "Comments";
 
     let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} ${commentLabel}`, () => renderComments(post), `${post.comments.length} ${commentLabel}`, `${post.comments.length}`, true);
 
@@ -94,7 +94,7 @@ function buildFooter(post) {
         let buttonRow = document.createElement("div");
         buttonRow.className = "flex";
 
-        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`, "post edit");
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`, "interaction edit");
 
         buttonRow.appendChild(editButton);
 
@@ -110,7 +110,7 @@ function buildFooter(post) {
                 console.log(`Post ${post._id} deleted`);
             }
             window.location.reload();
-        }, "post delete");
+        }, "interaction delete");
 
         buttonRow.appendChild(deleteButton);
 

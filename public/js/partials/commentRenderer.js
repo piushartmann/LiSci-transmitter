@@ -22,6 +22,8 @@ function renderComments(post) {
         textarea.disabled = true;
         textarea.placeholder = "Please log in to comment";
     }
+
+    loadLanguage()
 }
 
 function hideComments() {
@@ -73,12 +75,12 @@ function buildComment(comment) {
 
     if (comment.canEdit) {
 
-        let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(comment._id), 'comment_edit');
+        let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(comment._id), 'interaction edit');
         editButton.className = 'edit-button button';
 
         buttonRow.appendChild(editButton);
 
-        let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(comment._id), 'comment_delete');
+        let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(comment._id), 'interaction delete');
         deleteButton.className = 'delete-button button';
 
         buttonRow.appendChild(deleteButton);
@@ -116,11 +118,11 @@ function editComment(commentID) {
     editButton.remove();
     deleteButton.remove();
 
-    let saveButton = buildButton('/icons/save.svg', 'Save', () => saveComment(commentID), 'comment_save');
+    let saveButton = buildButton('/icons/save.svg', 'Save', () => saveComment(commentID), 'interaction save');
     saveButton.className = 'save-button button';
     buttonRow.appendChild(saveButton);
 
-    let cancelButton = buildButton('/icons/cancel.svg', 'Cancel', () => cancelEditComment(commentID, contentText), 'comment_cancel');
+    let cancelButton = buildButton('/icons/cancel.svg', 'Cancel', () => cancelEditComment(commentID, contentText), 'interaction cancel');
     cancelButton.className = 'cancel-button button';
     buttonRow.appendChild(cancelButton);
 }
@@ -151,10 +153,10 @@ async function cancelEditComment(commentID, contentText) {
     saveButton.remove();
     cancelButton.remove();
 
-    let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(commentID), 'comment_edit');
+    let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(commentID), 'interaction edit');
     buttonRow.appendChild(editButton);
 
-    let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(commentID), 'comment_delete');
+    let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(commentID), 'interaction delete');
     buttonRow.appendChild(deleteButton);
     window.location.reload();
 }

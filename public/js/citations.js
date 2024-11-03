@@ -21,6 +21,7 @@ function loadCitations(page) {
         .then(data => {
             data.forEach(citation => {
                 buildCitation(citation);
+                loadLanguage();
             });
         });
 }
@@ -87,8 +88,8 @@ function buildCitation(citation) {
     interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length, loggedIn));
 
     if (citation.canEdit) {
-        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "citation_delete");
-        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id), "citation_edit");
+        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "interaction delete");
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id), "interaction edit");
 
         editButtons.appendChild(deleteButton);
         editButtons.appendChild(editButton);
@@ -171,11 +172,11 @@ function editCitation(id) {
     let buttonRow = citationContainer.querySelector('.edit-buttons');
     buttonRow.innerHTML = '';
 
-    let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id), "citation_save");
+    let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id), "interaction save");
 
     buttonRow.appendChild(saveButton);
 
-    let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => cancelEditCitation(id, contentText, authorText), "citation_cancel");
+    let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => cancelEditCitation(id, contentText, authorText), "interaction cancel");
 
     buttonRow.appendChild(cancelButton);
 }
@@ -210,11 +211,11 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     let buttonRow = citationContainer.querySelector('.edit-buttons');
     buttonRow.innerHTML = '';
 
-    let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id), "citation_delete");
+    let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id), "interaction delete");
 
     buttonRow.appendChild(deleteButton);
 
-    let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id), "citation_edit");
+    let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id), "interaction edit");
 
     buttonRow.appendChild(editButton);
 }
