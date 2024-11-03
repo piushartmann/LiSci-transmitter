@@ -94,7 +94,7 @@
     "games": {
         "request": {
             "title": "qa'",
-            "message": "} {} { DaneH'a'?",
+            "message": "{game} {username} Danab'a'?",
             "accept": "laj",
             "decline": "Sab"
         },
@@ -102,12 +102,14 @@
             "play_singleplayer": "yIQong",
             "search_for_others": "'e' lajqangwI'",
             "modal": {
-                "title": "ghIt"
+                "title": "qeylIS"
             }
         },
         "sudoku": {
             "modal": {
-                "title": "'aw'"
+                "title": "'aw'",
+                "show_errors": "qagh'a'",
+                "prevent_errors": "bagh"
             }
         }
     }

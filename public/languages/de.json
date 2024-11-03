@@ -102,7 +102,7 @@
             "play_singleplayer": "Singleplayer",
             "search_for_others": "Suche nach anderen Spielern",
             "modal": {
-                "title": "Spiel auswählen"
+                "title": "Spieler auswählen"
             }
         },
         "sudoku": {

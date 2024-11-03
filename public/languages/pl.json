@@ -7,7 +7,7 @@
         "create": "Nowy post",
         "settings": "Ustawienia",
         "logout": "Wyloguj",
-        "login": "Anmeldung"
+        "login": "Login"
     },
     "login_form": {
         "username": "Nazwa użytkownika",
@@ -42,7 +42,7 @@
         "title": "Cytatów"
     },
     "posts": {
-        "file_view_fallback": "Anzeigen der Datei",
+        "file_view_fallback": "Datei anzeigen",
         "only_show_news": "Pokaż tylko wiadomości"
     },
     "create": {
@@ -94,7 +94,7 @@
     "games": {
         "request": {
             "title": "Prośba o grę",
-            "message": "Czy chcesz zagrać w {grę} z {użytkownik}?",
+            "message": "Czy chcesz zagrać w {game} z {username}?",
             "accept": "Akceptować",
             "decline": "Odrzucać"
         },
@@ -102,12 +102,14 @@
             "play_singleplayer": "Tryb dla jednego gracza",
             "search_for_others": "Szukaj innych graczy",
             "modal": {
-                "title": "Wybierz grę"
+                "title": "Wybierz gracza"
             }
         },
         "sudoku": {
             "modal": {
-                "title": "Ustawienia"
+                "title": "Ustawienia",
+                "show_errors": "Pokaż błędy",
+                "prevent_errors": "Zapobieganie błędom"
             }
         }
     }

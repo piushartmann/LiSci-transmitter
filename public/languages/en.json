@@ -94,7 +94,7 @@
     "games": {
         "request": {
             "title": "Game Request",
-            "message": "Do you want to play {game} with {user}?",
+            "message": "Do you want to play {game} with {username}?",
             "accept": "Accept",
             "decline": "Decline"
         },
@@ -102,7 +102,7 @@
             "play_singleplayer": "Singleplayer",
             "search_for_others": "Search for other players",
             "modal": {
-                "title": "Select Game"
+                "title": "Select Player"
             }
         },
         "sudoku": {
