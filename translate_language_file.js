@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const baseLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', 'en.json')));
-const targetLanguage = 'pl';
+const targetLanguages = ["tlh-Latn", "pl"];
 
 async function translateObject(obj, fromLanguage, toLanguage) {
     if (obj) {
@@ -22,11 +22,17 @@ async function translateObject(obj, fromLanguage, toLanguage) {
     }
 }
 
-translateObject(baseLanguageFile, 'en', targetLanguage).then(translation => {
-    console.log(translation);
-    if(!fs.existsSync(path.join(__dirname, 'public', 'languages', targetLanguage + '.json'))) {
+function translateFiles(targetLanguage) {
+    // Clone the baseLanguageFile to avoid modifying the original object
+    const languageFileCopy = JSON.parse(JSON.stringify(baseLanguageFile));
+    
+    translateObject(languageFileCopy, 'en', targetLanguage).then(translation => {
+        if (targetLanguage === 'tlh-Latn') {
+            targetLanguage = 'tlh';
+        }
+        console.log(`Writing ${targetLanguage} translation file`);
         fs.writeFileSync(path.join(__dirname, 'public', 'languages', targetLanguage + '.json'), JSON.stringify(translation, null, 4));
-    } else {
-        console.error(`File ${targetLanguage}.json already exists`);
-    }
-});
+    });
+}
+
+targetLanguages.forEach(translateFiles);

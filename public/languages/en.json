@@ -41,8 +41,26 @@
         },
         "title": "Citations"
     },
-    "sections": {
-        "file_view_fallback": "Datei anzeigen"
+    "posts": {
+        "file_view_fallback": "Datei anzeigen",
+        "only_show_news": "Only show news"
+    },
+    "create": {
+        "post": {
+            "title": "Title",
+            "placeholder": "The Life-Science Profile is on an Adventure again",
+            "teacher_can_see": "Teacher can see this post",
+            "is_news": "This is a news post",
+            "submit": "Submit",
+            "save": "Save"
+        },
+        "sections": {
+            "select_section": "Select Section Type",
+            "text": "Text",
+            "image": "Image",
+            "file": "File",
+            "markdown": "Markdown"
+        }
     },
     "settings": {
         "title": "Settings",

@@ -7,7 +7,7 @@
         "create": "Nowy post",
         "settings": "Ustawienia",
         "logout": "Wyloguj",
-        "login": "Login"
+        "login": "Anmeldung"
     },
     "login_form": {
         "username": "Nazwa użytkownika",
@@ -41,8 +41,26 @@
         },
         "title": "Cytatów"
     },
-    "sections": {
-        "file_view_fallback": "Datei anzeigen"
+    "posts": {
+        "file_view_fallback": "Anzeigen der Datei",
+        "only_show_news": "Pokaż tylko wiadomości"
+    },
+    "create": {
+        "post": {
+            "title": "Tytuł",
+            "placeholder": "Profil Life-Science znów jest na drodze",
+            "teacher_can_see": "Nauczyciel może zobaczyć ten post",
+            "is_news": "To jest post z wiadomościami",
+            "submit": "Prześlij",
+            "save": "Zapisać"
+        },
+        "sections": {
+            "select_section": "Wybierz typ przekroju",
+            "text": "Tekst",
+            "image": "Obraz",
+            "file": "Plik",
+            "markdown": "Markdown"
+        }
     },
     "settings": {
         "title": "Ustawienia",

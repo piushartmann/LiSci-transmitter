@@ -36,7 +36,7 @@ function buildPost(post) {
                 let titleFallback = "View File";
                 if (localStorage.getItem('languageFile')) {
                     const languageFile = JSON.parse(localStorage.getItem('languageFile'));
-                    titleFallback = languageFile["sections file_view_fallback"];
+                    titleFallback = languageFile["posts file_view_fallback"];
                 }
                 const fileButton = buildButton("/icons/view.svg", section.title ? section.title : titleFallback, () => window.open(`https://storage.liscitransmitter.live/${section.content}`, '_blank'));
                 fileButton.label.classList.add("file-label");

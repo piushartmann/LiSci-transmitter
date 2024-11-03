@@ -41,8 +41,26 @@
         },
         "title": "Zitate"
     },
-    "sections": {
-        "file_view_fallback": "Datei anzeigen"
+    "posts": {
+        "file_view_fallback": "Datei anzeigen",
+        "only_show_news": "Nur Zeitungen anzeigen"
+    },
+    "create": {
+        "post": {
+            "title": "Title",
+            "placeholder": "Das Life-Science Profil wieder unterwergs",
+            "teacher_can_see": "Lehrer können diesen Post sehen",
+            "is_news": "Das ist ein Zeitungsartikel",
+            "submit": "Absenden",
+            "save": "Speichern"
+        },
+        "sections": {
+            "select_section": "Abschnittstyp auswählen",
+            "text": "Text",
+            "image": "Bild",
+            "file": "Datei",
+            "markdown": "Markdown"
+        }
     },
     "settings": {
         "title": "Einstellungen",

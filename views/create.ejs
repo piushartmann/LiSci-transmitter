@@ -24,17 +24,17 @@
     <div class="article-container">
 
       <div class="title">
-        <label for="title">Titel</label>
-        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required>
+        <label for="title" data-lang-content="create post title">Titel</label>
+        <input type="text" id="title" placeholder="Das Life-Science Profil wieder unterwergs" required data-lang-content-placeholder="create post placeholder">
       </div>
 
       <div class="checkbox-group">
-        <label for="teachersafe">Dürfen Lehrer sehen</label>
+        <label for="teachersafe" data-lang-content="create post teacher_can_see">Dürfen Lehrer sehen</label>
         <input type="checkbox" id="teachersafe" value="teachersafe">
 
         <% if (canCreateNews) { %>
           <br>
-          <label for="news">Ist eine neue Zeitung</label>
+          <label for="news" data-lang-content="create post is_news">Ist eine neue Zeitung</label>
           <input type="checkbox" id="news" value="news">
         <% } %>
       </div>
@@ -49,9 +49,9 @@
       <br>
 
       <% if (typeof post != "undefined") { %>
-      <button onclick="submitPost(true)" class="button">Save Post</button>
+      <button onclick="submitPost(true)" class="button" data-lang-content="create post save">Save Post</button>
       <% } else { %>
-      <button onclick="submitPost()" class="button">Create Post</button>
+      <button onclick="submitPost()" class="button" data-lang-content="create post submit">Create Post</button>
       <% } %>
     </div>
   </div>
@@ -59,11 +59,11 @@
   <div id="popup" class="popup hidden">
     <div class="popup-content">
       <span class="close" onclick="closePopup()">&times;</span>
-      <h2>Select Section Type</h2>
-      <button onclick="addTextSection()">Text</button>
-      <button onclick="addImageSection()">Image</button>
-      <button onclick="addFileSection()">File</button>
-      <button onclick="addMarkdownSection()">Markdown</button>
+      <h2 data-lang-content="create sections select_section">Select Section Type</h2>
+      <button onclick="addTextSection()" data-lang-content="create sections text">Text</button>
+      <button onclick="addImageSection()" data-lang-content="create sections image">Image</button>
+      <button onclick="addFileSection()" data-lang-content="create sections file">File</button>
+      <button onclick="addMarkdownSection()" data-lang-content="create sections markdown">Markdown</button>
     </div>
   </div>
 

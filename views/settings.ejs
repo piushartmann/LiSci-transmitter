@@ -49,7 +49,7 @@
       <label for="head" data-lang-content="settings pick_profile_picture">Pick Profile Picture Color</label>
       <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;"">
         <%= username.charAt(0).toUpperCase() %>
-        <input type=" color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
+        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
       </p>
       <button id="profilePictureColorSubmit">Save</button>
     </div>
@@ -64,8 +64,8 @@
       <select id="language">
         <option value="de" <%= preferences.find(p => p.key === 'language')?.value === 'de' ? 'selected' : '' %>>Deutsch</option>
         <option value="en" <%= preferences.find(p => p.key === 'language')?.value === 'en' ? 'selected' : '' %>>English</option>
-        <option value="pl" <%= preferences.find(p => p.key === 'language')?.value === 'pl' ? 'selected' : '' %>>Polski</option>
-        <option value="tlh" <%= preferences.find(p => p.key === 'language')?.value === 'tlh' ? 'selected' : '' %>>Klingon</option>
+        <option value="pl" <%= preferences.find(p => p.key === 'language')?.value === 'pl' ? 'selected' : '' %>>Polski (ai)</option>
+        <option value="tlh" <%= preferences.find(p => p.key === 'language')?.value === 'tlh' ? 'selected' : '' %>>Klingon (ai)</option>
       </select>
     </div>
 

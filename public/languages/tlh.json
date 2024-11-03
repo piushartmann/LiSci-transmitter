@@ -41,8 +41,26 @@
         },
         "title": "tlhaw'DIyuS"
     },
-    "sections": {
-        "file_view_fallback": "taHqeq"
+    "posts": {
+        "file_view_fallback": "taHqeq",
+        "only_show_news": "wa' mIv'a'"
+    },
+    "create": {
+        "post": {
+            "title": "mang",
+            "placeholder": "SuVwI' pong HutlhwI''e'",
+            "teacher_can_see": "ghojmoHwI'",
+            "is_news": "net ghomvam'e'",
+            "submit": "lIy",
+            "save": "choq"
+        },
+        "sections": {
+            "select_section": "yIQong",
+            "text": "wej",
+            "image": "qelI'",
+            "file": "teywI'",
+            "markdown": "majQa'"
+        }
     },
     "settings": {
         "title": "'aw'",
