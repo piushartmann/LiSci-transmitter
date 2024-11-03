@@ -107,7 +107,9 @@
         },
         "sudoku": {
             "modal": {
-                "title": "Settings"
+                "title": "Settings",
+                "show_errors": "Show errors",
+                "prevent_errors": "Prevent errors"
             }
         }
     }

@@ -73,14 +73,31 @@
     border-left-style: solid;
 }
 
-.reset {
+.button-row {
     position: absolute;
     bottom: 0;
     left: -2%;
     transform: translate(0, 80px);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 104%;
+    gap: 5%;
+}
+
+.checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .reset button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.settings button {
     background-color: transparent;
     border: none;
     cursor: pointer;
@@ -93,12 +110,13 @@
 }
 
 @media (max-width: 768px) {
-    .reset {
-        transform: translate(0, 60px);
+    .button-row {
+        transform: translate(0, 80px);
         left: -5%;
+        width: 110%;
     }
 
-    .reset button img {
+    .button-row div button img {
         width: 75%;
     }
 

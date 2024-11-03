@@ -11,19 +11,39 @@
     <div class="square bottom right"></div>
   </div>
 
-  <div class="reset">
-    <button onclick="deleteGame()">
-      <img src="/icons/games/ttt-reset.svg" alt="reset">
-    </button>
+  <div class="button-row">
+    <div class="reset">
+      <button onclick="deleteGame()">
+        <img src="/icons/games/ttt-reset.svg" alt="reset">
+      </button>
+    </div>
+
+    <div class="settings">
+      <button onclick="openModal()">
+        <img src="/icons/settings.svg" alt="settings">
+      </button>
+    </div>
   </div>
+
 </div>
 
 <div id="modal" class="modal">
-    <span id="modalClose" class="close" title="Close Modal">&times;</span>
+  <span id="modalClose" class="close" title="Close Modal">&times;</span>
 
-    <form class="modal-content animate">
+  <form class="modal-content animate">
 
-      <h1 data-lang-content="games sudoku modal title"></h1>
+    <h1 data-lang-content="games sudoku modal title"></h1>
 
-    </form>
-  </div>
+    <div class="checkboxes">
+      <label>
+        <input type="checkbox" id="showErrors" checked>
+        <span data-lang-content="games sudoku modal show_errors">Show Errors</span>
+      </label>
+      <label>
+        <input type="checkbox" id="preventErrors" checked>
+        <span data-lang-content="games sudoku modal prevent_errors">Prevent Errors</span>
+      </label>
+    </div>
+
+  </form>
+</div>

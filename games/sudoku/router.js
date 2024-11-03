@@ -21,18 +21,29 @@ module.exports = (db) => {
                 let game = await db.getGame(gameID);
                 receiveMove(game, message.index, message.value);
             }
+            else if (message.type === "preferences") {
+                console.log("Received preferences");
+                console.log(message.preferences);
+                let game = await db.getGame(gameID);
+                let preferences = message.preferences;
+                if (!"showErrors" in preferences || typeof preferences["showErrors"] !== "boolean") return;
+                if (!"preventErrors" in preferences || typeof preferences["preventErrors"] !== "boolean") return;
+                game.gameState.preferences = preferences;
+                await db.updateGameState(game._id, { board: game.gameState.board, originalBoard: game.gameState.originalBoard, solvedBoard: game.gameState.solvedBoard, preferences: game.gameState.preferences });
+                console.log("Updated preferences");
+            }
         });
 
         ws.on('close', () => {
             connections = connections.filter(c => c.ws !== ws);
         });
-        const playerIndex = game.players.indexOf(req.session.userID) === 0 ? 1 : -1;
-        ws.send(JSON.stringify({ type: "board", board: game.gameState.board, originalBoard: game.gameState.originalBoard, player: playerIndex }));
+
+        ws.send(JSON.stringify({ type: "board", board: game.gameState.board, originalBoard: game.gameState.originalBoard, preferences: game.gameState.preferences }));
     });
 
     function receiveMove(game, index, value) {
         const originalValue = game.gameState.originalBoard[index[0]][index[1]];
-        
+
         if (originalValue !== 0) return;
 
         // Check if the value is valid
@@ -42,7 +53,7 @@ module.exports = (db) => {
 
         newBoard[index[0]][index[1]] = value;
 
-        db.updateGameState(game._id, { board: newBoard, originalBoard: game.gameState.originalBoard, solvedBoard: game.gameState.solvedBoard });
+        db.updateGameState(game._id, { board: newBoard, originalBoard: game.gameState.originalBoard, solvedBoard: game.gameState.solvedBoard, preferences: game.gameState.preferences });
     }
 
     return router

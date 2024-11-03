@@ -30,8 +30,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof ws !== 'undefined') return;
         ws.connect();
     });
+
+    const showErrorsCheckbox = document.getElementById('showErrors');
+    const preventErrorsCheckbox = document.getElementById('preventErrors');
+
+    showErrorsCheckbox.addEventListener('change', () => {
+        highlightImpossibleValues = showErrorsCheckbox.checked;
+        if (!highlightImpossibleValues) {
+            unhighlightSquares();
+            preventErrorsCheckbox.checked = false;
+            preventErrorsCheckbox.disabled = true;
+        } else {
+            preventErrorsCheckbox.disabled = false;
+        }
+        sendPreferencesUpdate();
+    });
+
+    preventErrorsCheckbox.addEventListener('change', () => {
+        preventImpossibleValues = preventErrorsCheckbox.checked;
+        sendPreferencesUpdate();
+    });
 });
 
+function sendPreferencesUpdate() {
+    const showErrors = document.getElementById('showErrors');
+    const preventErrors = document.getElementById('preventErrors');
+
+    ws.send(JSON.stringify({ type: 'preferences', preferences: { showErrors: showErrors.checked, preventErrors: preventErrors.checked } }));
+}
 
 function deleteGame() {
 
@@ -52,6 +78,10 @@ function deleteGame() {
 
 function connectToWS(gameID) {
     const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/sudoku/${gameID}`);
+
+    const showErrorsCheckbox = document.getElementById('showErrors');
+    const preventErrorsCheckbox = document.getElementById('preventErrors');
+
     ws.onopen = () => {
         console.log('Connected to server');
     }
@@ -59,6 +89,13 @@ function connectToWS(gameID) {
         data = JSON.parse(event.data);
         if (data.type === 'board') {
             renderBoard(data.board, data.originalBoard);
+
+            const preferences = data.preferences;
+            showErrorsCheckbox.checked = preferences.showErrors;
+            preventErrorsCheckbox.checked = preferences.preventErrors;
+            highlightImpossibleValues = preferences.showErrors;
+            preventImpossibleValues = preferences.preventErrors;
+
             board = data.board;
         }
     }
@@ -249,19 +286,20 @@ function checkWon() {
 function checkIfPossible(value, board, row, col) {
     console.log(value, board, row, col);
 
+    let possible = true;
     for (let i = 0; i < 9; i++) {
         if (board[row][i].innerHTML === value) {
             if (i != col) {
                 console.log(row, i);
                 highlightSquare(row, i);
-                return false;
+                possible = false;
             }
         }
         if (board[i][col].innerHTML === value) {
             if (i != row) {
                 console.log(i, col);
                 highlightSquare(i, col);
-                return false;
+                possible = false;
             }
         }
     }
@@ -275,13 +313,13 @@ function checkIfPossible(value, board, row, col) {
                 if (i != row && j != col) {
                     console.log(i, j);
                     highlightSquare(i, j);
-                    return false;
+                    possible = false;
                 }
             }
         }
     }
 
-    return true;
+    return possible;
 
 }
 

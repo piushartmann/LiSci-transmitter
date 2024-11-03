@@ -7,7 +7,7 @@ async function newGame(db, players) {
     }
 
     const [removedVals, startingBoard, solvedBoard] = await generateBoard(50);
-    const game = await db.createGame(players, 'sudoku', { board: startingBoard, originalBoard: startingBoard, solvedBoard: solvedBoard });
+    const game = await db.createGame(players, 'sudoku', { board: startingBoard, originalBoard: startingBoard, solvedBoard: solvedBoard, preferences: { showErrors: true, preventErrors: true } });
     if (!game) {
         return null;
     }
