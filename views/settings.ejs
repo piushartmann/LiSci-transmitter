@@ -64,6 +64,7 @@
       <select id="language">
         <option value="de" <%= preferences.find(p => p.key === 'language')?.value === 'de' ? 'selected' : '' %>>Deutsch</option>
         <option value="en" <%= preferences.find(p => p.key === 'language')?.value === 'en' ? 'selected' : '' %>>English</option>
+        <option value="pl" <%= preferences.find(p => p.key === 'language')?.value === 'pl' ? 'selected' : '' %>>Polski</option>
         <option value="tlh" <%= preferences.find(p => p.key === 'language')?.value === 'tlh' ? 'selected' : '' %>>Klingon</option>
       </select>
     </div>

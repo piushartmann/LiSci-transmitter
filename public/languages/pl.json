@@ -1,0 +1,96 @@
+{
+    "header": {
+        "home": "Dom",
+        "citations": "Cytatów",
+        "games": "Igrzyska",
+        "about": "Około",
+        "create": "Nowy post",
+        "settings": "Ustawienia",
+        "logout": "Wyloguj",
+        "login": "Login"
+    },
+    "login_form": {
+        "username": "Nazwa użytkownika",
+        "password": "Hasło",
+        "cancel": "Anuluj"
+    },
+    "comment_modal": {
+        "title": "Komentarze",
+        "new_comment": "Dodaj nowy komentarz:",
+        "submit": "Komentarz",
+        "comment_placeholder": "To najzabawniejsza rzecz, jaką kiedykolwiek widziałem!"
+    },
+    "interaction": {
+        "edit": "Redagować",
+        "delete": "Usunąć",
+        "save": "Zapisać",
+        "cancel": "Anuluj",
+        "likes": "Lubi",
+        "comments": "Komentarze"
+    },
+    "citations": {
+        "new": {
+            "title": "Utwórz nowy cytat",
+            "sentence": {
+                "0": "Herr Treetzen",
+                "1": "powiedziany",
+                "2": "Zabawny cytat",
+                "3": "."
+            },
+            "submit": "Prześlij"
+        },
+        "title": "Cytatów"
+    },
+    "sections": {
+        "file_view_fallback": "Datei anzeigen"
+    },
+    "settings": {
+        "title": "Ustawienia",
+        "push": {
+            "title": "Powiadomienia push",
+            "title_to_this_device": "Powiadomienia push do tego urządzenia",
+            "checkboxes": {
+                "news": "Wiadomości",
+                "posts": "Posty",
+                "citations": "Cytaty (wkrótce)",
+                "comments": "Komentarze (wkrótce)"
+            }
+        },
+        "pick_profile_picture": "Wybierz kolor zdjęcia profilowego",
+        "api_key": "Klucz API",
+        "language": "Język"
+    },
+    "admin_settings": {
+        "title": "Ustawienia administratora",
+        "create_user": {
+            "title": "Utwórz użytkownika",
+            "username": "Nazwa użytkownika",
+            "password": "Hasło",
+            "create": "Tworzyć"
+        },
+        "edit_user": {
+            "title": "Edytuj użytkownika",
+            "username": "Nazwa użytkownika"
+        }
+    },
+    "games": {
+        "request": {
+            "title": "Prośba o grę",
+            "message": "Czy chcesz zagrać w {grę} z {użytkownik}?",
+            "accept": "Akceptować",
+            "decline": "Odrzucać"
+        },
+        "selector": {
+            "play_singleplayer": "Tryb dla jednego gracza",
+            "search_for_others": "Szukaj innych graczy",
+            "modal": {
+                "title": "Wybierz grę"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": "Ustawienia"
+            }
+        }
+    }
+}

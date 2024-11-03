@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const baseLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', 'en.json')));
-const targetLanguage = 'tlh-Latn';
+const targetLanguage = 'pl';
 
 async function translateObject(obj, fromLanguage, toLanguage) {
     if (obj) {
