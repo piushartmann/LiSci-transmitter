@@ -15,10 +15,22 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
     let invites = [];
 
     router.get('*', async (req, res, next) => {
+        // always allow access to the invite page
+        if (req.path.startsWith("/invite/")) return next();
+
+        if (req.session.inviteID && req.session.inviteGameID) {
+            const invite = await db.getInvite(req.session.inviteID);
+            if (invite) {
+                if (req.path.endsWith(req.session.inviteGameID) || (req.path.endsWith(req.session.inviteGameID)+"/.websocket")) {
+                    return next();
+                }
+            }
+        }
+
         if (req.session.userID) {
             const permissions = await db.getUserPermissions(req.session.userID);
             if (!permissions.includes("games")) return res.redirect('/');
-            next();
+            return next();
         } else {
             return res.redirect('/');
         }
@@ -32,6 +44,18 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
             games: gameConfigs
         });
+    });
+
+    router.get('/:game/newInviteLink', async (req, res) => {
+        const gameURL = req.params.game;
+        const gameConfig = gameConfigs.find(g => g.url === gameURL);
+        if (!gameConfig) return res.status(404).send("Game not found");
+
+        const invite = await db.newInvite({ url: gameConfig.url, name: gameConfig.name, description: gameConfig.description }, req.session.userID);
+
+        const inviteLink = req.protocol + '://' + req.get('host') + '/games/invite/' + invite._id;
+
+        return res.status(200).send(JSON.stringify({ invite: inviteLink }));
     });
 
     router.ws('/discover', async (ws, req) => {
@@ -143,20 +167,12 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
 
         if (!gameConfig.routerInstance) return;
 
-        gameConfig.routerInstance.get('*', async (req, res, next) => {
-            if (!req.session.userID) return res.status(401).send("Not logged in");
-
-            const permissions = await db.getUserPermissions(req.session.userID);
-            if (!permissions.includes("games")) return res.status(403).send("You cant access Games.")
-            next()
-        })
-
         gameConfig.routerInstance.get('/:gameID', async (req, res) => {
             const permissions = await db.getUserPermissions(req.session.userID);
 
             return res.render("game", {
                 loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css:  "/" + gameConfig.url + "/" +(gameConfig.css || gameConfig.url + ".css"), js:  "/" + gameConfig.url + "/" +(gameConfig.js || gameConfig.url + ".js")
+                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
             });
         });
 
@@ -194,6 +210,9 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
         if (!gameConfig.routerInstance) return;
         router.use("/" + gameConfig.url, gameConfig.routerInstance);
     });
+
+    //include invite routes
+    router.use('/invite', require('./invites')(db, gameConfigs, discoverUsers));
 
     return router;
 }

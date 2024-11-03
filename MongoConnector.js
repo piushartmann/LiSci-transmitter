@@ -72,6 +72,13 @@ const gameSchema = new Schema({
     timestamp: { type: Date, default: Date.now },
 });
 
+const gameInviteSchema = new Schema({
+    gameInfo: { url: { type: String, required: true }, name: { type: String, required: true }, description: { type: String, required: true } },
+    from: { type: ObjectId, ref: 'User', required: true, index: true },
+    gameID: { type: ObjectId, ref: 'Game', required: false },
+    timestamp: { type: Date, default: Date.now },
+});
+
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
     hash.update(password);
@@ -89,6 +96,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.Comment = this.mongoose.model('Comment', commentSchema);
         this.Citation = this.mongoose.model('Citation', citationSchema);
         this.Game = this.mongoose.model('Game', gameSchema);
+        this.GameInvite = this.mongoose.model('GameInvite', gameInviteSchema);
     }
 
     async dropDatabase() { //be careful intended for debugging
@@ -546,6 +554,7 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async createGame(players, type, gameState) {
+
         players = players.map(id => new ObjectId(id));
 
         const game = new this.Game({ players, type, gameState });
@@ -579,5 +588,30 @@ module.exports.MongoConnector = class MongoConnector {
         const game = await this.Game.findById(gameID);
         game.gameState = gameState;
         return await game.save();
+    }
+
+    async newInvite(gameInfo, userID) {
+        const invite = new this.GameInvite({ gameInfo, from: userID });
+        return await invite.save();
+    }
+
+    async getInvite(inviteID) {
+        try {
+            return await this.GameInvite.findById(inviteID);
+        }
+        catch (error) {
+            return null;
+        }
+    }
+
+    async setInviteGameID(inviteID, gameID) {
+        try {
+            const invite = await this.GameInvite.findById(inviteID);
+            invite.gameID = gameID;
+            return await invite.save();
+        }
+        catch (error) {
+            return null;
+        }
     }
 };

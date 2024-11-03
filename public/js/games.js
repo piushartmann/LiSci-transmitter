@@ -110,6 +110,11 @@ function discoverOtherPlayers(game) {
     connectionModal.style.display = 'block';
 
     discoverGame = game;
+
+    const createInviteButton = document.getElementById('createInviteButton');
+    createInviteButton.onclick = () => {
+        createInviteLink(game);
+    }
 }
 
 function hideDiscovery() {
@@ -117,4 +122,41 @@ function hideDiscovery() {
     connectionModal.style.display = 'none';
 
     discoverGame = null;
+}
+
+function createInviteLink(game) {
+    console.log("Creating invite link");
+
+    fetch(`/games/${game}/newInviteLink`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then(async (res) => {
+        if (res.ok) {
+            const data = await res.json();
+            console.log(data);
+            const inviteLink = document.getElementById('inviteLink');
+            const copyLink = document.getElementById('copyLink');
+            inviteLink.value = data.invite;
+            inviteLink.style.display = 'block';
+            copyLink.style.display = 'block';
+            copyLink.onclick = async () => {
+                shareData = { url: data.invite }
+                if (navigator.share && navigator.canShare(shareData)) {
+                    try {
+                        await navigator.share(shareData);
+                        console.log("Data was shared successfully");
+                    } catch (err) {
+                        alert("Error: " + err);
+                    }
+                } else {
+                    inviteLink.select();
+                    document.execCommand('copy');
+                    copyLink.innerText = "Copied!";
+                }
+            }
+            loadLanguage();
+        }
+    });
 }

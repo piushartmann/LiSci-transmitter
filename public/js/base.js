@@ -371,20 +371,25 @@ function applyLanguage(languageFile, redraw = false) {
                 dirs.forEach(dir => {
                     json = json[dir];
                 });
+
+                const arguments = element.getAttribute(`data-lang-arguments`);
+                if (arguments) {
+                    const args = JSON.parse(arguments);
+                    Object.keys(args).forEach(arg => {
+                        json = json.replace(`{${arg}}`, args[arg]);
+                    });
+                }
+
+                if (json) {
+                    element[input] = json;
+                } else {
+                    console.warn(`Could not find language content for ${key}`);
+                }
             }
             catch (e) {
                 console.warn(`Could not find language content for ${key}`);
             }
 
-            const arguments = element.getAttribute(`data-lang-arguments`);
-            if (arguments) {
-                const args = JSON.parse(arguments);
-                Object.keys(args).forEach(arg => {
-                    json = json.replace(`{${arg}}`, args[arg]);
-                });
-            }
-
-            element[input] = json;
             convertedItems.push(element);
         });
 

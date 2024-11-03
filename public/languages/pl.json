@@ -102,7 +102,9 @@
             "play_singleplayer": "Tryb dla jednego gracza",
             "search_for_others": "Szukaj innych graczy",
             "modal": {
-                "title": "Wybierz gracza"
+                "title": "Wybierz gracza",
+                "create_invite": "Utwórz nowe zaproszenie Link do gry z anonimowymi graczami",
+                "copy_link": "Kopiuj link"
             }
         },
         "sudoku": {

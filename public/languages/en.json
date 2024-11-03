@@ -102,7 +102,9 @@
             "play_singleplayer": "Singleplayer",
             "search_for_others": "Search for other players",
             "modal": {
-                "title": "Select Player"
+                "title": "Select Player",
+                "create_invite": "Create a new invite Link to play with anonymous players",
+                "copy_link": "Copy Link"
             }
         },
         "sudoku": {

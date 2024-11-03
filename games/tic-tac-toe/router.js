@@ -14,9 +14,28 @@ module.exports = (db) => {
         const { gameID } = req.params;
         let game = await db.getGame(gameID);
         if (!game) return ws.close();
-        if (!game.players.includes(req.session.userID)) return ws.close();
 
-        connections.push({ userID: req.session.userID, ws: ws });
+        let anonymous = false;
+
+        if (!game.players.includes(req.session.userID)) {
+            if (req.session.inviteGameID) {
+                if (req.session.inviteGameID !== gameID) {
+                    return ws.close();
+                } else {
+                    anonymous = true;
+                }
+            } else {
+                return ws.close();
+            }
+        }
+
+        if (anonymous) {
+            const inviteID = req.session.inviteID;
+            connections.push({ userID: inviteID, ws: ws });
+        } else {
+            connections.push({ userID: req.session.userID, ws: ws });
+        }
+
 
         ws.on('message', async (msg) => {
             const message = JSON.parse(msg);
