@@ -1,23 +1,23 @@
 <script src="/js/partials/autocomplete.js"></script>
 <link rel="stylesheet" href="/css/autocomplete.css">
 
-<h1>Admin Settings</h1>
+<h1 data-lang-content="admin_settings title">Admin Settings</h1>
 
 <div class="createUser setting">
-  <h2>Create User</h2>
+  <h2 data-lang-content="admin_settings create_user title">Create User</h2>
   <form id="createUserForm">
-    <label for="username">Username</label>
+    <label for="username" data-lang-content="admin_settings create_user username">Username</label>
     <input type="text" id="createUserUsername" name="username" required>
-    <label for="password">Password</label>
+    <label for="password" data-lang-content="admin_settings create_user password">Password</label>
     <input type="password" id="createUserPasswort" name="password" required>
     </select>
-    <button type="button" id="createUserSubmit">Create User</button>
+    <button type="button" id="createUserSubmit" data-lang-content="admin_settings create_user create">Create User</button>
   </form>
 </div>
 
 <div id="setUserPermissions">
   <div class="setting">
-    <h2>Edit User</h2>
+    <h2 data-lang-content="admin_settings edit_user title">Edit User</h2>
     <form id="setUserPermissionsForm" autocomplete="off">
       <div class="autocomplete">
         <input id="userAutoComplete" type="text" placeholder="admin">

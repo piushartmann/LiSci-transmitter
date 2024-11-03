@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
     newGame: async function newGame(db, players) {
-        const ongoingGame = await db.getGamesFromUsers(players);
+        const ongoingGame = await db.getGamesFromUsers(players, 'testGame');
         if (ongoingGame[0]) {
             return ongoingGame[0]._id;
         }

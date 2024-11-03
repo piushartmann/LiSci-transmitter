@@ -73,12 +73,12 @@ function buildComment(comment) {
 
     if (comment.canEdit) {
 
-        let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(comment._id));
+        let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(comment._id), 'comment_edit');
         editButton.className = 'edit-button button';
 
         buttonRow.appendChild(editButton);
 
-        let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(comment._id));
+        let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(comment._id), 'comment_delete');
         deleteButton.className = 'delete-button button';
 
         buttonRow.appendChild(deleteButton);
@@ -116,11 +116,11 @@ function editComment(commentID) {
     editButton.remove();
     deleteButton.remove();
 
-    let saveButton = buildButton('/icons/save.svg', 'Save', () => saveComment(commentID));
+    let saveButton = buildButton('/icons/save.svg', 'Save', () => saveComment(commentID), 'comment_save');
     saveButton.className = 'save-button button';
     buttonRow.appendChild(saveButton);
 
-    let cancelButton = buildButton('/icons/cancel.svg', 'Cancel', () => cancelEditComment(commentID, contentText));
+    let cancelButton = buildButton('/icons/cancel.svg', 'Cancel', () => cancelEditComment(commentID, contentText), 'comment_cancel');
     cancelButton.className = 'cancel-button button';
     buttonRow.appendChild(cancelButton);
 }
@@ -151,10 +151,10 @@ async function cancelEditComment(commentID, contentText) {
     saveButton.remove();
     cancelButton.remove();
 
-    let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(commentID));
+    let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(commentID), 'comment_edit');
     buttonRow.appendChild(editButton);
 
-    let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(commentID));
+    let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(commentID), 'comment_delete');
     buttonRow.appendChild(deleteButton);
     window.location.reload();
 }

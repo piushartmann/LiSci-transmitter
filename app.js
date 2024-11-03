@@ -49,9 +49,9 @@ console.log(gameConfig);
 app.set('view engine', 'ejs')
 
 app.use(function (req, res, next) {
-    let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views/partials')]
+    let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
     gameConfig.forEach(config => {
-        if (req.path.includes(config.url)) views.push(path.join(__dirname, 'games/' + config.url + (config.views || '/views')));
+        if (req.path.includes(config.url)) views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
     })
     app.set('views', views);
     next()
@@ -60,7 +60,7 @@ app.use(function (req, res, next) {
 app.use(express.static(path.join(__dirname, 'public')));
 
 gameConfig.forEach(config => {
-    app.use(express.static(path.join(__dirname, 'games/' + config.url + (config.public || '/public'))));
+    app.use("/"+config.url, express.static(path.join(__dirname, 'games', config.url, (config.public || 'public'))));
 })
 
 app.use(bodyParser.json());

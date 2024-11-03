@@ -10,7 +10,7 @@
     "ejs": "tic-tac-toe.ejs",
     "views": "/views",
     "public": "/public",
-    "css": "/tic-tac-toe.css",
-    "js": "/tic-tac-toe.js",
+    "css": "tic-tac-toe.css",
+    "js": "tic-tac-toe.js",
     "priority": 11
 }

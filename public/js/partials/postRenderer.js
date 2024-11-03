@@ -33,7 +33,12 @@ function buildPost(post) {
                     summary.className = "AISummary";
                     sectionDiv.appendChild(summary);
                 }
-                const fileButton = buildButton("/icons/view.svg", section.title ? section.title : "View File", () => window.open(`https://storage.liscitransmitter.live/${section.content}`, '_blank'));
+                let titleFallback = "View File";
+                if (localStorage.getItem('languageFile')) {
+                    const languageFile = JSON.parse(localStorage.getItem('languageFile'));
+                    titleFallback = languageFile["sections_file_view_fallback"];
+                }
+                const fileButton = buildButton("/icons/view.svg", section.title ? section.title : titleFallback, () => window.open(`https://storage.liscitransmitter.live/${section.content}`, '_blank'));
                 fileButton.label.classList.add("file-label");
                 sectionDiv.appendChild(fileButton);
                 break;
@@ -76,7 +81,9 @@ function buildFooter(post) {
     let iteractionButtons = document.createElement("div");
     iteractionButtons.className = "flex";
 
-    let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} Comments`, () => renderComments(post), post.comments.length);
+    let commentLabel = resolveLanguageContent("counter_comments") || "Comments";
+
+    let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} ${commentLabel}`, () => renderComments(post), `${post.comments.length} ${commentLabel}`, `${post.comments.length}`, true);
 
     iteractionButtons.appendChild(buildLikeButton("/internal/likePost", post._id, post.liked, post.likes.length, loggedIn));
     iteractionButtons.appendChild(commentButton);
@@ -87,7 +94,7 @@ function buildFooter(post) {
         let buttonRow = document.createElement("div");
         buttonRow.className = "flex";
 
-        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`);
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`, "post edit");
 
         buttonRow.appendChild(editButton);
 
@@ -103,7 +110,7 @@ function buildFooter(post) {
                 console.log(`Post ${post._id} deleted`);
             }
             window.location.reload();
-        });
+        }, "post delete");
 
         buttonRow.appendChild(deleteButton);
 

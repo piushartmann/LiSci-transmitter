@@ -1,0 +1,9 @@
+{
+    "url": "template",
+    "name": "Test Game",
+    "description": "Nur ein Test Game",
+    "singleplayer": true,
+    "multiplayer": false,
+    "priority": 10,
+    "enabled": false
+}

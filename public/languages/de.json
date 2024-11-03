@@ -1,0 +1,78 @@
+{
+    "header": {
+        "home": "Startseite",
+        "citations": "Zitate",
+        "games": "Spiele",
+        "about": "About",
+        "create": "Neuer Post",
+        "settings": "Einstellungen",
+        "logout": "Abmelden",
+        "login": "Anmelden"
+    },
+    "login_form": {
+        "username": "Benutzername",
+        "password": "Passwort",
+        "cancel": "Abbrechen"
+    },
+    "comment_modal": {
+        "title": "Kommentare",
+        "new_comment": "Verfasse einen neuen Kommentar:",
+        "submit": "Kommentieren",
+        "comment_placeholder": "Das ist ja das lustigste was ich jemals gesehen habe!"
+    },
+    "post": {
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+    },
+    "comment_edit": "Bearbeiten",
+    "comment_delete": "Löschen",
+    "comment_save": "Speichern",
+    "comment_cancel": "Abbrechen",
+    "counter_likes": "Likes",
+    "counter_comments": "Kommentare",
+    "citation_save": "Speichern",
+    "citation_cancel": "Abbrechen",
+    "citation_delete": "Löschen",
+    "citation_edit": "Bearbeiten",
+    "game_request_accept": "Annehmen",
+    "game_request_decline": "Ablehnen",
+    "sections_file_view_fallback": "Datei Anschauen",
+    "games_play_singleplayer": "Singleplayer",
+    "games_play_search_for_others": "Suche nach anderen Spielern",
+    "games_connection_modal_title": "Mit wem möchtest du dich verbinden?",
+    "settings": {
+        "title": "Einstellungen",
+        "push": {
+            "title": "Push-Benachrichtigungen",
+            "title_to_this_device": "Push-Benachrichtigungen an dieses Gerät",
+            "checkboxes": {
+                "news": "Zeitungen",
+                "posts": "Posts",
+                "citations": "Zitate (kommen bald)",
+                "comments": "Kommentare (kommen bald)"
+            }
+        },
+        "pick_profile_picture": "Profilbildfarbe auswählen",
+        "api_key": "API Key"
+    },
+    "admin_settings": {
+        "title": "Admin Einstellungen",
+        "create_user": {
+            "title": "Benutzer erstellen",
+            "username": "Benutzername",
+            "password": "Passwort",
+            "create": "Erstellen"
+        },
+        "edit_user": {
+            "title": "Benutzer bearbeiten",
+            "username": "Benutzername"
+        }
+    },
+    "games": {
+        "sudoku": {
+            "modal": {
+                "title": "Einstellungen"
+            }
+        }
+    }
+}

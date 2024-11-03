@@ -223,4 +223,5 @@ function buildUserDisplay(user) {
     userDisplay.appendChild(submitButton);
 
     return userDisplay;
+
 }

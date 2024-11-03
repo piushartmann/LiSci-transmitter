@@ -87,8 +87,8 @@ function buildCitation(citation) {
     interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length, loggedIn));
 
     if (citation.canEdit) {
-        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id));
-        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id));
+        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "citation_delete");
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id), "citation_edit");
 
         editButtons.appendChild(deleteButton);
         editButtons.appendChild(editButton);
@@ -171,11 +171,11 @@ function editCitation(id) {
     let buttonRow = citationContainer.querySelector('.edit-buttons');
     buttonRow.innerHTML = '';
 
-    let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id));
+    let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id), "citation_save");
 
     buttonRow.appendChild(saveButton);
 
-    let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => cancelEditCitation(id, contentText, authorText));
+    let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => cancelEditCitation(id, contentText, authorText), "citation_cancel");
 
     buttonRow.appendChild(cancelButton);
 }
@@ -210,11 +210,11 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     let buttonRow = citationContainer.querySelector('.edit-buttons');
     buttonRow.innerHTML = '';
 
-    let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id));
+    let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id), "citation_delete");
 
     buttonRow.appendChild(deleteButton);
 
-    let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id));
+    let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id), "citation_edit");
 
     buttonRow.appendChild(editButton);
 }

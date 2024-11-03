@@ -1,0 +1,108 @@
+.gameBox {
+    position: absolute;
+    top: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: calc(100% - 10%);
+    height: calc(100vmin - 10vw);
+    max-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    aspect-ratio: 1/1;
+    width: calc(100vmin - 10vw);
+    height: calc(100vmin - 10vw);
+    max-width: 80vh;
+    max-height: 80vh;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--post-outline-color);
+}
+
+.inner.game {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: none;
+    aspect-ratio: initial;
+    border: none;
+}
+
+.inner.square {
+    border-width: 1px;
+}
+
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100%;
+    border-width: 5px;
+    border-color: var(--post-outline-color);
+    font-size: 1.5em;
+}
+
+.original {
+    font-weight: bold;
+}
+
+.playable {
+    cursor: pointer;
+}
+
+.top {
+    border-bottom-style: solid;
+}
+
+.bottom {
+    border-top-style: solid;
+}
+
+.left {
+    border-right-style: solid;
+}
+
+.right {
+    border-left-style: solid;
+}
+
+.reset {
+    position: absolute;
+    bottom: 0;
+    left: -2%;
+    transform: translate(0, 80px);
+}
+
+.reset button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.not-selectable {
+    opacity: 0.8;
+    pointer-events: none;
+    background-color: rgb(255 0 0 / 10%)
+}
+
+@media (max-width: 768px) {
+    .reset {
+        transform: translate(0, 60px);
+        left: -5%;
+    }
+
+    .reset button img {
+        width: 75%;
+    }
+
+    .square {
+        font-size: 1.2em;
+    }
+}

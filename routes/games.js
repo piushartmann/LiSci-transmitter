@@ -74,6 +74,8 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
 
                 const game = await startGame(message.game, [req.session.userID, message.user]);
 
+                console.log("Game: " + game)
+
                 const otherPlayer = discoverUsers.find(u => u.user.id === message.user);
                 if (!otherPlayer) return;
                 otherPlayer.ws.send(JSON.stringify({ "type": "accept", "game": message.game, "gameID": game }));
@@ -115,14 +117,16 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
         });
     }
 
-    function startGame(game, players) {
+    async function startGame(game, players) {
         console.log("Starting Game")
-        gameConfigs.forEach(config => {
+        for (const config of gameConfigs) {
             if (config.url == game) {
-                return config.logic.newGame(db, players)
+                console.log("Starting Game: " + config.name)
+                const gameID = await config.logicInstance.newGame(db, players);
+                return gameID.toString();
             }
-        })
-        return null
+        }
+        return null;
     }
 
     gameConfigs.forEach(game => {
@@ -152,7 +156,7 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
 
             return res.render("game", {
                 loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: (gameConfig.css || "/" + gameConfig.url + ".css"), js: (gameConfig.js || "/" + gameConfig.url + ".js")
+                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css:  "/" + gameConfig.url + "/" +(gameConfig.css || gameConfig.url + ".css"), js:  "/" + gameConfig.url + "/" +(gameConfig.js || gameConfig.url + ".js")
             });
         });
 

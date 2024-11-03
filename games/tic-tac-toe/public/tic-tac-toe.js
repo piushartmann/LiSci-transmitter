@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const ws = connectToWS(gameID);
 
-
     const squares = Array.from(document.getElementsByClassName('playable'));
     squares.forEach(square => {
         square.addEventListener('click', () => {
@@ -34,6 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ws.send(JSON.stringify({ "type": "move", "index": squares.indexOf(square) }));
             }
         });
+    });
+
+    window.addEventListener("focus", () => {
+        if (typeof ws !== 'undefined') return;
+        ws.connect();
     });
 });
 
@@ -171,6 +175,10 @@ function connectToWS(gameID) {
     ws.onmessage = (event) => {
         data = JSON.parse(event.data);
         if (data.type === 'board') {
+            if (data.board.length === 0) {
+                console.error('Game not found');
+                return;
+            }
             updateBoard(data.board, data.player, data.nextGame);
             if (data.board[9] !== 0) {
                 gameOver(data.board[9]);

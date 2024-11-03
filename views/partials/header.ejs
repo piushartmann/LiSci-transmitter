@@ -8,21 +8,21 @@
 
   <nav class="header-nav">
     <ul>
-      <li><a href="/">Home</a></li>
+      <li><a href="/" data-lang-content="header home"></a></li>
       <!-- <li><a href="/archive">Archiv</a></li> -->
       <% if (usertype.includes("classmate")) { %>
-      <li><a href="/citations">Zitate</a></li>
+      <li><a href="/citations" data-lang-content="header citations"></a></li>
       <% } %>
       <% if (usertype.includes("games")) { %>
-      <li><a href="/games">Games</a></li>
+      <li><a href="/games" data-lang-content="header games"></a></li>
       <% } %>
-      <li><a href="/about">About</a></li>
+      <li><a href="/about" data-lang-content="header about"></a></li>
     </ul>
   </nav>
 
   <div class="header-button">
     <% if (usertype.includes("admin") || usertype.includes("canPost")) { %>
-    <button class="create-post-button" onclick="window.location.href='/create'">Neuer Post</button>
+    <button class="create-post-button" onclick="window.location.href='/create'" data-lang-content="header create"></button>
     <% } %>
 
     <% if (loggedIn) { %>
@@ -32,7 +32,7 @@
     </p>
     <% } %>
     <% } else { %>
-    <button id="login-button" onclick="showLoginPopup()">Login</button>
+    <button id="login-button" onclick="showLoginPopup()" data-lang-content="header login"></button>
     <% } %>
 
     <button class="mobileMenuButton" onclick="toggleMobileMenu()">
@@ -49,14 +49,14 @@
 
 <div class="login-popup" id="loginPopup">
   <div class="login-popup-content">
-    <p id="login-popup-title">Login</p>
+    <p id="login-popup-title" data-lang-content="header login"></p>
     <form method="post" action="internal/login">
-      <input type="text" name="username" placeholder="Username" autocomplete="username">
-      <input type="password" name="password" placeholder="Password" autocomplete="current-password">
+      <input type="text" name="username" placeholder="Username" autocomplete="username" data-lang-content-placeholder="login_form username">
+      <input type="password" name="password" placeholder="Password" autocomplete="current-password" data-lang-content-placeholder="login_form password">
 
       <div class="submit-button-container">
-        <button type="button" class="cancel-button" onclick="hideLoginPopup()">Cancel</button>
-        <input type="submit" class="submit-login" value="Login">
+        <button type="button" class="cancel-button" onclick="hideLoginPopup()" data-lang-content="login_form cancel"></button>
+        <input type="submit" class="submit-login" data-lang-content-value="header login">
       </div>
     </form>
   </div>
@@ -68,7 +68,7 @@
   <div class="content">
     <button onclick="window.location.href='/settings'" class="button">
       <img class="icon" src="/icons/settings.svg"></img>
-      <label class="button-label">Settings</label>
+      <label class="button-label" data-lang-content="header settings"></label>
     </button>
   </div>
   <% } %>
@@ -76,34 +76,34 @@
   <div class="content">
     <button onclick="logout()" class="button">
       <img class="icon" src="/icons/logout.svg"></img>
-      <label class="button-label">Logout</label>
+      <label class="button-label" data-lang-content="header logout"></label>
     </button>
   </div>
 </div>
 
 <div class="mobileMenu" id="mobileMenu" style="display: none">
   <ul>
-    <li><a href="/">Home</a></li>
+    <li><a href="/" data-lang-content="header home"></a></li>
     <!-- <li><a href="/archive">Archiv</a></li> -->
     <% if (usertype.includes("classmate")) { %>
-    <li><a href="/citations">Zitate</a></li>
+    <li><a href="/citations" data-lang-content="header citations"></a></li>
     <% } %>
 
     <% if (usertype.includes("admin") || usertype.includes("canPost")) { %>
-    <li><a href="/create">Neuer Post</a></li>
+    <li><a href="/create" data-lang-content="header create"></a></li>
     <% } %>
 
     <% if (usertype.includes("games")) { %>
-    <li><a href="/games">Games</a></li>
+    <li><a href="/games" data-lang-content="header games"></a></li>
     <% } %>
 
-    <li><a href="/about">About</a></li>
+    <li><a href="/about" data-lang-content="header about"></a></li>
 
     <% if (loggedIn) { %>
-    <li><a href="/settings">Settings</a></li>
-    <li><a href="#" onclick="logout()">Logout</a></li>
+    <li><a href="/settings" data-lang-content="header settings"></a></li>
+    <li><a href="#" onclick="logout()" data-lang-content="header logout"></a></li>
     <% } else { %>
-    <li><a href="#" onclick="showLoginPopup()">Login</a></li>
+    <li><a href="#" onclick="showLoginPopup()" data-lang-content="header login"></a></li>
     <% } %>
   </ul>
 </div>

@@ -1,4 +1,5 @@
-function buildButton(icon, label, onclick, short) {
+function buildButton(icon, fallback, onclick, languageContent, languageContentShort, counter) {
+
     let button = document.createElement("button");
     button.className = "button";
     button.onclick = onclick;
@@ -9,15 +10,36 @@ function buildButton(icon, label, onclick, short) {
 
     let buttonLabel = document.createElement("p");
     buttonLabel.className = "label";
-    buttonLabel.textContent = label;
+    if (!counter) {
+        buttonLabel.textContent = fallback;
+        if (typeof languageContentShort !== "undefined") {
+            buttonLabel.dataset.langContent = languageContentShort;
+        }
+    } else {
+        buttonLabel.textContent = languageContent;
+    }
 
     button.appendChild(buttonIcon);
     button.appendChild(buttonLabel);
 
-    if (typeof short !== "undefined") {
+    if (typeof languageContentShort !== "undefined") {
         let shortLabel = document.createElement("p");
         shortLabel.className = "short-label";
-        shortLabel.textContent = short;
+        if (!counter) {
+            if (typeof languageContentShort !== "undefined") {
+                shortLabel.dataset.langContent = languageContentShort;
+            } else {
+                if (typeof languageContent !== "undefined") {
+                    shortLabel.dataset.langContent = languageContent;
+                }
+                else {
+                    shortLabel.textContent = fallback;
+                }
+            }
+        } else {
+            shortLabel.textContent = languageContentShort;
+        }
+
         button.appendChild(shortLabel);
         button.short = shortLabel;
     }
@@ -75,6 +97,8 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
 
     let likeIcon;
 
+    let likeLabel = resolveLanguageContent("counter_likes") || "Likes";
+
     if (loggedIn) {
         likeIcon = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
     }
@@ -82,7 +106,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
         likeIcon = "/icons/like-locked.svg";
     }
 
-    let likeButton = buildButton(likeIcon, `${likes} Likes`, () => { }, likes);
+    let likeButton = buildButton(likeIcon, `${likes} ${likeLabel}`, () => { }, `${likes} ${likeLabel}`, `${likes}`, true);
 
     if (loggedIn) {
         likeButton.onclick = async () => {
@@ -94,7 +118,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
                     },
                     body: JSON.stringify({ id: id }),
                 });
-                likeButton.label.textContent = `${likes + 1} Likes`;
+                likeButton.label.textContent = `${likes + 1} ${likeLabel}`;
                 likeButton.short.textContent = likes + 1;
                 likes++;
                 likeButton.icon.src = "/icons/like-filled.svg";
@@ -108,7 +132,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
                     },
                     body: JSON.stringify({ id: id }),
                 });
-                likeButton.label.textContent = `${likes - 1} Likes`;
+                likeButton.label.textContent = `${likes - 1} ${likeLabel}`;
                 likeButton.short.textContent = likes - 1;
                 likes--;
                 likeButton.icon.src = "/icons/like-unfilled.svg";
@@ -234,12 +258,12 @@ function makeDiscoverable() {
 
             ws.send(JSON.stringify({ type: 'accept', "user": user, "game": game }));
 
-        }, 'Accept');
+        }, 'game_request_accept');
 
         let gameRequestDecline = buildButton('/icons/close.svg', 'Decline', () => {
             ws.send(JSON.stringify({ type: 'decline', "user": user }));
             gameRequest.remove();
-        }, 'Decline');
+        }, 'game_request_decline');
 
         gameRequestButtons.appendChild(gameRequestAccept);
         gameRequestButtons.appendChild(gameRequestDecline);
@@ -267,13 +291,183 @@ function addPWABar() {
     });
 }
 
+function hideModal() {
+    const commentModal = document.getElementById('modal');
+    const commentContainer = document.getElementById('modal-content');
+    commentModal.style.display = 'none';
+}
+
+function openModal(content) {
+    const commentModal = document.getElementById('modal');
+    const commentContainer = document.getElementById('modal-content');
+    if (typeof content === 'string') {
+        commentContainer.innerHTML = content;
+    }
+    commentModal.style.display = 'block';
+}
+
+function loadLanguage() {
+    const language = (localStorage.getItem('language') || navigator.language || navigator.userLanguage).split('-')[0];
+    //TODO: remove true to force reload
+    if (localStorage.getItem('language') !== language || localStorage.getItem('languageFile') == null) {
+        fetchLanguageFile(language);
+    }
+    else {
+        console.log('Loading language from local storage');
+        applyLanguage(JSON.parse(localStorage.getItem('languageFile')));
+        fetchLanguageFile(language, true);
+    }
+}
+
+function fetchLanguageFile(language, redraw = false) {
+    console.log('Loading language file for ' + language);
+    const languageFile = `/languages/${language}.json`;
+    fetch(languageFile)
+        .then(response => response.json())
+        .then(data => {
+            if (redraw && (localStorage.getItem('languageFile') != JSON.stringify(data))) {
+                console.log('Language file changed. Redrawing');
+                applyLanguage(data, true);
+                localStorage.setItem('languageFile', JSON.stringify(data));
+                return;
+            }
+            else if (!redraw) {
+                console.log('Applying language');
+                applyLanguage(data);
+            }
+
+            localStorage.setItem('language', language);
+
+            if (localStorage.getItem('languageFile') === null || localStorage.getItem('languageFile') !== data) {
+                localStorage.setItem('languageFile', JSON.stringify(data));
+            }
+        })
+        .catch(error => {
+            console.log('Could not load requested language file ' + languageFile);
+            console.error(error);
+            console.log("Loading default language file");
+            if (language !== 'de') {
+                fetchLanguageFile('de');
+            }
+            else {
+                console.error('Could not load default language file');
+            }
+        });
+}
+
+let convertedItems = [];
+function applyLanguage(languageFile, redraw = false) {
+    if (redraw) {
+        convertedItems = [];
+    }
+    let totalChanges = 0;
+    const langContent = Array.from(document.querySelectorAll('[data-lang-content]')).filter(element => !convertedItems.includes(element));
+    totalChanges += langContent.length;
+    langContent.forEach(element => {
+        const key = element.getAttribute('data-lang-content');
+        const dirs = key.split(' ');
+        let json = languageFile
+        try {
+            dirs.forEach(dir => {
+                json = json[dir];
+            });
+        }
+        catch (e) {
+            console.warn(`Could not find language content for ${key}`);
+        }
+        element.textContent = json;
+        convertedItems.push(element);
+    });
+
+    const langContentValue = Array.from(document.querySelectorAll('[data-lang-content-value]')).filter(element => !convertedItems.includes(element));
+    totalChanges += langContentValue.length;
+    langContentValue.forEach(element => {
+        const key = element.getAttribute('data-lang-content-value');
+        const dirs = key.split(' ');
+        let json = languageFile
+        try {
+            dirs.forEach(dir => {
+                json = json[dir];
+            });
+        }
+        catch (e) {
+            console.warn(`Could not find language content for ${key}`);
+        }
+        element.value = json;
+        convertedItems.push(element);
+    });
+
+    const langContentPlaceholder = Array.from(document.querySelectorAll('[data-lang-content-placeholder]')).filter(element => !convertedItems.includes(element));
+    totalChanges += langContentPlaceholder.length;
+    langContentPlaceholder.forEach(element => {
+        const key = element.getAttribute('data-lang-content-placeholder');
+        const dirs = key.split(' ');
+        let json = languageFile
+        try {
+            dirs.forEach(dir => {
+                json = json[dir];
+            });
+        }
+        catch (e) {
+            console.warn(`Could not find language content for ${key}`);
+        }
+        element.placeholder = json;
+        convertedItems.push(element);
+    });
+
+    console.log(`Applied ${totalChanges} language changes`);
+}
+
+function resolveLanguageContent(key) {
+    let languageFile = JSON.parse(localStorage.getItem('languageFile'));
+    if (!languageFile) {
+        console.warn('No language file found');
+        return;
+    }
+
+    const dirs = key.split(' ');
+    let json = languageFile
+    try {
+        dirs.forEach(dir => {
+            json = json[dir];
+        });
+    }
+    catch (e) {
+        console.warn(`Could not find language content for ${key}`);
+    }
+    return json;
+}
+
 const isInStandaloneMode = () =>
     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
 document.addEventListener('DOMContentLoaded', async () => {
+    loadLanguage();
+
     makeDiscoverable();
     if (isInStandaloneMode()) {
         addPWABar();
+    }
+
+    var modal = document.getElementById('modal');
+
+    if (modal) {
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                hideModal();
+            }
+        }
+
+        window.ontouchstart = function (event) {
+            if (event.target == modal) {
+                hideModal();
+            }
+        }
+
+        document.getElementById("modalClose").addEventListener("click", () => {
+            hideModal();
+        });
     }
 });
 

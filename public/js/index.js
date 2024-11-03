@@ -15,6 +15,8 @@ async function renderPosts(selectedPosts) {
     renderPosts.forEach(post => {
         buildPost(post)
     });
+    
+    loadLanguage();
 }
 
 function buildPageSelector(page, totalPages, newsPages, postsPages) {

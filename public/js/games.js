@@ -44,8 +44,7 @@ function buildDiscoveryList(players) {
                     invitePlayer(discoverGame, player.userID);
                 }
             }
-
-        }, player.username);
+        });
 
         if (invited.includes(player.userID)) {
             playerElement.classList.add('invited');

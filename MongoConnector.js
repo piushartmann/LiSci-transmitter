@@ -561,12 +561,13 @@ module.exports.MongoConnector = class MongoConnector {
         }
     }
 
-    async getGamesFromUsers(userIDs) {
+    async getGamesFromUsers(userIDs, type) {
         return await this.Game.find({
             players: {
                 $size: userIDs.length,
                 $all: userIDs.map(id => new ObjectId(id))
-            }
+            },
+            type: type
         });
     }
 

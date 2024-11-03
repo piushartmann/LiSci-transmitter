@@ -1,0 +1,10 @@
+{
+    "url": "sudoku",
+    "name": "Sudoku",
+    "description": "Klassisches Sudoku",
+    "singleplayer": true,
+    "multiplayer": false,
+    "ejs": "sudoku.ejs",
+    "priority": 10,
+    "enabled": true
+}
