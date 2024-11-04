@@ -46,7 +46,7 @@ gameConfig.reverse()
 console.log(gameConfig);
 
 //create express app
-app.set('view engine', 'ejs'
+app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
