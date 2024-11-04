@@ -8,8 +8,8 @@
     "aiPath": "ai.js",
     "logic": "logic.js",
     "ejs": "tic-tac-toe.ejs",
-    "views": "/views",
-    "public": "/public",
+    "views": "views",
+    "public": "public",
     "css": "tic-tac-toe.css",
     "js": "tic-tac-toe.js",
     "priority": 11
