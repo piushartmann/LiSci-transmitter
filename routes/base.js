@@ -102,5 +102,12 @@ module.exports = (db) => {
         });
     });
 
+    router.get('/noInternet', async (req, res) => {
+        const permissions = await db.getUserPermissions(req.session.userID);
+        return res.render('noInternet', {
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic')
+        });
+    });
+
     return router;
 }

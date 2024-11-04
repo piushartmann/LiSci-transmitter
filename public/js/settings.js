@@ -1,7 +1,4 @@
-let registration = null;
-
 document.addEventListener('DOMContentLoaded', async () => {
-    await registerServiceWorker();
     button = document.getElementById('enablePush');
     if (button) button.addEventListener('click', enablePush);
 
@@ -73,29 +70,14 @@ function changePushPreference(type, value) {
     });
 }
 
-async function registerServiceWorker() {
-    // A service worker must be registered in order to send notifications on iOS
-    if ('serviceWorker' in navigator) {
-        registration = await navigator.serviceWorker.register(
-            "push/serviceworker.js",
-            {
-                scope: "push/",
-            }
-        );
-    } else {
-        button = document.getElementById('enablePush');
-        button.disabled = true;
-    }
-    console.log("Service Worker registered with scope: ", registration);
-}
-
 async function enablePush() {
     const result = await window.Notification.requestPermission();
 
     if (result === "granted") {
+        const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.subscribe({
             applicationServerKey:
-                "BA6ytZNJcaQnbML4C9w17snFJ_S5KmOzQamZddcchIPuyVPMfDBhNNvzCVkyUMxraUa-mfi8wBHP1gkyCDl50QA",
+            "BA6ytZNJcaQnbML4C9w17snFJ_S5KmOzQamZddcchIPuyVPMfDBhNNvzCVkyUMxraUa-mfi8wBHP1gkyCDl50QA",
             userVisibleOnly: true,
         });
 

@@ -16,9 +16,9 @@ const MongoConnector = require('./MongoConnector').MongoConnector;
 
 connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
-
 const gamesDirectory = path.join(__dirname, "games")
 
+//load game config from manifest files
 let gameConfig = [];
 
 const files = fs.readdirSync(gamesDirectory);
@@ -45,9 +45,8 @@ gameConfig.reverse()
 
 console.log(gameConfig);
 
-//create express app
+//set up view engine and view directorys
 app.set('view engine', 'ejs')
-
 app.use(function (req, res, next) {
     let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
     gameConfig.forEach(config => {
@@ -57,15 +56,38 @@ app.use(function (req, res, next) {
     next()
 })
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.set('etag', 'strong'); 
+
+//set up static files
+app.use(express.static(path.join(__dirname, 'public'), {
+    setHeaders: function (res, path) {
+        if (path.endsWith(".svg") || path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+            res.setHeader("Cache-Control", "public, max-age=86400");
+        }
+        else{
+            res.setHeader('Cache-Control', 'public, no-cache');
+        }
+    }
+}));
 
 gameConfig.forEach(config => {
     app.use("/"+config.url, express.static(path.join(__dirname, 'games', config.url, (config.public || 'public'))));
 })
 
+//use body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+//set http headers
+app.use(function (req, res, next) {
+    const csp = res.getHeader("Content-Security-Policy") || "";
+    const newCsp = csp ? `${csp}; script-src 'self' 'unsafe-inline'` : "script-src 'self' 'unsafe-inline'";
+    res.setHeader("Content-Security-Policy", newCsp);
+
+    return next();
+});
+
+//use dotenv in development environment
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 //use db to store session

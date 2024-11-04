@@ -311,14 +311,14 @@ function loadLanguage() {
         fetchLanguageFile(language);
     }
     else {
-        console.log('Loading language from local storage');
+        //console.log('Loading language from local storage');
         applyLanguage(JSON.parse(localStorage.getItem('languageFile')));
         fetchLanguageFile(language, true);
     }
 }
 
 function fetchLanguageFile(language, redraw = false) {
-    console.log('Loading language file for ' + language);
+    //console.log('Loading language file for ' + language);
     const languageFile = `/languages/${language}.json`;
     fetch(languageFile)
         .then(response => response.json())
@@ -393,7 +393,7 @@ function applyLanguage(languageFile, redraw = false) {
             convertedItems.push(element);
         });
 
-        console.log(`Applied ${totalChanges} language changes`);
+        //console.log(`Applied ${totalChanges} language changes`);
     }
 
     applyLanguageToString("data-lang-content", "textContent");
@@ -424,13 +424,36 @@ function resolveLanguageContent(key) {
 const isInStandaloneMode = () =>
     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            if (registrations.length === 0) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/serviceworker.js')
+                        .then(registration => {
+                            console.log('Service Worker registered');
+                        })
+                        .catch(error => {
+                            console.error('Service Worker registration failed:', error);
+                        });
+                });
+            } else {
+                console.log('Service Worker already registered');
+            }
+        }).catch(error => {
+            console.error('Error checking Service Worker registrations:', error);
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     loadLanguage();
-
-    makeDiscoverable();
     if (isInStandaloneMode()) {
         addPWABar();
     }
+
+    makeDiscoverable();
+    registerServiceWorker();
 
     var modal = document.getElementById('modal');
 
