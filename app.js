@@ -53,6 +53,7 @@ app.use(function (req, res, next) {
     gameConfig.forEach(config => {
         if (req.path.includes(config.url)) views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
     })
+    console.log(views)
     app.set('views', views);
     next()
 })
