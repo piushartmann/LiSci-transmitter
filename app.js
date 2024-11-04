@@ -46,23 +46,16 @@ gameConfig.reverse()
 console.log(gameConfig);
 
 //create express app
-app.set('view engine', 'ejs')
-
-app.use(function (req, res, next) {
-    let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
-    gameConfig.forEach(config => {
-        if (req.path.includes(config.url)) views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
-    })
-    console.log(views)
-    app.set('views', views);
-    next()
-})
+app.set('view engine', 'ejs'
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
 gameConfig.forEach(config => {
     app.use("/"+config.url, express.static(path.join(__dirname, 'games', config.url, (config.public || 'public'))));
+    views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
 })
+app.set('views', views);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
