@@ -4,7 +4,7 @@
     "description": "Klassisches Sudoku",
     "singleplayer": true,
     "multiplayer": false,
-    "ejs": "sudoku.ejs",
+    "ejs": "sudoku",
     "priority": 10,
     "enabled": true
 }
