@@ -23,8 +23,12 @@
     </nav>
 
     <div class="header-button">
-      <p class="defaultProfilePicture profilePicture" style="background-color: <%= profilePic.content%>;">
-        <%= username.charAt(0).toUpperCase() %>
+      <% if (profilePic) { %>
+        <p class="defaultProfilePicture profilePicture" style="background-color:  <%= profilePic.content %>;">
+      <% } else { %>
+        <p class="defaultProfilePicture profilePicture" style="background-color: #9d9d9d";>
+      <% } %>
+        <%= (username || "anonymous").charAt(0).toUpperCase() %>
       </p>
     </div>
 
