@@ -156,7 +156,7 @@ function createInviteLink(game) {
                     copyLink.innerText = "Copied!";
                 }
             }
-            loadLanguage();
+            loadLanguage(true);
         }
     });
 }

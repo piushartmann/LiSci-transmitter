@@ -27,9 +27,22 @@ module.exports = (db) => {
 
         if (currentPage > pages) currentPage = 1;
         const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
+        const prefetches = [
+            "/icons/view.svg",
+            "/icons/edit.svg",
+            "/icons/delete.svg",
+            "/icons/comment-unfilled.svg",
+            "/icons/comment-filled.svg",
+            "/css/sections.css",
+            "/js/partials/commentRenderer.js",
+            "/js/partials/postRenderer.js",
+            "js/index.js",
+            "/internal/getPosts?page=1&filter=all",
+            "/internal/getPosts?page=1&filter=news"
+        ];
         return res.render('index', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            currentPage: currentPage, prank: prank, pages: pages
+            currentPage: currentPage, prank: prank, pages: pages, prefetches: prefetches
         });
     });
 
@@ -73,9 +86,16 @@ module.exports = (db) => {
         const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
         if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
+        const prefetches = [
+            "/css/citations.css",
+            "/css/autocomplete.css",
+            "/js/citations.js",
+            "/js/partials/autocomplete.js",
+            "/internal/getCitations?page=1"
+        ];
         return res.render('citations', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            currentPage: currentPage, pages: pages
+            currentPage: currentPage, pages: pages, prefetches: prefetches
 
         });
     });
@@ -85,9 +105,19 @@ module.exports = (db) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
+        const prefetches = [
+            "/css/settings.css",
+            "/js/settings.js",
+        ];
+
+        if (permissions.includes("admin")) {
+            prefetches.push("/css/adminSettings.css");
+            prefetches.push("/js/adminSettings.js");
+        }
+
         return res.render('settings', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID)
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID), prefetches: prefetches
         });
     });
 

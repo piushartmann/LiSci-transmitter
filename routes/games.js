@@ -40,9 +40,14 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
 
+        const prefetches = [
+            "/css/games.css",
+            "/js/games.js",
+        ];
+
         return res.render('games', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            games: gameConfigs
+            games: gameConfigs, prefetches: prefetches
         });
     });
 

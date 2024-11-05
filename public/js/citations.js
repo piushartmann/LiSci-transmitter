@@ -21,7 +21,7 @@ function loadCitations(page) {
         .then(data => {
             data.forEach(citation => {
                 buildCitation(citation);
-                loadLanguage();
+                loadLanguage(true);
             });
         });
 }

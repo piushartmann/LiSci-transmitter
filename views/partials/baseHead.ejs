@@ -1,6 +1,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="prefetch" href="/js/other/marked.min.js" />
+<link rel="prefetch" href="/js/partials/header.js" />
+<link rel="prefetch" href="/js/base.js" />
+<link rel="prefetch" href="/css/style.css" />
+<link rel="prefetch" href="/manifest.json" />
+<link rel="prefetch" href="/images/favicon.jpg" />
+<link rel="prefetch" href="/images/splashScreen.png" />
+<link rel="prefetch" href="/images/logo.png" />
+<link rel="prefetch" href="/css/headers.css" />
+<link rel="prefetch" href="/css/colors.css" />
+<link rel="prefetch" href="/icons/menu.svg" />
+<link rel="prefetch" href="/icons/settings.svg" />
+<link rel="prefetch" href="/icons/logout.svg" />
+
+<% if (typeof prefetches !== "undefined") { %>
+  <% for( let i = 0; i < prefetches.length; i++ ) { %>
+    <link rel="prefetch" href="<%= prefetches[i] %>" />
+  <% } %>
+<% } %>
+
 <script src="/js/other/marked.min.js"></script>
 <script src="/js/partials/header.js"></script>
 <link rel="stylesheet" href="/css/style.css">

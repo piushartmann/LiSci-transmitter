@@ -23,7 +23,7 @@ function renderComments(post) {
         textarea.placeholder = "Please log in to comment";
     }
 
-    loadLanguage()
+    loadLanguage(true);
 }
 
 function hideComments() {

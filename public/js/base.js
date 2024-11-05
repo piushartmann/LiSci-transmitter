@@ -304,16 +304,17 @@ function openModal(content) {
     commentModal.style.display = 'block';
 }
 
-function loadLanguage() {
+function loadLanguage(update = false) {
     const language = (localStorage.getItem('language') || navigator.language || navigator.userLanguage).split('-')[0];
-    //TODO: remove true to force reload
     if (localStorage.getItem('language') !== language || localStorage.getItem('languageFile') == null) {
         fetchLanguageFile(language);
     }
     else {
         //console.log('Loading language from local storage');
         applyLanguage(JSON.parse(localStorage.getItem('languageFile')));
-        fetchLanguageFile(language, true);
+        if (!update) {
+            fetchLanguageFile(language);
+        }
     }
 }
 
@@ -424,6 +425,7 @@ function resolveLanguageContent(key) {
 const isInStandaloneMode = () =>
     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
+let serviceworker;
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -432,6 +434,7 @@ function registerServiceWorker() {
                     navigator.serviceWorker.register('/serviceworker.js')
                         .then(registration => {
                             console.log('Service Worker registered');
+                            serviceworker = registration;
                         })
                         .catch(error => {
                             console.error('Service Worker registration failed:', error);
