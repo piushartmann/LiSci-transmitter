@@ -65,10 +65,10 @@
 
   <% if (typeof isSettingsPage == "undefined") { %>
   <div class="content">
-    <a href="/settings" class="button">
+    <button onclick="window.location.href='/settings'" class="button">
       <img class="icon" src="/icons/settings.svg"></img>
       <label class="button-label" data-lang-content="header settings"></label>
-    </a>
+    </button>
   </div>
   <% } %>
 
