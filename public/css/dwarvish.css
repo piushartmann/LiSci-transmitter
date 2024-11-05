@@ -1,0 +1,8 @@
+* {
+    font-family: 'Dwarvish Regular';
+}
+
+@font-face {
+    font-family: 'Dwarvish Regular';
+    src: url(/languages/fonts/dwarvishregular.ttf) format('truetype')
+}

@@ -1,0 +1,118 @@
+{
+    "header": {
+        "home": "HOmE",
+        "citations": "CItAtIOns",
+        "games": "GAmEs",
+        "about": "AbOUt",
+        "create": "NEw POst",
+        "settings": "SEttIngs",
+        "logout": "LOgOUt",
+        "login": "LOgIn"
+    },
+    "login_form": {
+        "username": "UsErnAmE",
+        "password": "PAsswOrd",
+        "cancel": "CAncEl"
+    },
+    "comment_modal": {
+        "title": "COmmEnts",
+        "new_comment": "MAkE A nEw cOmmEnt:",
+        "submit": "COmmEnt",
+        "comment_placeholder": "ThAts thE fUnnIEst thIng I'vE EvEr sEEn!"
+    },
+    "interaction": {
+        "edit": "EdIt",
+        "delete": "DElEtE",
+        "save": "SAvE",
+        "cancel": "CAncEl",
+        "likes": "LIkEs",
+        "comments": "COmmEnts"
+    },
+    "citations": {
+        "new": {
+            "title": "MAkE A nEw CItAtIOn",
+            "sentence": {
+                "0": "HErr TrEEtzEn",
+                "1": "sAId",
+                "2": "A fUnny qUOtE",
+                "3": "."
+            },
+            "submit": "SUbmIt"
+        },
+        "title": "CItAtIOns"
+    },
+    "posts": {
+        "file_view_fallback": "DAtEI AnzEIgEn",
+        "only_show_news": "Only shOw nEws"
+    },
+    "create": {
+        "post": {
+            "title": "TItlE",
+            "placeholder": "ThE LIfE-ScIEncE PrOfIlE Is On An AdvEntUrE AgAIn",
+            "teacher_can_see": "TEAchEr cAn sEE thIs pOst",
+            "is_news": "ThIs Is A nEws pOst",
+            "submit": "SUbmIt",
+            "save": "SAvE"
+        },
+        "sections": {
+            "select_section": "SElEct SEctIOn TypE",
+            "text": "TExt",
+            "image": "ImAgE",
+            "file": "FIlE",
+            "markdown": "MArkdOwn"
+        }
+    },
+    "settings": {
+        "title": "SEttIngs",
+        "push": {
+            "title": "PUsh-NOtIfIcAtIOns",
+            "title_to_this_device": "PUsh-NOtIfIcAtIOns tO thIs dEvIcE",
+            "checkboxes": {
+                "news": "NEws",
+                "posts": "POsts",
+                "citations": "CItAtIOns (cOmIng sOOn)",
+                "comments": "COmmEnts (cOmIng sOOn)"
+            }
+        },
+        "pick_profile_picture": "PIck prOfIlE pIctUrE cOlOr",
+        "api_key": "API KEy",
+        "language": "LAngUAgE"
+    },
+    "admin_settings": {
+        "title": "AdmIn SEttIngs",
+        "create_user": {
+            "title": "CrEAtE UsEr",
+            "username": "UsErnAmE",
+            "password": "PAsswOrd",
+            "create": "CrEAtE"
+        },
+        "edit_user": {
+            "title": "EdIt UsEr",
+            "username": "UsErnAmE"
+        }
+    },
+    "games": {
+        "request": {
+            "title": "GAmE REqUEst",
+            "message": "DO yOU wAnt tO plAy {gAmE} wIth {UsErnAmE}?",
+            "accept": "AccEpt",
+            "decline": "DEclInE"
+        },
+        "selector": {
+            "play_singleplayer": "SInglEplAyEr",
+            "search_for_others": "SEArch fOr OthEr plAyErs",
+            "modal": {
+                "title": "SElEct PlAyEr",
+                "create_invite": "CrEAtE A nEw InvItE LInk tO plAy wIth AnOnymOUs plAyErs",
+                "copy_link": "COpy LInk"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": "SEttIngs",
+                "show_errors": "ShOw ErrOrs",
+                "prevent_errors": "PrEvEnt ErrOrs"
+            }
+        }
+    }
+}

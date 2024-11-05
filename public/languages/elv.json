@@ -1,0 +1,118 @@
+{
+    "header": {
+        "home": " Home",
+        "citations": " CitatiOns",
+        "games": " Games",
+        "about": " AboUt",
+        "create": " New Post",
+        "settings": " Settings",
+        "logout": " LogoUt",
+        "login": " Login"
+    },
+    "login_form": {
+        "username": " Username",
+        "password": " Password",
+        "cancel": " Cancel"
+    },
+    "comment_modal": {
+        "title": " Comments",
+        "new_comment": " Make A new comment:",
+        "submit": " Comment",
+        "comment_placeholder": " Thats the funniEst thing I've Ever seEn!"
+    },
+    "interaction": {
+        "edit": " Edit",
+        "delete": " Delete",
+        "save": " Save",
+        "cancel": " Cancel",
+        "likes": " Likes",
+        "comments": " Comments"
+    },
+    "citations": {
+        "new": {
+            "title": " Make A new CitatiOn",
+            "sentence": {
+                "0": " Herr TreEtzen",
+                "1": " saId",
+                "2": " A funny quOte",
+                "3": " ."
+            },
+            "submit": " Submit"
+        },
+        "title": " CitatiOns"
+    },
+    "posts": {
+        "file_view_fallback": " DateI AnzeIgen",
+        "only_show_news": " Only show news"
+    },
+    "create": {
+        "post": {
+            "title": " Title",
+            "placeholder": " The Life-SciEnce Profile Is On An Adventure AgaIn",
+            "teacher_can_see": " TeAcher can seE this post",
+            "is_news": " This Is A news post",
+            "submit": " Submit",
+            "save": " Save"
+        },
+        "sections": {
+            "select_section": " Select SectiOn Type",
+            "text": " Text",
+            "image": " Image",
+            "file": " File",
+            "markdown": " Markdown"
+        }
+    },
+    "settings": {
+        "title": " Settings",
+        "push": {
+            "title": " Push-NotificatiOns",
+            "title_to_this_device": " Push-NotificatiOns to this device",
+            "checkboxes": {
+                "news": " News",
+                "posts": " Posts",
+                "citations": " CitatiOns (coming seOn)",
+                "comments": " Comments (coming seOn)"
+            }
+        },
+        "pick_profile_picture": " Pic profile picture color",
+        "api_key": " API Key",
+        "language": " LanguAge"
+    },
+    "admin_settings": {
+        "title": " Admin Settings",
+        "create_user": {
+            "title": " CreAte User",
+            "username": " Username",
+            "password": " Password",
+            "create": " CreAte"
+        },
+        "edit_user": {
+            "title": " Edit User",
+            "username": " Username"
+        }
+    },
+    "games": {
+        "request": {
+            "title": " Game RequEst",
+            "message": " Do yoU want to play {game} with {username}?",
+            "accept": " Accept",
+            "decline": " Decline"
+        },
+        "selector": {
+            "play_singleplayer": " Singleplayer",
+            "search_for_others": " SeArch for Other players",
+            "modal": {
+                "title": " Select Player",
+                "create_invite": " CreAte A new Invite Link to play with AnonymoUs players",
+                "copy_link": " Copy Link"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": " Settings",
+                "show_errors": " Show Errors",
+                "prevent_errors": " Prevent Errors"
+            }
+        }
+    }
+}

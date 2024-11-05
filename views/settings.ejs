@@ -66,6 +66,8 @@
         <option value="en" <%= preferences.find(p => p.key === 'language')?.value === 'en' ? 'selected' : '' %>>English</option>
         <option value="pl" <%= preferences.find(p => p.key === 'language')?.value === 'pl' ? 'selected' : '' %>>Polski (ai)</option>
         <option value="tlh" <%= preferences.find(p => p.key === 'language')?.value === 'tlh' ? 'selected' : '' %>>Klingon (ai)</option>
+        <option value="elv" <%= preferences.find(p => p.key === 'language')?.value === 'elv' ? 'selected' : '' %>>Elvish</option>
+        <option value="dwa" <%= preferences.find(p => p.key === 'language')?.value === 'dwa' ? 'selected' : '' %>>Dwarvish</option>
       </select>
     </div>
 

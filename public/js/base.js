@@ -341,6 +341,18 @@ function fetchLanguageFile(language, redraw = false) {
             if (localStorage.getItem('languageFile') === null || localStorage.getItem('languageFile') !== data) {
                 localStorage.setItem('languageFile', JSON.stringify(data));
             }
+
+            if (language === 'elv') {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '/css/elvish.css';
+                document.head.appendChild(link);
+            }else if (language === 'dwa') {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '/css/dwarvish.css';
+                document.head.appendChild(link);
+            }
         })
         .catch(error => {
             console.log('Could not load requested language file ' + languageFile);

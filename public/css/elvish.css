@@ -1,0 +1,8 @@
+* {
+    font-family: 'Tengwar Feanor Regular';
+}
+
+@font-face {
+    font-family: 'Tengwar Feanor Regular';
+    src: url(/languages/fonts/tengwarfeanorregular.ttf) format('truetype')
+}
