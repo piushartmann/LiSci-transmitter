@@ -32,22 +32,12 @@ self.addEventListener('fetch', function (event) {
                     console.log('Page: ', url.pathname, ' served from cache');
                     return new Response(response.body, { headers: response.headers, status: response.status, statusText: response.statusText });
                 };
-                
+
             })
         );
         return;
     }
 
-    event.respondWith(
-        fetch(event.request).catch(function () {
-            return caches.match("/noInternet").then(function (response) {
-                if (response) {
-                    console.log('Page: ', url.pathname, ' served from cache');
-                    return new Response(response.body, { headers: response.headers, status: response.status, statusText: response.statusText });
-                }
-            });
-        })
-    );
 
 });
 

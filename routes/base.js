@@ -36,9 +36,7 @@ module.exports = (db) => {
             "/css/sections.css",
             "/js/partials/commentRenderer.js",
             "/js/partials/postRenderer.js",
-            "js/index.js",
-            "/internal/getPosts?page=1&filter=all",
-            "/internal/getPosts?page=1&filter=news"
+            "js/index.js"
         ];
         return res.render('index', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
@@ -90,8 +88,7 @@ module.exports = (db) => {
             "/css/citations.css",
             "/css/autocomplete.css",
             "/js/citations.js",
-            "/js/partials/autocomplete.js",
-            "/internal/getCitations?page=1"
+            "/js/partials/autocomplete.js"
         ];
         return res.render('citations', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
