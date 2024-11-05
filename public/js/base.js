@@ -221,7 +221,8 @@ function makeDiscoverable() {
         }
     }
     gamesWS.onclose = () => {
-        console.log('Disconnected from server');
+        console.log('Disconnected from server. Reconnecting...');
+        makeDiscoverable();
     }
 
     function buildGameRequest(ws, game, user, username) {

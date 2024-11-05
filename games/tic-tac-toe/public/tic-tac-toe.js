@@ -1,5 +1,6 @@
 let yourTurn = false;
 let gameID = null;
+let ws;
 
 const gameHTML = `<div class="inner game">
 <div class="inner square top left"></div>
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParts = window.location.pathname.split('/');
     gameID = urlParts[urlParts.length - 1];
 
-    const ws = connectToWS(gameID);
+    connectToWS(gameID);
 
     const squares = Array.from(document.getElementsByClassName('playable'));
     squares.forEach(square => {
@@ -168,7 +169,7 @@ function gameOver(status) {
 }
 
 function connectToWS(gameID) {
-    const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/tic-tac-toe/${gameID}`);
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/tic-tac-toe/${gameID}`);
     ws.onopen = () => {
         console.log('Connected to server');
     }
@@ -187,6 +188,7 @@ function connectToWS(gameID) {
     }
     ws.onclose = () => {
         console.log('Disconnected from server');
+        connectToWS(gameID);
     }
     return ws;
 }

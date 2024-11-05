@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const urlParts = window.location.pathname.split('/');
     gameID = urlParts[urlParts.length - 1];
 
-    ws = connectToWS(gameID);
+    connectToWS(gameID);
 
     window.addEventListener("focus", () => {
         if (typeof ws !== 'undefined') return;
@@ -77,7 +77,7 @@ function deleteGame() {
 }
 
 function connectToWS(gameID) {
-    const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/sudoku/${gameID}`);
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/sudoku/${gameID}`);
 
     const showErrorsCheckbox = document.getElementById('showErrors');
     const preventErrorsCheckbox = document.getElementById('preventErrors');
@@ -101,6 +101,7 @@ function connectToWS(gameID) {
     }
     ws.onclose = () => {
         console.log('Disconnected from server');
+        connectToWS(gameID);
     }
     return ws;
 }
