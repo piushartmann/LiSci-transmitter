@@ -22,6 +22,10 @@ function versioningCalc(res, html, view, send) {
         const versionedPrefetches = [];
         prefetches.forEach(prefetchURL => {
             const file = path.join(__dirname, 'public', prefetchURL);
+            if (!fs.existsSync(file)) {
+                versionedPrefetches.push(prefetchURL);
+                return;
+            }
             const fileHash = require('crypto').createHash('md5').update(fs.readFileSync(file)).digest('hex');
             versionedPrefetches.push(`${prefetchURL}?v=${fileHash}`);
         });

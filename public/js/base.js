@@ -184,6 +184,7 @@ function iosPWASplash(t, e = "white") {
         }
 }
 
+let gameWS;
 function makeDiscoverable() {
     gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
     gamesWS.onopen = () => {
@@ -510,7 +511,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addPWABar();
     }
 
-    if (!(loggedIn == false)) {
+    if (typeof loggedIn !== "undefined" && !(loggedIn == false)) {
         makeDiscoverable();
     }
     registerServiceWorker();

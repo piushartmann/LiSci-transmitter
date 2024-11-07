@@ -85,7 +85,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //set http headers
 app.use(function (req, res, next) {
     const csp = res.getHeader("Content-Security-Policy") || "";
-    const newCsp = csp ? `${csp}; script-src 'self' 'unsafe-inline'` : "script-src 'self' 'unsafe-inline'";
+    const newCsp = csp ? `${csp}; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com` : "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com";
     res.setHeader("Content-Security-Policy", newCsp);
     return next();
 });
