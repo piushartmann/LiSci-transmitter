@@ -221,7 +221,10 @@ function makeDiscoverable() {
         }
     }
     gamesWS.onclose = () => {
-        console.log('Disconnected from server. Reconnecting...');
+        console.log('Disconnected from server. Reconnecting in 5 seconds');
+        setTimeout(() => {
+            makeDiscoverable();
+        }, 5000);
     }
 
     function buildGameRequest(ws, game, user, username) {
@@ -345,12 +348,12 @@ function fetchLanguageFile(language, redraw = false) {
             if (language === 'elv') {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
-                link.href = '/css/elvish.css';
+                link.href = '/css/languages/elvish.css';
                 document.head.appendChild(link);
             } else if (language === 'dwa') {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
-                link.href = '/css/dwarvish.css';
+                link.href = '/css/languages/dwarvish.css';
                 document.head.appendChild(link);
             }
         })
@@ -507,7 +510,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         addPWABar();
     }
 
-    makeDiscoverable();
+    if (!(loggedIn == false)) {
+        makeDiscoverable();
+    }
     registerServiceWorker();
 
     setupModal();

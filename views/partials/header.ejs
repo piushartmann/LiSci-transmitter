@@ -7,7 +7,6 @@
 
   <nav class="header-nav">
     <ul>
-      <li><a href="/" data-lang-content="header home"></a></li>
       <!-- <li><a href="/archive">Archiv</a></li> -->
       <% if (usertype.includes("classmate")) { %>
       <li><a href="/citations" data-lang-content="header citations"></a></li>
@@ -15,6 +14,7 @@
       <% if (usertype.includes("games")) { %>
       <li><a href="/games" data-lang-content="header games"></a></li>
       <% } %>
+      
       <li><a href="/about" data-lang-content="header about"></a></li>
     </ul>
   </nav>
@@ -30,8 +30,6 @@
       <%= username.charAt(0).toUpperCase() %>
     </p>
     <% } %>
-    <% } else { %>
-    <button id="login-button" onclick="showLoginPopup()" data-lang-content="header login"></button>
     <% } %>
 
     <button class="mobileMenuButton" onclick="toggleMobileMenu()">
@@ -46,20 +44,7 @@
 </header>
 
 
-<div class="login-popup" id="loginPopup">
-  <div class="login-popup-content">
-    <p id="login-popup-title" data-lang-content="header login"></p>
-    <form method="post" action="internal/login">
-      <input type="text" name="username" placeholder="Username" autocomplete="username" data-lang-content-placeholder="login_form username">
-      <input type="password" name="password" placeholder="Password" autocomplete="current-password" data-lang-content-placeholder="login_form password">
 
-      <div class="submit-button-container">
-        <button type="button" class="cancel-button" onclick="hideLoginPopup()" data-lang-content="login_form cancel"></button>
-        <input type="submit" class="submit-login" data-lang-content-value="header login">
-      </div>
-    </form>
-  </div>
-</div>
 
 <div class="userMenu" id="userMenu" style="display: none">
 
@@ -82,7 +67,6 @@
 
 <div class="mobileMenu" id="mobileMenu" style="display: none">
   <ul>
-    <li><a href="/" data-lang-content="header home"></a></li>
     <!-- <li><a href="/archive">Archiv</a></li> -->
     <% if (usertype.includes("classmate")) { %>
     <li><a href="/citations" data-lang-content="header citations"></a></li>
@@ -101,8 +85,6 @@
     <% if (loggedIn) { %>
     <li><a href="/settings" data-lang-content="header settings"></a></li>
     <li><a href="#" onclick="logout()" data-lang-content="header logout"></a></li>
-    <% } else { %>
-    <li><a href="#" onclick="showLoginPopup()" data-lang-content="header login"></a></li>
     <% } %>
   </ul>
 </div>
