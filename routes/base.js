@@ -49,7 +49,7 @@ module.exports = (db) => {
             res.locals.additionalPrefetches = basePrefetches.concat([
 
             ])
-            return res.render('loggedOut', {
+            return res.render('landing', {
                 loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
             });
         }

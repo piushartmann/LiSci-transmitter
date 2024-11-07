@@ -19,19 +19,3 @@
 <script>
   iosPWASplash('/images/splashScreen.png', '#ffffff');
 </script>
-
-<script type="speculationrules">
-  {
-    "prerender": [
-      {
-        "where": {
-          "and": [
-            { "href_matches": "/*" },
-            { "not": { "selector_matches": ".no-prerender" } }
-          ]
-        },
-        "eagerness": "eager"
-      }
-    ]
-  }
-</script>

@@ -184,7 +184,7 @@ function iosPWASplash(t, e = "white") {
         }
 }
 
-let gameWS;
+let gamesWS;
 function makeDiscoverable() {
     gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
     gamesWS.onopen = () => {
@@ -522,6 +522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.addEventListener("focus", () => {
-    if (typeof gamesWS !== 'undefined') return;
-    gamesWS.connect();
+    if (typeof gamesWS !== 'undefined' && gamesWS.readyState === WebSocket.CLOSED) {
+        makeDiscoverable();
+    }
 });
