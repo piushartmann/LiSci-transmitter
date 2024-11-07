@@ -222,7 +222,6 @@ function makeDiscoverable() {
     }
     gamesWS.onclose = () => {
         console.log('Disconnected from server. Reconnecting...');
-        makeDiscoverable();
     }
 
     function buildGameRequest(ws, game, user, username) {
@@ -340,6 +339,7 @@ function fetchLanguageFile(language, redraw = false) {
 
             if (localStorage.getItem('languageFile') === null || localStorage.getItem('languageFile') !== data) {
                 localStorage.setItem('languageFile', JSON.stringify(data));
+                applyLanguage(data, true);
             }
 
             if (language === 'elv') {
@@ -347,7 +347,7 @@ function fetchLanguageFile(language, redraw = false) {
                 link.rel = 'stylesheet';
                 link.href = '/css/elvish.css';
                 document.head.appendChild(link);
-            }else if (language === 'dwa') {
+            } else if (language === 'dwa') {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
                 link.href = '/css/dwarvish.css';
@@ -438,39 +438,7 @@ function resolveLanguageContent(key) {
 const isInStandaloneMode = () =>
     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
-let serviceworker;
-function registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-            if (registrations.length === 0) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/serviceworker.js')
-                        .then(registration => {
-                            console.log('Service Worker registered');
-                            serviceworker = registration;
-                        })
-                        .catch(error => {
-                            console.error('Service Worker registration failed:', error);
-                        });
-                });
-            } else {
-                console.log('Service Worker already registered');
-            }
-        }).catch(error => {
-            console.error('Error checking Service Worker registrations:', error);
-        });
-    }
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    loadLanguage();
-    if (isInStandaloneMode()) {
-        addPWABar();
-    }
-
-    makeDiscoverable();
-    registerServiceWorker();
-
+function setupModal() {
     var modal = document.getElementById('modal');
 
     if (modal) {
@@ -491,6 +459,60 @@ document.addEventListener('DOMContentLoaded', async () => {
             hideModal();
         });
     }
+}
+
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            if (registrations.length === 0) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/serviceworker.js')
+                        .then(() => {
+                            console.log('Service Worker registered');
+                        })
+                        .catch(error => {
+                            console.error('Service Worker registration failed:', error);
+                        });
+                });
+            } else {
+                registrations.forEach(registration => {
+                    registration.update();
+                    console.log('Service Worker updated');
+                });
+            }
+        }).catch(error => {
+            console.error('Error checking Service Worker registrations:', error);
+        });
+    }
+}
+
+function checkVersion() {
+    if (typeof version !== 'undefined' && localStorage.getItem('version') !== version.toString()) {
+        localStorage.setItem('version', version.toString());
+        cacheBust();
+    }
+}
+
+function cacheBust() {
+    console.log('Busting cache');
+    caches.keys().then(function (names) {
+        for (let name of names) caches.delete(name);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    checkVersion();
+    loadLanguage();
+    if (isInStandaloneMode()) {
+        addPWABar();
+    }
+
+    makeDiscoverable();
+    registerServiceWorker();
+
+    setupModal();
+
+    console.log('Base script loaded!');
 });
 
 window.addEventListener("focus", () => {

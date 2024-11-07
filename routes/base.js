@@ -1,4 +1,6 @@
 const { Router } = require('express');
+const path = require('path');
+const fs = require('fs');
 const { MongoConnector } = require('../MongoConnector');
 const router = Router();
 
@@ -7,10 +9,73 @@ const router = Router();
  * @returns {Router} The router instance.
  */
 
+function versionPrefetches(prefetches) {
+    const versionedPrefetches = [];
+    prefetches.forEach(prefetchURL => {
+        const file = path.join(__dirname, '..', 'public', prefetchURL);
+        const fileHash = require('crypto').createHash('md5').update(fs.readFileSync(file)).digest('hex');
+        versionedPrefetches.push(`${prefetchURL}?v=${fileHash}`);
+    });
+    return versionedPrefetches;
+}
+
+function extractSrcs(view) {
+    const indexFilePath = path.join(__dirname, '..', 'views', view + '.ejs');
+    let indexFileContent = fs.readFileSync(indexFilePath, 'utf-8');
+
+    // Resolve dependencies
+    const includeRegex = /<%- include\((.*?)\) %>/g;
+    let includeMatch;
+    while ((includeMatch = includeRegex.exec(indexFileContent)) !== null) {
+        const includePath = path.join(__dirname, '..', 'views', includeMatch[1].replace(/['"]/g, ''));
+        const includeContent = fs.readFileSync(includePath, 'utf-8');
+        indexFileContent = indexFileContent.replace(includeMatch[0], includeContent);
+    }
+
+    // Extract srcs
+    const srcRegex = /<script.*?src="(.*?)"/g;
+    const imgRegex = /<img.*?src="(.*?)"/g;
+    const hrefRegex = /<link(?!.*rel="prefetch").*?href="(.*?)"/g;
+    const srcs = [];
+    let match;
+
+    while ((match = srcRegex.exec(indexFileContent)) !== null) {
+        srcs.push(match[1]);
+    }
+
+    while ((match = hrefRegex.exec(indexFileContent)) !== null) {
+        srcs.push(match[1]);
+    }
+
+    while ((match = imgRegex.exec(indexFileContent)) !== null) {
+        srcs.push(match[1]);
+    }
+
+    return srcs;
+}
+
+function makePrefetches(view, additionalPrefetches = []) {
+    const srcs = extractSrcs(view);
+    const prefetches = srcs.concat(additionalPrefetches);
+    const versionedPrefetches = versionPrefetches(prefetches)
+    const fetches = {};
+    prefetches.forEach((prefetch, index) => {
+        fetches[prefetch] = versionedPrefetches[index];
+    });
+    return { versionedPrefetches, fetches };
+}
+
 module.exports = (db) => {
     const config = require('../config.json');
     const postsPageSize = config.postsPageSize;
     const citationsPageSize = config.citationsPageSize;
+    const version = process.env.VERSION;
+    const basePrefetches = [
+        "/css/headers.css",
+        "/css/colors.css",
+        "/images/splashScreen.png",
+        "/images/appIcon.jpg"
+    ];
 
     router.get('/', async (req, res) => {
         let currentPage = req.query.page || 1;
@@ -27,30 +92,36 @@ module.exports = (db) => {
 
         if (currentPage > pages) currentPage = 1;
         const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
-        const prefetches = [
-            "/icons/view.svg",
-            "/icons/edit.svg",
-            "/icons/delete.svg",
-            "/icons/comment-unfilled.svg",
-            "/icons/comment-filled.svg",
-            "/css/sections.css",
-            "/js/partials/commentRenderer.js",
-            "/js/partials/postRenderer.js",
-            "js/index.js"
-        ];
-        return res.render('index', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            currentPage: currentPage, prank: prank, pages: pages, prefetches: prefetches
-        });
+
+        if (req.session.userID) {
+            res.locals.additionalPrefetches = basePrefetches.concat([
+
+            ])
+            return res.render('index', {
+                loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+                currentPage: currentPage, prank: prank, pages: pages
+            });
+        } else {
+            res.locals.additionalPrefetches = basePrefetches.concat([
+
+            ])
+            return res.render('loggedOut', {
+                loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+            });
+        }
+
     });
 
     router.get('/create', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
         if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot create a new Post");
-
+        
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('create', {
-            loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+            loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
             isCreatePage: true, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
     });
@@ -62,17 +133,24 @@ module.exports = (db) => {
 
         const postID = req.params.postID;
         const post = await db.getPost(postID);
-
+        
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('create', {
-            loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+            loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
             isCreatePage: true, post: post, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
     });
 
     router.get('/post/:id', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
+
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('postFullscreen', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
             postID: req.params.id
         });
     });
@@ -84,15 +162,12 @@ module.exports = (db) => {
         const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
         if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
-        const prefetches = [
-            "/css/citations.css",
-            "/css/autocomplete.css",
-            "/js/citations.js",
-            "/js/partials/autocomplete.js"
-        ];
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('citations', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            currentPage: currentPage, pages: pages, prefetches: prefetches
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+            currentPage: currentPage, pages: pages
 
         });
     });
@@ -102,18 +177,11 @@ module.exports = (db) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
-        const prefetches = [
-            "/css/settings.css",
-            "/js/settings.js",
-        ];
-
-        if (permissions.includes("admin")) {
-            prefetches.push("/css/adminSettings.css");
-            prefetches.push("/js/adminSettings.js");
-        }
-
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('settings', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
             isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID), prefetches: prefetches
         });
     });
@@ -124,15 +192,23 @@ module.exports = (db) => {
 
     router.get('/about', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
+
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('about', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic')
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
         });
     });
 
     router.get('/noInternet', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
+
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
         return res.render('noInternet', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic')
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
         });
     });
 

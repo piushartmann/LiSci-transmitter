@@ -9,30 +9,48 @@ const bodyParser = require('body-parser');
 const webpush = require('web-push')
 const app = express();
 const ws = require('express-ws')(app);
+const versioning = require('./versioning');
 
 const oneDay = 24 * 3600 * 1000
 
 const MongoConnector = require('./MongoConnector').MongoConnector;
 
+//use dotenv in development environment
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+const randomVersion = true;
+
 connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
 const gamesDirectory = path.join(__dirname, "games")
 
+let version = revision = require('child_process')
+    .execSync('git rev-parse HEAD')
+    .toString().trim();
+
+if (randomVersion) {
+    version = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+console.log(`Running version ${version}`);
+
+process.env.VERSION = version;
+
 //load game config from manifest files
 let gameConfig = [];
 
-const files = fs.readdirSync(gamesDirectory);
-files.forEach(function (file, index) {
+const games = fs.readdirSync(gamesDirectory);
+games.forEach(function (file) {
     const fileDir = path.join(gamesDirectory, file);
     const stat = fs.statSync(fileDir);
 
     if (stat.isDirectory()) {
-        const innerFiles = fs.readdirSync(fileDir);
-        innerFiles.forEach(function (innerFile, innerIndex) {
-            if (innerFile === "manifest.json") {
-                const manifest = JSON.parse(fs.readFileSync(path.join(fileDir, innerFile)));
+        const gameFiles = fs.readdirSync(fileDir);
+        gameFiles.forEach(function (gameFile) {
+            if (gameFile === "manifest.json") {
+                const manifest = JSON.parse(fs.readFileSync(path.join(fileDir, gameFile)));
                 //console.log(manifest);
-                if (!(manifest.enabled==false)) {
+                if (!(manifest.enabled == false)) {
                     gameConfig.push(manifest);
                 }
             }
@@ -43,28 +61,25 @@ files.forEach(function (file, index) {
 gameConfig.sort((a, b) => a.priority - b.priority)
 gameConfig.reverse()
 
-console.log(gameConfig);
+console.log("Loaded games:", gameConfig.map(config => "'" + config.name + "'").join(", "));
 
 //create express app
 app.set('view engine', 'ejs');
 
-app.set('etag', 'strong'); 
+//set up versioning
+app.use(versioning.ejs);
 
 //set up static files
 app.use(express.static(path.join(__dirname, 'public'), {
     setHeaders: function (res, path) {
-        if (path.endsWith(".svg") || path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-            res.setHeader("Cache-Control", "public, max-age=86400");
-        }
-        else{
-            res.setHeader('Cache-Control', 'public, no-cache');
-        }
-    }
+        res.setHeader("Cache-Control", "public, max-age=86400");
+    },
+    
 }));
 
 let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
 gameConfig.forEach(config => {
-    app.use("/"+config.url, express.static(path.join(__dirname, 'games', config.url, (config.public || 'public'))));
+    app.use("/" + config.url, express.static(path.join(__dirname, 'games', config.url, (config.public || 'public'))));
     views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
 })
 app.set('views', views);
@@ -78,12 +93,8 @@ app.use(function (req, res, next) {
     const csp = res.getHeader("Content-Security-Policy") || "";
     const newCsp = csp ? `${csp}; script-src 'self' 'unsafe-inline'` : "script-src 'self' 'unsafe-inline'";
     res.setHeader("Content-Security-Policy", newCsp);
-
     return next();
 });
-
-//use dotenv in development environment
-dotenv.config({ path: path.join(__dirname, '.env') });
 
 //use db to store session
 app.use(session({
