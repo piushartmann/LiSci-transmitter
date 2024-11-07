@@ -85,6 +85,4 @@ function versioningCalc(res, html, view, send) {
     send(html);
 }
 
-module.exports = {
-    ejs
-}
+module.exports = ejs

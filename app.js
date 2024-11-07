@@ -18,8 +18,6 @@ const MongoConnector = require('./MongoConnector').MongoConnector;
 //use dotenv in development environment
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-const randomVersion = true;
-
 connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
 const gamesDirectory = path.join(__dirname, "games")
@@ -27,10 +25,6 @@ const gamesDirectory = path.join(__dirname, "games")
 let version = revision = require('child_process')
     .execSync('git rev-parse HEAD')
     .toString().trim();
-
-if (randomVersion) {
-    version = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
 
 console.log(`Running version ${version}`);
 
@@ -67,7 +61,7 @@ console.log("Loaded games:", gameConfig.map(config => "'" + config.name + "'").j
 app.set('view engine', 'ejs');
 
 //set up versioning
-app.use(versioning.ejs);
+app.use(versioning);
 
 //set up static files
 app.use(express.static(path.join(__dirname, 'public'), {
