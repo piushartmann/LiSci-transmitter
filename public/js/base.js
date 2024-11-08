@@ -493,6 +493,17 @@ function registerServiceWorker() {
         }).catch(error => {
             console.error('Error checking Service Worker registrations:', error);
         });
+        
+        navigator.serviceWorker.addEventListener('message', event => {
+            console.log('Service Worker message received:', event.data);
+            if (event.data.type === 'updateContent') {
+                console.log('Service Worker updating content');
+                reloadContent && reloadContent();
+            }
+        });
+    }
+    else {
+        console.warn('Service Worker not supported');
     }
 }
 
@@ -510,7 +521,24 @@ function cacheBust() {
     });
 }
 
+function checkOnline() {
+    if (navigator.onLine) {
+        document.body.classList.remove('offline');
+    } else {
+        document.body.classList.add('offline');
+    }
+
+    window.addEventListener('online', () => {
+        document.body.classList.remove('offline');
+    });
+
+    window.addEventListener('offline', () => {
+        document.body.classList.add('offline');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    checkOnline();
     checkVersion();
     loadLanguage();
     if (isInStandaloneMode()) {

@@ -1,10 +1,3 @@
-const filesToCache = [
-    "/noInternet",
-    "/noInternet/favicon.jpg",
-    "/noInternet/logo.png",
-    "/noInternet/style.css"
-];
-
 const sitesToPreload = [
     "/",
     "/citations",
@@ -14,6 +7,13 @@ const sitesToPreload = [
     "/create"
 ];
 
+const requestsToCache = [
+    "/internal/getPosts?page=1&filter=all",
+    "/internal/getPosts?page=1&filter=news",
+    "/internal/getCitations?page=1",
+    "/internal/getPreviousAuthors"
+];
+
 const maxAge = 3600;
 
 async function preloadSites() {
@@ -21,8 +21,10 @@ async function preloadSites() {
     const cacheKeys = await cache.keys();
     const now = Date.now();
 
-    sitesToPreload.forEach(async site => {
-        const cachedResponse = cacheKeys.find(request => request.url.endsWith(site));
+    const allPreloads = sitesToPreload.concat(requestsToCache);
+
+    allPreloads.forEach(async url => {
+        const cachedResponse = cacheKeys.find(request => request.url.endsWith(url));
         if (cachedResponse) {
             const response = await cache.match(cachedResponse);
             const dateHeader = response.headers.get('date');
@@ -33,7 +35,7 @@ async function preloadSites() {
                 }
             }
         }
-        cache.add(new Request(site, {
+        cache.add(new Request(url, {
             cache: 'reload',
             headers: { 'Cache-Control': 'max-age=' + maxAge }
         }));
@@ -42,13 +44,6 @@ async function preloadSites() {
 
 self.addEventListener('install', function (event) {
     event.waitUntil(
-        caches.open('offline').then(function (cache) {
-            filesToCache.forEach(file => {
-                cache.add(new Request(file, {
-                    cache: 'reload',
-                }));
-            })
-        }),
         preloadSites()
     );
     self.skipWaiting();
@@ -70,24 +65,73 @@ self.addEventListener('message', function (event) {
 self.addEventListener('fetch', function (event) {
     const url = new URL(event.request.url);
 
-    if (url.pathname.startsWith('/noInternet')) {
+    let cacheResponse;
+    if (sitesToPreload.includes(url.pathname)) {
         event.respondWith(
             caches.match(event.request.url).then(function (response) {
                 console.log(response);
                 if (response) {
                     console.log('Page: ', url.pathname, ' served from cache');
-                    return new Response(response.body, { headers: response.headers, status: response.status, statusText: response.statusText });
-                };
+                    cacheResponse = new Response(response.body, { headers: response.headers, status: response.status, statusText: response.statusText });
+                    updateCache(url, () => {
+                        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+                            for (let client of windowClients) {
+                                client.navigate(client.url);
+                            }
+                        });
+                    });
+                }
+                else {
+                    cacheResponse = fetch(event.request);
+                }
 
+                return cacheResponse;
             })
         );
         return;
     }
 
-    if (sitesToPreload.includes(url.pathname)) {
+    if (requestsToCache.includes(url.pathname+url.search)) {
+        event.respondWith(
+            caches.open('preload').then(function (cache) {
+                return cache.match(url.href).then(function (cacheResponse) {
+                    if (cacheResponse) {
+                        console.log('Request: ', url.pathname, ' served from cache');
+                        updateCache(url, () => {
+                            clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+                                for (let client of windowClients) {
+                                    client.postMessage({ type: 'updateContent' });
+                                }
+                            });
+                        });
+                        return cacheResponse;
+                    }
 
+                    fetch(event.request).then(function (fetchResponse) {
+                        cache.put(url.href, fetchResponse.clone());
+                        return fetchResponse;
+                    });
+                });
+            })
+        );
     }
 });
+
+async function updateCache(url, callback) {
+    const fetchPromise = fetch(url);
+    const cache = await caches.open('preload')
+    const match = await cache.match(url)
+    const fetchResponse = await fetchPromise;
+
+    const matchEtag = match ? match.headers.get('etag') : null;
+    const fetchEtag = fetchResponse.headers.get('etag');
+    cache.put(url, fetchResponse.clone())
+
+    if (matchEtag !== fetchEtag) {
+        console.log('Cache of ', url.href, ' updated');
+        callback && callback();
+    }
+}
 
 
 self.addEventListener('push', event => {

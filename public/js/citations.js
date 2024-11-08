@@ -26,6 +26,12 @@ function loadCitations(page) {
         });
 }
 
+const reloadContent = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+    loadCitations(page);
+};
+
 async function loadPreviousAuthors() {
     const previousAuthors = await fetch('internal/getPreviousAuthors')
     return await previousAuthors.json();
@@ -104,10 +110,6 @@ function buildCitation(citation) {
     buttonRow.appendChild(editButtons);
 
     citationBox.appendChild(citationContainer);
-}
-
-function likeCitation(id) {
-
 }
 
 function submitCitation() {

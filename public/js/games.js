@@ -1,4 +1,3 @@
-let gamesWS = null;
 let invited = [];
 let invites = [];
 let users = [];
@@ -92,7 +91,12 @@ function invitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    gamesWS.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
+    if (gamesWS && gamesWS.readyState === WebSocket.OPEN) {
+        gamesWS.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
+    }
+    else {
+        console.log("Websocket not open");
+    }
 }
 
 function uninvitePlayer(game, player) {
@@ -100,7 +104,12 @@ function uninvitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    gamesWS.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
+    if (gamesWS && gamesWS.readyState === WebSocket.OPEN) {
+        gamesWS.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
+    }
+    else {
+        console.log("Websocket not open");
+    }
 }
 
 function discoverOtherPlayers(game) {

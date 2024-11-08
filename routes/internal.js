@@ -22,6 +22,10 @@ module.exports = (db, s3Client, webpush) => {
         res.send("This is the internal API, it is not meant to be accessed directly. On the /api route you can find the public API.");
     });
 
+    router.get('/test', async (req, res) => {
+        res.status(200).send("OK");
+    });
+
     router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await db.checkLogin(username, password);

@@ -7,15 +7,37 @@ const page = urlParams.get('page') || 1;
 const postsRequest = loadPosts(page, "all");
 const newsRequest = loadPosts(page, "news");
 
+let posts = [];
+let news = [];
+
+const reloadContent = async () => {
+    const onlyNewsFilter = document.getElementById("onlyNews").checked;
+
+    const postsRequest = loadPosts(page, "all");
+    const newsRequest = loadPosts(page, "news");
+
+    const newsJson = await (await newsRequest).json();
+    const postsJson = await (await postsRequest).json();
+
+    news = newsJson.posts;
+    posts = postsJson.posts;
+
+    const selectedPosts = onlyNewsFilter ? news : posts;
+    renderPosts(selectedPosts);
+};
+
 async function renderPosts(selectedPosts) {
     const postBox = document.getElementById("postBox");
 
-    const renderPosts = await selectedPosts;
+    if (selectedPosts instanceof Promise) {
+        selectedPosts = await selectedPosts;
+    }
+    console.log(selectedPosts);
     postBox.innerHTML = "";
-    renderPosts.forEach(post => {
+    selectedPosts.forEach(post => {
         buildPost(post)
     });
-    
+
     loadLanguage(true);
 }
 
@@ -47,8 +69,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newsJson = await (await newsRequest).json();
     const postsJson = await (await postsRequest).json();
 
-    const news = newsJson.posts;
-    const posts = postsJson.posts;
+    news = newsJson.posts;
+    posts = postsJson.posts;
 
     const newsPages = Math.ceil(newsJson.totalPosts / newsJson.pageSize);
     const postsPages = Math.ceil(postsJson.totalPosts / postsJson.pageSize);
@@ -56,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectedPosts = onlyNewsFilter ? news : posts;
     const totalPages = onlyNewsCheckbox.checked ? newsPages : postsPages;
     renderPosts(selectedPosts);
-    
+
     buildPageSelector(page, totalPages, newsPages, postsPages);
 
     if (document.getElementById("prank")) {
@@ -127,10 +149,10 @@ async function changePage(page, newsPages, postsPages) {
 
         const newsJson = await (await newsRequest).json();
         const postsJson = await (await postsRequest).json();
-    
-        const news = newsJson.posts;
-        const posts = postsJson.posts;
-    
+
+        news = newsJson.posts;
+        posts = postsJson.posts;
+
         const selectedPosts = onlyNewsFilter ? news : posts;
         renderPosts(selectedPosts);
 

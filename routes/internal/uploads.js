@@ -76,7 +76,7 @@ module.exports = (db, s3Client) => {
     router.post("/uploadFile", async function (req, res) {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
-        if (!permissions.includes("admin") && !permissions.includes("writer")) return res.status(403).send("You cannot upload an image");
+        if (!permissions.includes("admin") && !permissions.includes("writer") && !permissions.includes("canPost")) return res.status(403).send("You cannot upload an image");
 
         let filename;
         try {
@@ -90,7 +90,7 @@ module.exports = (db, s3Client) => {
     router.post('/uploadImage', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
-        if (!permissions.includes("admin") && !permissions.includes("writer")) return res.status(403).send("You cannot upload a File");
+        if (!permissions.includes("admin") && !permissions.includes("writer") && !permissions.includes("canPost")) return res.status(403).send("You cannot upload a File");
 
         let filename;
         try {
