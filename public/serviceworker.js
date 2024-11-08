@@ -5,6 +5,41 @@ const filesToCache = [
     "/noInternet/style.css"
 ];
 
+const sitesToPreload = [
+    "/",
+    "/citations",
+    "/games",
+    "/about",
+    "/settings",
+    "/create"
+];
+
+const maxAge = 3600;
+
+async function preloadSites() {
+    const cache = await caches.open('preload');
+    const cacheKeys = await cache.keys();
+    const now = Date.now();
+
+    sitesToPreload.forEach(async site => {
+        const cachedResponse = cacheKeys.find(request => request.url.endsWith(site));
+        if (cachedResponse) {
+            const response = await cache.match(cachedResponse);
+            const dateHeader = response.headers.get('date');
+            if (dateHeader) {
+                const age = (now - new Date(dateHeader).getTime()) / 1000;
+                if (age < maxAge) {
+                    return;
+                }
+            }
+        }
+        cache.add(new Request(site, {
+            cache: 'reload',
+            headers: { 'Cache-Control': 'max-age=' + maxAge }
+        }));
+    });
+}
+
 self.addEventListener('install', function (event) {
     event.waitUntil(
         caches.open('offline').then(function (cache) {
@@ -13,7 +48,8 @@ self.addEventListener('install', function (event) {
                     cache: 'reload',
                 }));
             })
-        })
+        }),
+        preloadSites()
     );
     self.skipWaiting();
 });
@@ -23,6 +59,12 @@ self.addEventListener('activate', function (event) {
         self.clients.claim()
     )
     console.log('SW activate:', event);
+});
+
+self.addEventListener('message', function (event) {
+    if (event.data.type === 'loaded') {
+        preloadSites();
+    }
 });
 
 self.addEventListener('fetch', function (event) {
@@ -40,6 +82,10 @@ self.addEventListener('fetch', function (event) {
             })
         );
         return;
+    }
+
+    if (sitesToPreload.includes(url.pathname)) {
+
     }
 });
 

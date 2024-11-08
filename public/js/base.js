@@ -481,7 +481,13 @@ function registerServiceWorker() {
             } else {
                 registrations.forEach(registration => {
                     registration.update();
-                    console.log('Service Worker updated');
+                    registration.onupdatefound = () => {
+                        console.log('Service Worker updating');
+                        return;
+                    };
+                    window.addEventListener('load', () => {
+                        registration.active.postMessage({ type: 'loaded' });
+                    });
                 });
             }
         }).catch(error => {
