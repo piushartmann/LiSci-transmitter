@@ -358,7 +358,7 @@ a {
     }
 }
 
-body.offline .like-button {
+body.offline .online-only {
     opacity: 0.5;
     pointer-events: none;
 }

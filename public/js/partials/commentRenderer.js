@@ -76,12 +76,12 @@ function buildComment(comment) {
     if (comment.canEdit) {
 
         let editButton = buildButton('/icons/edit.svg', 'Edit', () => editComment(comment._id), 'interaction edit');
-        editButton.className = 'edit-button button';
+        editButton.className = 'edit-button button online-only';
 
         buttonRow.appendChild(editButton);
 
         let deleteButton = buildButton('/icons/delete.svg', 'Delete', () => deleteComment(comment._id), 'interaction delete');
-        deleteButton.className = 'delete-button button';
+        deleteButton.className = 'delete-button button online-only';
 
         buttonRow.appendChild(deleteButton);
     }

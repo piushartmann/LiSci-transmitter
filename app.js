@@ -18,11 +18,11 @@ const MongoConnector = require('./MongoConnector').MongoConnector;
 //use dotenv in development environment
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
+const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
 const gamesDirectory = path.join(__dirname, "games")
 
-let version = revision = require('child_process')
+const version = require('child_process')
     .execSync('git rev-parse HEAD')
     .toString().trim();
 
@@ -57,7 +57,7 @@ gameConfig.reverse()
 
 console.log("Loaded games:", gameConfig.map(config => "'" + config.name + "'").join(", "));
 
-//create express app
+//set view engine
 app.set('view engine', 'ejs');
 
 //set up versioning
@@ -115,7 +115,7 @@ const s3Client = new S3Client({
 
 //set up webpush
 webpush.setVapidDetails(
-    'mailto:pius.hartmann@gmx.de',
+    'mailto:admin@liscitransmitter.live',
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
 );

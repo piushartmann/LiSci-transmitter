@@ -49,9 +49,9 @@
       <br>
 
       <% if (typeof post != "undefined") { %>
-      <button onclick="submitPost(true)" class="button" data-lang-content="create post save">Save Post</button>
+      <button onclick="submitPost(true)" class="button online-only" data-lang-content="create post save">Save Post</button>
       <% } else { %>
-      <button onclick="submitPost()" class="button" data-lang-content="create post submit">Create Post</button>
+      <button onclick="submitPost()" class="button online-only" data-lang-content="create post submit">Create Post</button>
       <% } %>
     </div>
   </div>

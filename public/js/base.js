@@ -100,7 +100,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
     }
 
     let likeButton = buildButton(likeIcon, `${likes} ${likeLabel}`, () => { }, `${likes} ${likeLabel}`, `${likes}`, true);
-    likeButton.classList.add("like-button");
+    likeButton.classList.add("online-only");
 
     if (loggedIn) {
         likeButton.onclick = async () => {
@@ -500,7 +500,9 @@ function registerServiceWorker() {
             console.log('Service Worker message received:', event.data);
             if (event.data.type === 'updateContent') {
                 console.log('Service Worker updating content');
-                reloadContent && reloadContent();
+                if (typeof reloadContent === 'function') {
+                    reloadContent();
+                }
             }
         });
     }
@@ -542,7 +544,9 @@ function checkOnline() {
     window.addEventListener('online', () => {
         document.body.classList.remove('offline');
         toggleOnlineOnly(true);
-        reloadContent && reloadContent();
+        if (typeof reloadContent === 'function') {
+            reloadContent();
+        }
     });
 
     window.addEventListener('offline', () => {
@@ -552,12 +556,7 @@ function checkOnline() {
 }
 
 function toggleOnlineOnly(online) {
-    const likeButtons = Array.from(document.getElementsByClassName('like-button'));
-    likeButtons.forEach(button => {
-        if (!online) {
-            button.icon.src = "/icons/like-locked.svg";
-        }
-    });
+
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

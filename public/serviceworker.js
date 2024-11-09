@@ -40,6 +40,48 @@ async function preloadSites() {
             headers: { 'Cache-Control': 'max-age=' + maxAge }
         }));
     });
+
+    sitesToPreload.forEach(async url => {
+
+        const response = await fetch(url);
+        const text = await response.text();
+
+        const cssLinks = [...text.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["'][^>]*>/g)].map(match => match[1]);
+        const jsScripts = [...text.matchAll(/<script[^>]+src=["']([^"']+)["'][^>]*>/g)].map(match => match[1]);
+
+        const dependencies = cssLinks.concat(jsScripts);
+
+        dependencies.forEach(async depUrl => {
+            try {
+                const cachedResponse = cacheKeys.find(request => request.url.endsWith(depUrl));
+                if (cachedResponse) {
+                    const response = await cache.match(cachedResponse);
+                    const dateHeader = response.headers.get('date');
+                    if (dateHeader) {
+                        const age = (now - new Date(dateHeader).getTime()) / 1000;
+                        if (age < maxAge) {
+                            return;
+                        }
+                    }
+                }
+                if (depUrl.origin === self.location.origin) {
+                    cache.add(new Request(depUrl, {
+                        cache: 'reload',
+                        headers: { 'Cache-Control': 'max-age=' + maxAge }
+                    }));
+                }
+                else {
+                    cache.add(new Request(depUrl, {
+                        cache: 'reload'
+                    }));
+                }
+            }
+            catch (error) {
+                console.warn('Failed to preload:', depUrl, error);
+            }
+        });
+    });
+
 }
 
 self.addEventListener('install', function (event) {
@@ -81,7 +123,7 @@ function reloadContent() {
     });
 }
 
-function reloadSite(){
+function reloadSite() {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
         for (let client of windowClients) {
             client.navigate(client.url);
@@ -92,44 +134,24 @@ function reloadSite(){
 self.addEventListener('fetch', function (event) {
     const url = new URL(event.request.url);
 
-    let cacheResponse;
-    if (sitesToPreload.includes(url.pathname)) {
-        event.respondWith(
-            caches.match(event.request.url).then(function (response) {
-                console.log(response);
-                if (response) {
-                    console.log('Page: ', url.pathname, ' served from cache');
-                    cacheResponse = new Response(response.body, { headers: response.headers, status: response.status, statusText: response.statusText });
+    event.respondWith(
+        caches.match(url.pathname + url.search).then(function (response) {
+            if (response) {
+                console.log('Page: ', url.pathname, ' served from cache');
+                if (sitesToPreload.includes(url.pathname + url.search)) {
                     updateCache(url, reloadSite);
                 }
-                else {
-                    cacheResponse = fetch(event.request);
+                else if (requestsToCache.includes(url.pathname + url.search)) {
+                    updateCache(url, reloadContent);
                 }
-
-                return cacheResponse;
-            })
-        );
-        return;
-    }
-
-    if (requestsToCache.includes(url.pathname+url.search)) {
-        event.respondWith(
-            caches.open('preload').then(function (cache) {
-                return cache.match(url.pathname+url.search).then(function (cacheResponse) {
-                    if (cacheResponse) {
-                        console.log('Request: ',url.pathname+url.search, ' served from cache');
-                        updateCache(url, reloadContent);
-                        return cacheResponse;
-                    }
-
-                    fetch(event.request).then(function (fetchResponse) {
-                        cache.put(url.pathname+url.search, fetchResponse.clone());
-                        return fetchResponse;
-                    });
-                });
-            })
-        );
-    }
+                return response;
+            }
+            else {
+                return fetch(event.request);
+            }
+        })
+    );
+    return;
 });
 
 async function updateCache(url, callback) {

@@ -18,15 +18,15 @@
     <h1 data-lang-content="citations new title">Ein neues Zitat einreichen</h1>
     <div class="sentenceStructure">
       <div class="author autocomplete">
-        <textarea type="text" name="author" id="author" placeholder="Herr Treetzen" pattern='[^"]+' oninput='this.value = this.value.replace(/[\n]/g,"")' required data-lang-content-placeholder="citations new sentence 0"></textarea>
+        <textarea type="text" name="author" id="author" class="online-only" placeholder="Herr Treetzen" pattern='[^"]+' oninput='this.value = this.value.replace(/[\n]/g,"")' required data-lang-content-placeholder="citations new sentence 0"></textarea>
       </div>
       <p data-lang-content="citations new sentence 1"> hat </p>
       <div class="content">
-        <textarea type="text" name="content" id="content" placeholder="ein lustiges Zitat" pattern='[^"]+' oninput='this.value = this.value.replace(/[\n]/g,"")' required data-lang-content-placeholder="citations new sentence 2"></textarea>
+        <textarea type="text" name="content" id="content" class="online-only" placeholder="ein lustiges Zitat" pattern='[^"]+' oninput='this.value = this.value.replace(/[\n]/g,"")' required data-lang-content-placeholder="citations new sentence 2"></textarea>
       </div>
       <p data-lang-content="citations new sentence 3"> gesagt.</p>
     </div>
-    <button id="citationSubmit" onclick="submitCitation()" data-lang-content="citations new submit">Submit</button>
+    <button id="citationSubmit" class="online-only" onclick="submitCitation()" data-lang-content="citations new submit">Submit</button>
   </div>
 
   <h1 data-lang-content="citations title">Zitate</h1>

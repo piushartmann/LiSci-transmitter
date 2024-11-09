@@ -20,21 +20,21 @@
     <div class="enablePushContainer setting">
       <label for="enablePush" data-lang-content="settings push title">Push Notifications</label>
       <% if (enabledPush) { %>
-      <button id="enablePush" data-lang-content="settings push title_to_this_device">Zu diesem Gerät verlagern</button>
+      <button id="enablePush" class="online-only" data-lang-content="settings push title_to_this_device">Zu diesem Gerät verlagern</button>
       <div id="pushTypesSettings">
         <div id="pushTypes" class="pushTypes">
-          <li><input type="checkbox" id="newsPushCheckbox" name="news" value="news" <%= preferences.find(p => p.key === 'newsNotifications')?.value ? 'checked' : '' %>>
+          <li><input type="checkbox" id="newsPushCheckbox" class="online-only" name="news" value="news" <%= preferences.find(p => p.key === 'newsNotifications')?.value ? 'checked' : '' %>>
             <label for="news" data-lang-content="settings push checkboxes news">News</label>
           </li>
-          <li><input type="checkbox" id="postsPushCheckbox" name="posts" value="posts" <%= preferences.find(p => p.key === 'postNotifications')?.value ? 'checked' : '' %>>
+          <li><input type="checkbox" id="postsPushCheckbox" class="online-only" name="posts" value="posts" <%= preferences.find(p => p.key === 'postNotifications')?.value ? 'checked' : '' %>>
             <label for="citations" data-lang-content="settings push checkboxes posts">Posts</label>
           </li>
           <li>
-            <input type="checkbox" id="citationsPushCheckbox" name="citations" value="citations" <%= preferences.find(p => p.key === 'citationNotifications')?.value ? 'checked' : '' %>>
+            <input type="checkbox" id="citationsPushCheckbox" class="online-only" name="citations" value="citations" <%= preferences.find(p => p.key === 'citationNotifications')?.value ? 'checked' : '' %>>
             <label for="citations" data-lang-content="settings push checkboxes citations">Citations (coming)</label>
           </li>
           <li>
-            <input type="checkbox" id="commentsPushCheckbox" name="comments" value="comments" <%= preferences.find(p => p.key === 'commentNotifications')?.value ? 'checked' : '' %>>
+            <input type="checkbox" id="commentsPushCheckbox" class="online-only" name="comments" value="comments" <%= preferences.find(p => p.key === 'commentNotifications')?.value ? 'checked' : '' %>>
             <label for="comments" data-lang-content="settings push checkboxes comments">Comments (coming)</label>
           </li>
         </div>
@@ -51,7 +51,7 @@
         <%= username.charAt(0).toUpperCase() %>
         <input type="color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
       </p>
-      <button id="profilePictureColorSubmit">Save</button>
+      <button id="profilePictureColorSubmit" class="online-only" >Save</button>
     </div>
 
     <div class="apiKeysContainer setting">
@@ -61,7 +61,7 @@
 
     <div class="languageContainer setting">
       <label for="language" data-lang-content="settings language">Language</label>
-      <select id="language">
+      <select id="language" class="online-only">
         <option value="de" <%= preferences.find(p => p.key === 'language')?.value === 'de' ? 'selected' : '' %>>Deutsch</option>
         <option value="en" <%= preferences.find(p => p.key === 'language')?.value === 'en' ? 'selected' : '' %>>English</option>
         <option value="pl" <%= preferences.find(p => p.key === 'language')?.value === 'pl' ? 'selected' : '' %>>Polski (ai)</option>
@@ -71,10 +71,14 @@
       </select>
     </div>
 
-      <% if (isAdmin) { %>
-      <%- include('./partials/adminSettings.ejs') %>
-      <% } %>
+    <div class="downloadAllContent setting">
+      <button id="downloadAllContent" class="online-only" data-lang-content="settings download_all_content">Download All Content</button>
     </div>
+
+    <% if (isAdmin) { %>
+    <%- include('./partials/adminSettings.ejs') %>
+    <% } %>
+  </div>
 
 </body>
 

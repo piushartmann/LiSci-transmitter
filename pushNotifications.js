@@ -8,6 +8,7 @@ const { MongoConnector } = require('./MongoConnector');
 module.exports = (db, webpush) => {
     async function send(title, body, userID) {
         const subscription = await db.getSubscription(userID);
+        if (!subscription) return;
 
         const pushData = { title, body };
         try {
@@ -21,10 +22,8 @@ module.exports = (db, webpush) => {
 
     async function sendToEveryone(type, title, body) {
         const users = await db.getAllSubscriptions();
-        const pushData = { title, body };
 
         for (const user of users) {
-            console.log(user.preferences);
             try {
                 if (type === "urgent") {
                     send(title, body, user._id);
