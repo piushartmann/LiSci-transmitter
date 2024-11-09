@@ -132,3 +132,12 @@ app.use('/api', require('./routes/api')(db, s3Client, webpush));
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });
+
+
+testapp = express();
+testapp.get('/', (req, res) => {
+    res.send('Hello World!');
+});
+testapp.listen(port+1, () => {
+    console.log('Example app listening on port', port+1);
+});
