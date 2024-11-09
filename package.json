@@ -21,6 +21,10 @@
     "web-push": "^3.6.7"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "build:digitalocean": "find ./public/js -name '*.js' -exec terser {} -o {} --compress --mangle --source-map 'content=inline,url=public/{}.map';"
+  },
+  "devDependencies": {
+    "terser": "^5.36.0"
   }
 }
