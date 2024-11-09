@@ -40,6 +40,7 @@ module.exports = (db, s3Client, webpush) => {
         const page = (req.query.page || 1) - 1;
 
         const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
+        if (!citations) return res.status(404).send("Citation not found");
 
         let filteredCitations = [];
 
@@ -83,6 +84,7 @@ module.exports = (db, s3Client, webpush) => {
         if (typeof citationID !== "string") return res.status(400).send("Invalid parameters");
 
         const citation = await db.getCitation(citationID);
+        if (!citation) return res.status(404).send("Citation not found");
         if (citation.userID.id.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot delete this citation");
 
         await db.deleteCitation(citationID);
@@ -102,6 +104,7 @@ module.exports = (db, s3Client, webpush) => {
         if (typeof citationID !== "string" || typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
 
         const citation = await db.getCitation(citationID);
+        if (!citation) return res.status(404).send("Citation not found");
         if (citation.userID.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
 
         await db.updateCitation(citationID, sanitizedAuthor, sanitizedContent);
