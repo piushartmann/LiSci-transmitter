@@ -338,10 +338,6 @@ a {
     }
 }
 
-@media (max-width: 768px) and (display-mode: standalone) {
-    
-}
-
 @media (max-width: 768px) {
 
     .author-profile-pic:hover .author-name-tooltip {
@@ -360,4 +356,9 @@ a {
     .author-name {
         display: none;
     }
+}
+
+body.offline .like-button {
+    opacity: 0.5;
+    pointer-events: none;
 }

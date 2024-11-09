@@ -15,21 +15,35 @@ window.onload = function () {
     currentPage = page;
 }
 
-function loadCitations(page) {
-    fetch(`internal/getCitations?page=${page}`)
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(citation => {
-                buildCitation(citation);
-                loadLanguage(true);
-            });
-        });
+async function loadCitations(page, callback) {
+    let response = await fetch(`internal/getCitations?page=${page}`)
+    response = await response.json()
+
+    const citationBox = document.getElementById("citationBox");
+    const citations = [];
+    response.forEach(citation => {
+        citation = buildCitation(citation);
+        citations.push(citation);
+    });
+    if (callback) {
+        callback(citations);
+        loadLanguage(true);
+        return;
+    }
+    citationBox.append(...citations);
+    loadLanguage(true);
 }
 
 const reloadContent = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page') || 1;
-    loadCitations(page);
+
+    const citationBox = document.getElementById("citationBox");
+    citationBox.innerHTML = "";
+
+    loadCitations(page, (citations) => {
+        citationBox.replaceChildren(...citations);
+    });
 };
 
 async function loadPreviousAuthors() {
@@ -38,7 +52,6 @@ async function loadPreviousAuthors() {
 }
 
 function buildCitation(citation) {
-    citationBox = document.getElementById("citationBox");
     let citationContainer = document.createElement("div");
     citationContainer.className = "citation";
     citationContainer.setAttribute("data-id", citation._id);
@@ -60,7 +73,7 @@ function buildCitation(citation) {
             contextItemDiv.className = "context-item";
             let authorDiv = document.createElement("div");
             authorDiv.className = "context-author";
-            authorDiv.innerText = contextItem.author+":";
+            authorDiv.innerText = contextItem.author + ":";
 
             let contentDiv = document.createElement("div");
             contentDiv.className = "context-content";
@@ -109,12 +122,25 @@ function buildCitation(citation) {
     buttonRow.appendChild(interactionButtons);
     buttonRow.appendChild(editButtons);
 
-    citationBox.appendChild(citationContainer);
+    return citationContainer;
+}
+
+function updateCitations() {
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+
+    const url = `/internal/getCitations?page=${page}`
+
+    updateCache(url, "reloadContent");
 }
 
 function submitCitation() {
-    author = document.getElementById("author").value;
-    content = document.getElementById("content").value;
+    authorElement = document.getElementById("author");
+    contentElement = document.getElementById("content");
+
+    let author = authorElement.value;
+    let content = contentElement.value;
 
     function checkChar(char) {
         bannedChars = ['"', '„', '“']
@@ -142,7 +168,10 @@ function submitCitation() {
     })
         .then(response => {
             if (response.status === 200) {
-                window.location.href = "/citations";
+                authorElement.value = "";
+                contentElement.value = "";
+
+                updateCitations();
             }
         });
 }
@@ -155,7 +184,7 @@ function deleteCitation(id) {
     })
         .then(response => {
             if (response.status === 200) {
-                window.location.href = "/citations";
+                updateCitations();
             }
         });
 }
@@ -197,7 +226,7 @@ function saveCitation(id) {
     })
         .then(response => {
             if (response.status === 200) {
-                window.location.href = "/citations";
+                updateCitations();
             }
         });
 }

@@ -100,6 +100,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
     }
 
     let likeButton = buildButton(likeIcon, `${likes} ${likeLabel}`, () => { }, `${likes} ${likeLabel}`, `${likes}`, true);
+    likeButton.classList.add("like-button");
 
     if (loggedIn) {
         likeButton.onclick = async () => {
@@ -483,6 +484,7 @@ function registerServiceWorker() {
                     registration.update();
                     registration.onupdatefound = () => {
                         console.log('Service Worker updating');
+                        location.reload();
                         return;
                     };
                     window.addEventListener('load', () => {
@@ -493,7 +495,7 @@ function registerServiceWorker() {
         }).catch(error => {
             console.error('Error checking Service Worker registrations:', error);
         });
-        
+
         navigator.serviceWorker.addEventListener('message', event => {
             console.log('Service Worker message received:', event.data);
             if (event.data.type === 'updateContent') {
@@ -504,6 +506,13 @@ function registerServiceWorker() {
     }
     else {
         console.warn('Service Worker not supported');
+    }
+}
+
+function updateCache(url, callbackType) {
+    const serviceWorker = navigator.serviceWorker.controller;
+    if (serviceWorker){
+        serviceWorker.postMessage({ type: 'updateCache', url: url, callbackType: callbackType});
     }
 }
 
@@ -524,16 +533,30 @@ function cacheBust() {
 function checkOnline() {
     if (navigator.onLine) {
         document.body.classList.remove('offline');
+        toggleOnlineOnly(true);
     } else {
         document.body.classList.add('offline');
+        toggleOnlineOnly(false);
     }
 
     window.addEventListener('online', () => {
         document.body.classList.remove('offline');
+        toggleOnlineOnly(true);
+        reloadContent && reloadContent();
     });
 
     window.addEventListener('offline', () => {
         document.body.classList.add('offline');
+        toggleOnlineOnly(false);
+    });
+}
+
+function toggleOnlineOnly(online) {
+    const likeButtons = Array.from(document.getElementsByClassName('like-button'));
+    likeButtons.forEach(button => {
+        if (!online) {
+            button.icon.src = "/icons/like-locked.svg";
+        }
     });
 }
 

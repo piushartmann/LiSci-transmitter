@@ -105,7 +105,7 @@ module.exports = (db, s3Client, webpush) => {
 
         const citation = await db.getCitation(citationID);
         if (!citation) return res.status(404).send("Citation not found");
-        if (citation.userID.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
+        if (citation.userID._id.toString() !== req.session.userID && !(permissions.includes("admin"))) return res.status(403).send("You cannot update this citation");
 
         await db.updateCitation(citationID, sanitizedAuthor, sanitizedContent);
         return res.status(200).send("Success");

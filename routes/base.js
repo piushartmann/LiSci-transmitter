@@ -18,7 +18,8 @@ module.exports = (db) => {
         "/css/headers.css",
         "/css/colors.css",
         "/images/splashScreen.png",
-        "/images/appIcon.jpg"
+        "/images/appIcon.jpg",
+        "/icons/like-locked.svg",
     ];
 
     router.get('/', async (req, res) => {

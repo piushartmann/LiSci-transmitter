@@ -56,11 +56,38 @@ self.addEventListener('activate', function (event) {
     console.log('SW activate:', event);
 });
 
-self.addEventListener('message', function (event) {
+self.addEventListener('message', async function (event) {
     if (event.data.type === 'loaded') {
         preloadSites();
     }
+    else if (event.data.type === 'updateCache') {
+        try {
+            const url = new URL(event.data.url, self.location.origin);
+            await updateCache(url);
+            if (event.data.callbackType === 'reloadContent') {
+                reloadContent();
+            }
+        } catch (error) {
+            console.error('Invalid URL:', event.data.url);
+        }
+    }
 });
+
+function reloadContent() {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+        for (let client of windowClients) {
+            client.postMessage({ type: 'updateContent' });
+        }
+    });
+}
+
+function reloadSite(){
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+        for (let client of windowClients) {
+            client.navigate(client.url);
+        }
+    });
+}
 
 self.addEventListener('fetch', function (event) {
     const url = new URL(event.request.url);
@@ -73,13 +100,7 @@ self.addEventListener('fetch', function (event) {
                 if (response) {
                     console.log('Page: ', url.pathname, ' served from cache');
                     cacheResponse = new Response(response.body, { headers: response.headers, status: response.status, statusText: response.statusText });
-                    updateCache(url, () => {
-                        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-                            for (let client of windowClients) {
-                                client.navigate(client.url);
-                            }
-                        });
-                    });
+                    updateCache(url, reloadSite);
                 }
                 else {
                     cacheResponse = fetch(event.request);
@@ -94,21 +115,15 @@ self.addEventListener('fetch', function (event) {
     if (requestsToCache.includes(url.pathname+url.search)) {
         event.respondWith(
             caches.open('preload').then(function (cache) {
-                return cache.match(url.href).then(function (cacheResponse) {
+                return cache.match(url.pathname+url.search).then(function (cacheResponse) {
                     if (cacheResponse) {
-                        console.log('Request: ', url.pathname, ' served from cache');
-                        updateCache(url, () => {
-                            clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-                                for (let client of windowClients) {
-                                    client.postMessage({ type: 'updateContent' });
-                                }
-                            });
-                        });
+                        console.log('Request: ',url.pathname+url.search, ' served from cache');
+                        updateCache(url, reloadContent);
                         return cacheResponse;
                     }
 
                     fetch(event.request).then(function (fetchResponse) {
-                        cache.put(url.href, fetchResponse.clone());
+                        cache.put(url.pathname+url.search, fetchResponse.clone());
                         return fetchResponse;
                     });
                 });
@@ -118,18 +133,24 @@ self.addEventListener('fetch', function (event) {
 });
 
 async function updateCache(url, callback) {
-    const fetchPromise = fetch(url);
-    const cache = await caches.open('preload')
-    const match = await cache.match(url)
-    const fetchResponse = await fetchPromise;
+    try {
+        const fetchRequest = fetch(url)
+        const cache = await caches.open('preload');
+        const match = await cache.match(url);
+        const fetchResponse = await fetchRequest;
 
-    const matchEtag = match ? match.headers.get('etag') : null;
-    const fetchEtag = fetchResponse.headers.get('etag');
-    cache.put(url, fetchResponse.clone())
+        const matchEtag = match ? match.headers.get('etag') : null;
+        const fetchEtag = fetchResponse.headers.get('etag');
+        await cache.put(url, fetchResponse.clone());
 
-    if (matchEtag !== fetchEtag) {
-        console.log('Cache of ', url.href, ' updated');
-        callback && callback();
+        if (matchEtag !== fetchEtag) {
+            console.log('Cache of ', url.pathname + url.search, ' updated');
+            if (callback) {
+                callback();
+            }
+        }
+    } catch (error) {
+        console.error('Failed to update cache:', error);
     }
 }
 
