@@ -22,7 +22,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "build:digitalocean": "find ./public -name '*.js' -exec sh -c 'terser \"$0\" -o \"$0\" --compress --mangle --source-map \"filename=public/map/$(basename $0).map,url=map/$(basename $0).map\"' {} \\;"
+    "build:digitalocean": "find ./public -name '*.js' -exec sh -c 'terser \"$0\" -o \"$0\" --compress --mangle --source-map \"filename=public/map/$(basename $0).map,url=/public/map/$(basename $0).map\"' {} \\;"
     },
   "devDependencies": {
     "terser": "^5.36.0"
