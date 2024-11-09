@@ -34,6 +34,7 @@ function uploadFile(req, res, directory = "", s3Client, forceFormats = []) {
                 acl: "public-read",
                 contentType: multerS3.AUTO_CONTENT_TYPE,
                 contentDisposition: "inline",
+                cacheControl: "max-age=31536000",
                 key: function (request, file, cb) {
                     const fileExtension = file.originalname.split('.').pop().toLowerCase();
 

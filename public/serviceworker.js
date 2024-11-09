@@ -23,7 +23,7 @@ async function preloadSites() {
 
     const allPreloads = sitesToPreload.concat(requestsToCache);
 
-    allPreloads.forEach(async url => {
+    await Promise.all(allPreloads.map(async url => {
         const cachedResponse = cacheKeys.find(request => request.url.endsWith(url));
         if (cachedResponse) {
             const response = await cache.match(cachedResponse);
@@ -35,15 +35,19 @@ async function preloadSites() {
                 }
             }
         }
-        cache.add(new Request(url, {
+        await cache.add(new Request(url, {
             cache: 'reload',
             headers: { 'Cache-Control': 'max-age=' + maxAge }
         }));
-    });
+    }));
 
     sitesToPreload.forEach(async url => {
 
-        const response = await fetch(url);
+        const response = await cache.match(url);
+        if (!response) {
+            console.warn('Failed to get depndencies of', url);
+            return;
+        }
         const text = await response.text();
 
         const cssLinks = [...text.matchAll(/<link[^>]+rel=["']stylesheet["'][^>]+href=["']([^"']+)["'][^>]*>/g)].map(match => match[1]);
@@ -172,7 +176,7 @@ async function updateCache(url, callback) {
             }
         }
     } catch (error) {
-        console.error('Failed to update cache:', error);
+        console.error(error, 'on UpdateCache with url:', url);
     }
 }
 

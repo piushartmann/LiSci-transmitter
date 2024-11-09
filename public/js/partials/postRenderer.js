@@ -27,12 +27,6 @@ function buildPost(post) {
                 sectionDiv.appendChild(text);
                 break;
             case "file":
-                if (section.summary) {
-                    const summary = document.createElement("p");
-                    summary.textContent = section.summary;
-                    summary.className = "AISummary";
-                    sectionDiv.appendChild(summary);
-                }
                 let titleFallback = "View File";
                 if (localStorage.getItem('languageFile')) {
                     const languageFile = JSON.parse(localStorage.getItem('languageFile'));
