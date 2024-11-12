@@ -503,6 +503,9 @@ function registerServiceWorker() {
                 if (typeof reloadContent === 'function') {
                     reloadContent();
                 }
+                else{
+                    window.location.reload();
+                }
             }
         });
     }

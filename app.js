@@ -60,8 +60,20 @@ console.log("Loaded games:", gameConfig.map(config => "'" + config.name + "'").j
 //set view engine
 app.set('view engine', 'ejs');
 
+//set up views
+let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
+let publicDirs = [path.join(__dirname, 'public')];
+gameConfig.forEach(config => {
+    const publicDir = path.join(__dirname, 'games', config.url, (config.public || 'public'))
+    app.use("/" + config.url, express.static(publicDir));
+
+    publicDirs.push(publicDir);
+    views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
+})
+app.set('views', views);
+
 //set up versioning
-app.use(versioning);
+app.use(versioning(views, publicDirs));
 
 //set up static files
 app.use(express.static(path.join(__dirname, 'public'), {
@@ -70,13 +82,6 @@ app.use(express.static(path.join(__dirname, 'public'), {
     },
     
 }));
-
-let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
-gameConfig.forEach(config => {
-    app.use("/" + config.url, express.static(path.join(__dirname, 'games', config.url, (config.public || 'public'))));
-    views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
-})
-app.set('views', views);
 
 //use body parser
 app.use(bodyParser.json());
