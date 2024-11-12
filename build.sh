@@ -1,1 +1,1 @@
-find ./public -type f -name '*.js' -exec sh -c 'terser "$1" -o "$1" --compress --mangle --source-map "filename=\"$1.map\",url=\"${1#./public}.map\",root=\"$1\""' sh {} \;
+find ./public -type f -name '*.js' -exec sh -c 'terser \"$1\" -o \"$1\" --compress --mangle --source-map \"base=./public,filename=$1.map,url=${1#./public}.map\"' _ {} \\;
