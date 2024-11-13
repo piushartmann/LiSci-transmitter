@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const multer = require("multer");
 const multerS3 = require("multer-s3");
-const { MongoConnector } = require('../../MongoConnector');
+const { MongoConnector } = require('../../server/MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
 

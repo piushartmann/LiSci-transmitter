@@ -7,7 +7,7 @@ dotenv.config({ path: (__dirname + '.env') });
 
 const openAI = new OpenAI(process.env.OPENAI_API_KEY);
 
-const config = require('./config.json');
+const config = require('../config.json');
 
 async function summarizeText(text) {
     const completion = await openAI.chat.completions.create({

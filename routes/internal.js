@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { MongoConnector } = require('../MongoConnector');
+const { MongoConnector } = require('../server/MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
 const oneDay = 24 * 3600 * 1000

@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { MongoConnector } = require('../MongoConnector');
+const { MongoConnector } = require('../server/MongoConnector');
 const { GetBucketPolicyStatusCommand } = require('@aws-sdk/client-s3');
 const router = Router();
 

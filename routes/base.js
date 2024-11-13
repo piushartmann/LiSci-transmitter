@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const path = require('path');
 const fs = require('fs');
-const { MongoConnector } = require('../MongoConnector');
+const { MongoConnector } = require('../server/MongoConnector');
 const router = Router();
 
 /**
@@ -142,17 +142,6 @@ module.exports = (db) => {
                 
         ])
         return res.render('about', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
-        });
-    });
-
-    router.get('/noInternet', async (req, res) => {
-        const permissions = await db.getUserPermissions(req.session.userID);
-
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('noInternet', {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
         });
     });

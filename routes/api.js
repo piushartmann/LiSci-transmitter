@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { MongoConnector } = require('../MongoConnector');
+const { MongoConnector } = require('../server/MongoConnector');
 const router = Router();
 
 /**

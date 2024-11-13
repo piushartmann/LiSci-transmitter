@@ -9,11 +9,11 @@ const bodyParser = require('body-parser');
 const webpush = require('web-push')
 const app = express();
 const ws = require('express-ws')(app);
-const versioning = require('./versioning');
+const versioning = require('./server/versioning');
 
 const oneDay = 24 * 3600 * 1000
 
-const MongoConnector = require('./MongoConnector').MongoConnector;
+const MongoConnector = require('./server/MongoConnector').MongoConnector;
 
 //use dotenv in development environment
 dotenv.config({ path: path.join(__dirname, '.env') });

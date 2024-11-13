@@ -61,6 +61,7 @@ function ejs(viewDirs, publicDirs) {
             const includeRegex = /<%- include\((.*?)\) %>/g;
             let includeMatch;
             while ((includeMatch = includeRegex.exec(indexFileContent)) !== null) {
+
                 let includePath;
                 for (const viewPath of viewDirs) {
                     includePath = path.join(viewPath, includeMatch[1].replace(/['"]/g, ''));
@@ -71,6 +72,7 @@ function ejs(viewDirs, publicDirs) {
                         break;
                     }
                 }
+
                 if (!fs.existsSync(includePath)) {
                     continue;
                 }
@@ -86,11 +88,33 @@ function ejs(viewDirs, publicDirs) {
             let match;
 
             while ((match = srcRegex.exec(indexFileContent)) !== null) {
-                srcs.push(match[1]);
+                const src = match[1]
+                if (src.endsWith('.min.js')) {
+                    srcs.push(src);
+                    continue;
+                }
+                const srcPath = path.join(publicDirs[0], src.replace(/\.js$/, '.min.js'))
+                if (!fs.existsSync(srcPath)) {
+                    srcs.push(src);
+                    continue;
+                }
+                html = html.replace(src, src.replace(/\.js$/, '.min.js'));
+                srcs.push(src.replace(/\.js$/, '.min.js'));
             }
 
             while ((match = hrefRegex.exec(indexFileContent)) !== null) {
-                srcs.push(match[1]);
+                const src = match[1]
+                if (src.endsWith('.min.js')) {
+                    srcs.push(src);
+                    continue;
+                }
+                const srcPath = path.join(publicDirs[0], src.replace(/\.js$/, '.min.js'))
+                if (!fs.existsSync(srcPath)) {
+                    srcs.push(src);
+                    continue;
+                }
+                html = html.replace(src, src.replace(/\.js$/, '.min.js'));
+                srcs.push(src.replace(/\.js$/, '.min.js'));
             }
 
             while ((match = imgRegex.exec(indexFileContent)) !== null) {

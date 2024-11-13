@@ -1,9 +1,9 @@
 const { Router } = require('express');
-const { MongoConnector } = require('../../MongoConnector');
+const { MongoConnector } = require('../../server/MongoConnector.js');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
-const openAI = require('../../openAI');
-const pushLib = require('../../pushNotifications.js');
+const openAI = require('../../server/openAI');
+const pushLib = require('../../server/pushNotifications.js');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
