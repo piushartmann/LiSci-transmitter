@@ -1,0 +1,92 @@
+.content {
+    display: flex;
+    flex-direction: row;
+}
+
+.chat-selector {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    height: calc(100vh - 90px);
+    margin: 10px;
+    border: 1px solid black;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    min-width: 100px;
+}
+
+.chat-selector::-webkit-scrollbar {
+    display: none;
+}
+
+.chat-selector-element {
+    position: relative;
+    flex-shrink: 0;
+    height: 100px;
+}
+
+.chat-selector-element:hover {
+    background-color: #c5c5c5;
+}
+
+.chat-selector-element.active {
+    background-color: #a5a5a5;
+}
+
+#chat-container {
+    width: 100%;
+}
+
+#messages {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.message {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.profile-pic .defaultProfilePicture {
+    width: 30px;
+    height: 30px;
+    font-size: 17px;
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.me .meta {
+    align-items: flex-end;
+}
+
+.me.message {
+    flex-direction: row-reverse;
+}
+
+.message-content {
+    height: 100%;
+    border: 1px solid black;
+    border-radius: 8px;
+    padding: 5px;
+    margin-top: 14px;
+}
+
+.timestamp {
+    font-size: 0.8em;
+}
+
+@media (max-width: 768px) {
+    .chat-selector {
+        display: none;
+    }
+    
+}

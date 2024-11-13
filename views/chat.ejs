@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <%- include("partials/baseHead.ejs") %>
+  <title>chat</title>
+  <link rel="stylesheet" href="css/chat.css">
+  <script src="js/chat.js"></script>
+</head>
+
+<body>
+  <%- include("partials/header.ejs") %>
+
+  <div class="warning floating">Diese Seite funktioniert noch nicht.</div>
+
+  <div class="content">
+    <div class="chat-selector">
+      <% for( let i = 1; i < 20; i++ ) { %>
+      <div class="chat-selector-element" onclick="selectChat('<%= i %>', '<%= i+2413 %>')">
+        <p>Chat <%= i %></p>
+      </div>
+      <% } %>
+    </div>
+
+    <div id="chat-container">
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo quaerat, porro nisi perferendis itaque placeat eum expedita exercitationem, ratione fugit, assumenda aspernatur iusto! Veniam corporis nobis illum atque voluptas esse?</p>
+    </div>
+  </div>
+
+</body>
+
+</html>

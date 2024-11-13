@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="/noInternet/style.css">
+  <link rel="icon" type="image/x-icon" href="/noInternet/favicon.jpg">
+
+  <title>No Internet</title>
+</head>
+
+<body>
+
+  <header>
+    <a class="header-logo" href="/">
+      <img src="/noInternet/logo.png" alt="Logo">
+    </a>
+
+    <nav class="header-nav">
+
+    </nav>
+
+    <div class="header-button">
+      <% if (profilePic) { %>
+        <p class="defaultProfilePicture profilePicture" style="background-color:  <%= profilePic.content %>;">
+      <% } else { %>
+        <p class="defaultProfilePicture profilePicture" style="background-color: #9d9d9d";>
+      <% } %>
+        <%= (username || "anonymous").charAt(0).toUpperCase() %>
+      </p>
+    </div>
+
+  </header>
+
+  <p>Du hast gerade kein Internet :(</p>
+
+  <button onclick="location.reload()">Reload</button>
+
+</body>
+
+</html>

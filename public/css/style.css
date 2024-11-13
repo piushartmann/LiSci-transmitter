@@ -47,6 +47,56 @@ body {
     display: none;
 }
 
+.warning {
+    text-align: center;
+    background-color: #ffd6a0;
+    border: 1px solid transparent;
+}
+
+.warning.header {
+    width: 100%;
+    justify-self: center;
+}
+
+.warning.floating {
+    position: fixed;
+    bottom: 10px;
+    left: 30%;
+    width: 40%;
+    border-radius: 4px;
+}
+
+.warning::before {
+    content: "⚠️";
+    font-size: 1em;
+    margin-right: 10px;
+}
+
+.error {
+    text-align: center;
+    background-color: #ff8c8c;
+    border: 1px solid transparent;
+}
+
+.error.header {
+    width: 100vw;
+    justify-self: center;
+}
+
+.error.floating {
+    position: fixed;
+    bottom: 10px;
+    left: 30%;
+    width: 40%;
+    border-radius: 4px;
+}
+
+.error::before {
+    content: "❌";
+    font-size: 1em;
+    margin-right: 10px;
+}
+
 
 .button {
     border: 1px solid var(--post-outline-color);

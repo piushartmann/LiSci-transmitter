@@ -43,13 +43,13 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
     return button;
 }
 
-function buildProfilePic(profilePic, username) {
+function buildProfilePic(profilePic, username, short = false) {
     let authorDiv = document.createElement("div");
     if (profilePic.type === "default") {
         authorDiv.className = "author-info";
-
+    
         let authorName = document.createElement("p");
-        authorName.textContent = username;
+        authorName.textContent = short ? "" : username;
         authorName.style = "margin-left: 10px;";
         authorName.className = "author-name";
 
@@ -63,7 +63,7 @@ function buildProfilePic(profilePic, username) {
         authorProfilePicName.className = "author-name-tooltip";
         authorProfilePic.appendChild(authorProfilePicName);
 
-        authorDiv.appendChild(authorName);
+        if (!short) authorDiv.appendChild(authorName);
         authorDiv.appendChild(authorProfilePic);
     }
     else if (profilePic.type === "custom") {

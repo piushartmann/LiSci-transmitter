@@ -135,6 +135,18 @@ module.exports = (db) => {
         return res.send("Das Archiv kommt bald!");
     });
 
+    router.get('/chat', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
+
+        res.locals.additionalPrefetches = basePrefetches.concat([
+                
+        ])
+        return res.render('chat', {
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
+        });
+    });
+
     router.get('/about', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
