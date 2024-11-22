@@ -47,7 +47,7 @@ function buildProfilePic(profilePic, username, short = false) {
     let authorDiv = document.createElement("div");
     if (profilePic.type === "default") {
         authorDiv.className = "author-info";
-    
+
         let authorName = document.createElement("p");
         authorName.textContent = short ? "" : username;
         authorName.style = "margin-left: 10px;";
@@ -503,7 +503,7 @@ function registerServiceWorker() {
                 if (typeof reloadContent === 'function') {
                     reloadContent();
                 }
-                else{
+                else {
                     window.location.reload();
                 }
             }
@@ -516,8 +516,8 @@ function registerServiceWorker() {
 
 function updateCache(url, callbackType) {
     const serviceWorker = navigator.serviceWorker.controller;
-    if (serviceWorker){
-        serviceWorker.postMessage({ type: 'updateCache', url: url, callbackType: callbackType});
+    if (serviceWorker) {
+        serviceWorker.postMessage({ type: 'updateCache', url: url, callbackType: callbackType });
     }
 }
 
@@ -570,9 +570,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addPWABar();
     }
 
-    if (typeof loggedIn !== "undefined" && !(loggedIn == false)) {
-        makeDiscoverable();
-    }
+    makeDiscoverable();
     registerServiceWorker();
 
     setupModal();
