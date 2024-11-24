@@ -7,7 +7,36 @@ function hideLoginPopup() {
 }
 
 function logout() {
-    window.location.href = '/internal/logout';
+    fetch('internal/logout', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            console.log(response);
+            if (response.status === 200) {
+                window.location.reload();
+            }
+        });
+}
+
+function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    fetch('internal/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: username, password: password }),
+    })
+        .then(response => {
+            if (response.status === 200) {
+                window.location.reload();
+            }
+        });
 }
 
 function toggleMenu() {

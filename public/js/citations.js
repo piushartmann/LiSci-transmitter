@@ -1,10 +1,25 @@
 let currentPage = 1;
+let previousAuthors = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
-    const previousAuthors = await loadPreviousAuthors();
-    const author = document.getElementById("author");
-    autocomplete(author, previousAuthors);
+    previousAuthors = await loadPreviousAuthors();
+    addNewContext();
 });
+
+function addNewContext() {
+    const citationBox = document.getElementById("newCitationBox");
+    const baseStructure = document.getElementById("baseStructure");
+
+    const sentence = document.createElement("div");
+    sentence.className = "sentenceStructure";
+    sentence.innerHTML = baseStructure.innerHTML;
+
+    const author = sentence.querySelector(".author textarea");
+    autocomplete(author, previousAuthors);
+
+    citationBox.appendChild(sentence);
+    loadLanguage(true);
+}
 
 window.onload = function () {
 
@@ -85,13 +100,24 @@ function buildCitation(citation) {
         });
 
     } else {
+
+        if (citation.context && citation.context.length > 0) {
+            const context = citation.context[0];
+            var content = context.content;
+            var author = context.author;
+
+        } else {
+            var content = citation.content;
+            var author = citation.author;
+        }
+
         sectionDiv = document.createElement("div");
         sectionDiv.className = "content";
-        sectionDiv.innerHTML = `<p>"${citation.content}"</p>`;
+        sectionDiv.innerHTML = `<p>"${content}"</p>`;
 
         authorDiv = document.createElement("div");
         authorDiv.className = "author";
-        authorDiv.innerHTML = `<p>-${citation.author}</p>`;
+        authorDiv.innerHTML = `<p>-${author}</p>`;
     }
 
 
@@ -136,25 +162,39 @@ function updateCitations() {
 }
 
 function submitCitation() {
-    authorElement = document.getElementById("author");
-    contentElement = document.getElementById("content");
-
-    let author = authorElement.value;
-    let content = contentElement.value;
+    console.log("Submit citation");
+    const authorElements = Array.from(document.querySelectorAll(".sentenceStructure .author textarea"));
+    const contentElements = Array.from(document.querySelectorAll(".sentenceStructure .content textarea"));
 
     function checkChar(char) {
         bannedChars = ['"', '„', '“']
         return bannedChars.includes(char);
     }
 
-    if (checkChar(content.charAt(0))) {
-        content = content.substring(1);
-    }
-    if (checkChar(content.charAt(content.length - 1))) {
-        content = content.substring(0, content.length - 1);
-    }
+    console.log(authorElements);
+    console.log(contentElements);
 
-    console.log(content);
+    if (authorElements.length !== contentElements.length) return;
+
+    const context = authorElements.map((authorElement, index) => {
+        let content = contentElements[index].value;
+        let author = authorElement.value;
+        if (checkChar(content.charAt(0))) {
+            content = content.substring(1);
+        }
+        if (checkChar(content.charAt(content.length - 1))) {
+            content = content.substring(0, content.length - 1);
+        }
+
+        if (content.length === 0 || author.length === 0) return;
+
+        return {
+            author: author,
+            content: content
+        }
+    });
+
+    console.log(context);
 
     fetch('internal/createCitation', {
         method: 'POST',
@@ -162,15 +202,19 @@ function submitCitation() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            author: author,
-            content: content
+            context: context
         }),
     })
         .then(response => {
             if (response.status === 200) {
-                authorElement.value = "";
-                contentElement.value = "";
-
+                authorElements.forEach(authorElement => {
+                    authorElement.value = "";
+                }
+                );
+                contentElements.forEach(contentElement => {
+                    contentElement.value = "";
+                }
+                );
                 updateCitations();
             }
         });
@@ -249,11 +293,6 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
     let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id), "interaction edit");
 
     buttonRow.appendChild(editButton);
-}
-
-function selectUser(user) {
-    const author = document.getElementById("author");
-    author.value = user;
 }
 
 let scrollTimeout;

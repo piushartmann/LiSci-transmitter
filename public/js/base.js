@@ -36,6 +36,10 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
         button.appendChild(shortLabel);
         button.short = shortLabel;
     }
+    else {
+        button.short = buttonLabel;
+        buttonLabel.classList.add("short-label");
+    }
 
     button.icon = buttonIcon;
     button.label = buttonLabel;
@@ -538,15 +542,12 @@ function cacheBust() {
 function checkOnline() {
     if (navigator.onLine) {
         document.body.classList.remove('offline');
-        toggleOnlineOnly(true);
     } else {
         document.body.classList.add('offline');
-        toggleOnlineOnly(false);
     }
 
     window.addEventListener('online', () => {
         document.body.classList.remove('offline');
-        toggleOnlineOnly(true);
         if (typeof reloadContent === 'function') {
             reloadContent();
         }
@@ -554,12 +555,7 @@ function checkOnline() {
 
     window.addEventListener('offline', () => {
         document.body.classList.add('offline');
-        toggleOnlineOnly(false);
     });
-}
-
-function toggleOnlineOnly(online) {
-
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

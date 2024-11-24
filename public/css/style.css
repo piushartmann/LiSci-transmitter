@@ -130,7 +130,7 @@ a {
     -webkit-user-select: none;
 }
 
-.button .short-label {
+.button .short-label:not(.label) {
     display: none;
 }
 
@@ -326,6 +326,11 @@ a {
 .game-request-buttons .decline-button:hover {
     background-color: #c82333;
     transform: scale(1.05);
+}
+
+.vertical {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Keyframes for fade-in animation */

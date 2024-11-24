@@ -17,7 +17,6 @@ function autocomplete(input, arr) {
                 autocompleteItem.innerHTML += "<input type='hidden' value='" + arr[index] + "'>";
                 autocompleteItem.addEventListener("click", function (e) {
                     input.value = this.getElementsByTagName("input")[0].value;
-                    selectUser(input.value);
                     closeAllLists();
                 });
                 autocompleteContainer.appendChild(autocompleteItem);

@@ -57,8 +57,8 @@ const citationContextSchema = new Schema({
 
 const citationSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
-    author: { type: String, required: true },
-    content: { type: String, required: true },
+    author: { type: String, required: false },
+    content: { type: String, required: false },
     context: [{ type: citationContextSchema, required: false }],
     timestamp: { type: Date, default: Date.now },
     likes: [likeSchema],
@@ -421,8 +421,8 @@ module.exports.MongoConnector = class MongoConnector {
         return await citation.save();
     }
 
-    async createCitationWithContext(userID, author, content, context, timestamp) {
-        const citation = new this.Citation({ userID, author, content, context, timestamp: timestamp || Date.now() });
+    async createCitationWithContext(userID, context, timestamp) {
+        const citation = new this.Citation({ userID, context, timestamp: timestamp || Date.now() });
         return await citation.save();
     }
 

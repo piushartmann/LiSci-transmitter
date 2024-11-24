@@ -44,13 +44,14 @@ module.exports = (db, s3Client, webpush) => {
                 req.session.profilePic = generateRandomProfilePic();
                 await db.setPreference(user._id, 'profilePic', req.session.profilePic);
             }
-            res.status(200).redirect('/');
+            res.status(200).send({ username: user.username });
         }
     });
 
     router.get('/logout', async (req, res) => {
         req.session.destroy();
-        res.status(200).redirect('/');
+        res.set('Clear-Site-Data', '"cache", "cookies", "storage", "executionContexts"');
+        res.status(200).send("OK");
     });
 
     //include all internal routes

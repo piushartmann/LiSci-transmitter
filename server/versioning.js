@@ -40,7 +40,7 @@ function ejs(viewDirs, publicDirs) {
                     versionedPrefetches.push(prefetchURL);
                     return;
                 }
-                const fileHash = require('crypto').createHash('md5').update(fs.readFileSync(file)).digest('hex');
+                const fileHash = require('crypto').createHash('md5').update(fs.readFileSync(file)).digest('hex').substring(0, 5);
                 versionedPrefetches.push(`${prefetchURL}?v=${fileHash}`);
             });
             return versionedPrefetches;

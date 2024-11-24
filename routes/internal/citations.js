@@ -18,17 +18,26 @@ module.exports = (db, s3Client, webpush) => {
     router.post('/createCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
-        const { author, content } = req.body;
+        const { context } = req.body;
 
-        console.log(author, content);
+        if (!context) return res.status(400).send("Missing parameters");
 
-        if (!author || !content) return res.status(400).send("Missing parameters");
-        if (typeof author !== "string" || typeof content !== "string") return res.status(400).send("Invalid parameters");
+        const sanitizedContext = [];
+        context.forEach(c => {
+            if (!c) return;
+            if (!c.author || !c.content) return;
+            const sanitizedAuthor = sanitizeHtml(c.author);
+            const sanitizedContent = sanitizeHtml(c.content);
 
-        const sanitizedContent = sanitizeHtml(content);
-        const sanitizedAuthor = sanitizeHtml(author);
+            sanitizedContext.push({
+                author: sanitizedAuthor,
+                content: sanitizedContent
+            });
+        });
 
-        await db.createCitation(req.session.userID, sanitizedAuthor, sanitizedContent);
+        console.log(sanitizedContext);
+
+        await db.createCitationWithContext(req.session.userID, sanitizedContext);
         return res.status(200).send("Success");
     });
 
