@@ -16,7 +16,7 @@ function logout() {
         .then(response => {
             console.log(response);
             if (response.status === 200) {
-                window.location.reload();
+                window.location.href = '/';
             }
         });
 }
@@ -34,7 +34,7 @@ function login() {
     })
         .then(response => {
             if (response.status === 200) {
-                window.location.reload();
+                window.location.href = '/';
             }
         });
 }
