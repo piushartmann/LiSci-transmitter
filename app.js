@@ -10,6 +10,9 @@ const webpush = require('web-push')
 const app = express();
 const ws = require('express-ws')(app);
 const versioning = require('./server/versioning');
+const subdomainManager = require('./server/subdomainManager');
+
+app.use(subdomainManager);
 
 const oneDay = 24 * 3600 * 1000
 
@@ -136,13 +139,4 @@ app.use('/api', require('./routes/api')(db, s3Client, webpush));
 
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
-});
-
-
-testapp = express();
-testapp.get('/', (req, res) => {
-    res.send('Hello World!');
-});
-testapp.listen(port+1, () => {
-    console.log('Example app listening on port', port+1);
 });
