@@ -164,14 +164,20 @@ async function updateCache(url, callback) {
     try {
         const fetchRequest = fetch(url)
         const cache = await caches.open('preload');
-        const match = await cache.match(url);
+        const cacheMatch = await cache.match(url);
         const fetchResponse = await fetchRequest;
 
-        const matchEtag = match ? match.headers.get('etag') : null;
+        const matchEtag = cacheMatch ? cacheMatch.headers.get('etag') : null;
         const fetchEtag = fetchResponse.headers.get('etag');
         await cache.put(url, fetchResponse.clone());
 
-        if (matchEtag != fetchEtag) {
+        const isRequest = requestsToCache.includes(url.pathname + url.search);
+
+        const match = isRequest ?
+            cacheMatch && fetchResponse.data === cacheMatch.data :
+            matchEtag === fetchEtag;
+
+        if (!match) {
             console.log('Cache of ', url.pathname + url.search, ' updated');
             if (callback) {
                 callback();

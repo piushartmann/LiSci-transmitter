@@ -18,7 +18,7 @@ function addNewContext() {
     autocomplete(author, previousAuthors);
 
     citationBox.appendChild(sentence);
-    //loadLanguage(true);
+    loadLanguage(true);
 }
 
 window.onload = function () {
@@ -30,28 +30,23 @@ window.onload = function () {
     currentPage = page;
 }
 
-let hasMorePages = true;
-
-async function loadCitations(page) {
-    if (!hasMorePages) return;
-
-    let response = await fetch(`internal/getCitations?page=${page}`);
-    let data = await response.json();
-
-    if (data.length === 0) {
-        hasMorePages = false; // No more pages to load
-        return;
-    }
+async function loadCitations(page, callback) {
+    let response = await fetch(`internal/getCitations?page=${page}`)
+    response = await response.json()
 
     const citationBox = document.getElementById("citationBox");
     const citations = [];
-    data.forEach(citation => {
+    response.forEach(citation => {
         citation = buildCitation(citation);
         citations.push(citation);
     });
-
+    if (callback) {
+        callback(citations);
+        loadLanguage(true);
+        return;
+    }
     citationBox.append(...citations);
-    //loadLanguage(true);
+    loadLanguage(true);
 }
 
 const reloadContent = async () => {
