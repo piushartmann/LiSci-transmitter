@@ -18,7 +18,7 @@ function addNewContext() {
     autocomplete(author, previousAuthors);
 
     citationBox.appendChild(sentence);
-    loadLanguage(true);
+    //loadLanguage(true);
 }
 
 window.onload = function () {
@@ -51,7 +51,7 @@ async function loadCitations(page) {
     });
 
     citationBox.append(...citations);
-    loadLanguage(true);
+    //loadLanguage(true);
 }
 
 const reloadContent = async () => {
