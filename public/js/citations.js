@@ -3,10 +3,10 @@ let previousAuthors = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
     previousAuthors = await loadPreviousAuthors();
-    addNewContext();
+    addNewContext(true);
 });
 
-function addNewContext() {
+function addNewContext(first = false) {
     const citationBox = document.getElementById("newCitationBox");
     const baseStructure = document.getElementById("baseStructure");
 
@@ -16,6 +16,12 @@ function addNewContext() {
 
     const author = sentence.querySelector(".author textarea");
     autocomplete(author, previousAuthors);
+
+    if (!first) {
+        const deleteButton = buildButton("/icons/delete.svg", "", () => sentence.remove());
+        deleteButton.style.border = "none";
+        sentence.appendChild(deleteButton);
+    }
 
     citationBox.appendChild(sentence);
     loadLanguage(true);

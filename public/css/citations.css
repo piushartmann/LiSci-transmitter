@@ -39,6 +39,9 @@
 
 .sentenceStructure {
     display: flex;
+    margin-bottom: 1vh;
+    border-radius: 8px;
+    box-shadow: 1px 1px 3px 0px #a7a7a7;
 }
 
 .sentenceStructure .author {
@@ -52,7 +55,6 @@
 .sentenceStructure .content,
 .sentenceStructure .author {
     margin: 5px;
-    margin-bottom: 1vh;
 }
 
 .sentenceStructure .content textarea,
