@@ -16,15 +16,21 @@
 
 .context-item {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-bottom: 10px;
+    align-items: baseline;
+    gap: 20px;
 }
 
 .context-content {
     font-size: 1.2em;
     font-weight: bold;
     margin-bottom: 10px;
-    width: 87%;
+}
+
+.context-author {
+    font-style: italic;
+    font-size: 1em;
 }
 
 .citation .author {

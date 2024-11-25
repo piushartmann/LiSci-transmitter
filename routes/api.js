@@ -95,6 +95,16 @@ router.get('/getMostRecentPost', async (req, res) => {
 
 });
 
+router.get('/getMostRecentCitation', async (req, res) => {
+    const user = await checkAPIKey(req);
+    if (!user) return res.status(401).send("Invalid API key");
+
+    const citations = await db.getCitations(1, 0);
+    if (!citations || citations.length < 1) return res.status(404).send("No citations found");
+    const citation = citations[0];
+    return res.send(await db.getCitation(citation._id));
+});
+
 router.get('/getComments', async (req, res) => {
     const user = await checkAPIKey(req);
     if (!user) return res.status(401).send("Invalid API key");

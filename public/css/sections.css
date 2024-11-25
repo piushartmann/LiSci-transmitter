@@ -76,7 +76,6 @@
 .modal .newCommentContainer {
     display: flex;
     flex-direction: column;
-    align-items: right;
 }
 
 .modal .newCommentContainer .commentButton {
@@ -93,7 +92,7 @@
 .modal .commentContainer {
     display: flex;
     flex-direction: column;
-    align-items: right;
+    margin-bottom: 6vh;
 }
 
 .modal #title {
