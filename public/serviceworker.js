@@ -127,7 +127,7 @@ function SWreloadContent() {
     });
 }
 
-function reloadSite() {
+function SWreloadSite() {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
         for (let client of windowClients) {
             client.navigate(client.url);
@@ -142,11 +142,13 @@ self.addEventListener('fetch', function (event) {
         caches.match(url.pathname + url.search).then(function (response) {
             if (response) {
                 console.log('Page: ', url.pathname, ' served from cache');
-                if (sitesToPreload.includes(url.pathname + url.search)) {
-                    updateCache(url, reloadSite);
+                reloadType = event.request.headers.get('reloadType') || sitesToPreload.includes(url.pathname + url.search) === true ? 'refreshSite' : 'refreshContent';
+
+                if (reloadType === 'refreshSite') {
+                    updateCache(url, SWreloadSite);
                 }
-                else if (requestsToCache.includes(url.pathname + url.search)) {
-                    updateCache(url, reloadContent);
+                else if (reloadType === 'refreshContent') {
+                    updateCache(url, SWreloadContent);
                 }
                 return response;
             }
@@ -169,7 +171,7 @@ async function updateCache(url, callback) {
         const fetchEtag = fetchResponse.headers.get('etag');
         await cache.put(url, fetchResponse.clone());
 
-        if (matchEtag !== fetchEtag) {
+        if (matchEtag != fetchEtag) {
             console.log('Cache of ', url.pathname + url.search, ' updated');
             if (callback) {
                 callback();

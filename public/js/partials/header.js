@@ -7,7 +7,7 @@ function hideLoginPopup() {
 }
 
 function logout() {
-    fetch('internal/logout', {
+    fetch('/internal/logout', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -21,22 +21,24 @@ function logout() {
         });
 }
 
-function login() {
+async function login() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    fetch('internal/login', {
+    response = await fetch('/internal/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ username: username, password: password }),
     })
-        .then(response => {
-            if (response.status === 200) {
-                window.location.href = '/';
-            }
-        });
+
+    if (response.status === 200) {
+        window.location.href = '/';
+    } else {
+        username.value = "";
+        password.value = "";
+    }
 }
 
 function toggleMenu() {
