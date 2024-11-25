@@ -30,21 +30,26 @@ window.onload = function () {
     currentPage = page;
 }
 
-async function loadCitations(page, callback) {
-    let response = await fetch(`internal/getCitations?page=${page}`)
-    response = await response.json()
+let hasMorePages = true;
+
+async function loadCitations(page) {
+    if (!hasMorePages) return;
+
+    let response = await fetch(`internal/getCitations?page=${page}`);
+    let data = await response.json();
+
+    if (data.length === 0) {
+        hasMorePages = false; // No more pages to load
+        return;
+    }
 
     const citationBox = document.getElementById("citationBox");
     const citations = [];
-    response.forEach(citation => {
+    data.forEach(citation => {
         citation = buildCitation(citation);
         citations.push(citation);
     });
-    if (callback) {
-        callback(citations);
-        loadLanguage(true);
-        return;
-    }
+
     citationBox.append(...citations);
     loadLanguage(true);
 }
@@ -297,15 +302,16 @@ function cancelEditCitation(id, originalContent, originalAuthor) {
 
 let scrollTimeout;
 
-window.addEventListener('scroll', () => {
-    if (scrollTimeout) {
-        clearTimeout(scrollTimeout);
-    }
+let isLoading = false;
 
-    scrollTimeout = setTimeout(() => {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
-            currentPage++;
-            loadCitations(currentPage);
-        }
-    }, 50);
+window.addEventListener('scroll', () => {
+    if (isLoading) return; // Prevent multiple triggers if already loading.
+
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+        isLoading = true; // Set loading state
+        currentPage++;
+        loadCitations(currentPage).then(() => {
+            isLoading = false; // Reset loading state once done
+        });
+    }
 });
