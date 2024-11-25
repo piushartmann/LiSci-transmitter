@@ -127,7 +127,7 @@ function SWreloadContent() {
     });
 }
 
-function SWreloadSite() {
+function reloadSite() {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
         for (let client of windowClients) {
             client.navigate(client.url);
