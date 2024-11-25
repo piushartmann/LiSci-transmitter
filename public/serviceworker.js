@@ -111,7 +111,7 @@ self.addEventListener('message', async function (event) {
             const url = new URL(event.data.url, self.location.origin);
             await updateCache(url);
             if (event.data.callbackType === 'reloadContent') {
-                reloadContent();
+                SWreloadContent();
             }
         } catch (error) {
             console.error('Invalid URL:', event.data.url);
@@ -119,7 +119,7 @@ self.addEventListener('message', async function (event) {
     }
 });
 
-function reloadContent() {
+function SWreloadContent() {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
         for (let client of windowClients) {
             client.postMessage({ type: 'updateContent' });
@@ -127,7 +127,7 @@ function reloadContent() {
     });
 }
 
-function reloadSite() {
+function SWreloadSite() {
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
         for (let client of windowClients) {
             client.navigate(client.url);
