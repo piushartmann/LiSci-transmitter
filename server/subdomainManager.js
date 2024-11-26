@@ -7,13 +7,12 @@ const subdomains = fs.readdirSync(path.join(__dirname, "subdomains"))
 function subdomainMiddleware(req, res, next) {
     if (req.subdomains.length > 0) {
         const subdomain = req.subdomains[0];
-        console.log(subdomain);
         if (subdomains.includes(subdomain)) {
             const routerModule = require(path.join(__dirname, "subdomains", subdomain, "router.js"));
             const router = routerModule();
             return router(req, res, next);
         } else {
-            next();
+            return res.status(404).send("Subdomain not found");
         }
     } else {
         next();

@@ -1,12 +1,13 @@
 const { Router } = require('express');
 const router = Router();
-console.log("Loaded dev router");
 
 module.exports = () => {
 
-    router.get('/', (req, res) => {
-        console.log("Dev subdomain hit");
-        return res.send("Hello from the dev subdomain!");
+    router.ws('/', (ws, req) => {
+        ws.on('message', msg => {
+            console.log(`Received message: ${msg}`);
+            ws.send(msg);
+        });
     });
 
     return router;
