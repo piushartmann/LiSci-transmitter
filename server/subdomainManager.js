@@ -9,6 +9,7 @@ function subdomainMiddleware(req, res, next) {
         console.log(subdomain);
         if (subdomains.includes(subdomain)) {
             const router = require(path.join(__dirname, "subdomains", subdomain, "router.js"));
+            console.log("Loaded subdomain router");
             if (typeof router === 'function') {
                 router(req, res, next);
             } else if (typeof router.handle === 'function') {
