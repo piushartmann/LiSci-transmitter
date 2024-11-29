@@ -105,6 +105,21 @@
     right: 15px;
 }
 
+.meta-info {
+    position: absolute;
+    top: 65px;
+    right: 15px;
+}
+
+.meta-info .date {
+    font-size: 0.8em;
+}
+
+.meta-info:hover .tooltip {
+    visibility: visible;
+    animation: tooltipFadeIn 0.2s forwards;
+}
+
 .autocomplete-items {
     transform: translateY(-5px);
 }
@@ -159,6 +174,10 @@
 
     .author-info {
         position: inherit;
-        bottom: 0;
+        top: 0px;
+    }
+
+    .meta-info {
+        bottom: 15px;
     }
 }

@@ -86,6 +86,7 @@ function buildCitation(citation) {
     let sectionDiv = document.createElement("div");
     let authorDiv = document.createElement("div");
     let contextDiv = document.createElement("div");
+    let metaDiv = document.createElement("div");
     if (citation.context.length > 1) {
         contextDiv = document.createElement("div");
         contextDiv.className = "context";
@@ -146,15 +147,59 @@ function buildCitation(citation) {
         editButtons.appendChild(editButton);
     }
 
+    metaDiv.className = "meta-info";
+    let date = new Date(citation.timestamp);
+    let dateDiv = document.createElement("div");
+    dateDiv.className = "date";
+    dateDiv.innerText = timeSince(date);
+    let dateTooltip = document.createElement("span");
+    dateTooltip.className = "tooltip";
+    dateTooltip.innerText = date.toLocaleString();
+    dateDiv.appendChild(dateTooltip);
+
+    metaDiv.appendChild(dateDiv);
+
     citationContainer.appendChild(contextDiv);
     citationContainer.appendChild(sectionDiv);
     citationContainer.appendChild(authorDiv);
     citationContainer.appendChild(userDiv);
     citationContainer.appendChild(buttonRow);
+    citationContainer.appendChild(metaDiv);
     buttonRow.appendChild(interactionButtons);
     buttonRow.appendChild(editButtons);
 
     return citationContainer;
+}
+
+function timeSince(date) {
+    let seconds = Math.floor((new Date() - date) / 1000);
+    let interval = seconds / 31536000;
+
+    if (interval > 1) {
+        return Math.floor(interval) + " years ago";
+    }
+
+    interval = seconds / 2592000;
+    if (interval > 1) {
+        return Math.floor(interval) + " months ago";
+    }
+
+    interval = seconds / 86400;
+    if (interval > 1) {
+        return Math.floor(interval) + " days ago";
+    }
+
+    interval = seconds / 3600;
+    if (interval > 1) {
+        return Math.floor(interval) + " hours ago";
+    }
+
+    interval = seconds / 60;
+    if (interval > 1) {
+        return Math.floor(interval) + " minutes ago";
+    }
+
+    return Math.floor(seconds) + " seconds ago";
 }
 
 function updateCitations() {

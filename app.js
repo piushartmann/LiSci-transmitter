@@ -10,9 +10,9 @@ const webpush = require('web-push')
 const app = express();
 const ws = require('express-ws')(app);
 const versioning = require('./server/versioning');
-const subdomainManager = require('./server/subdomainManager');
+const subdomains = require('./server/subdomainManager');
 
-app.use(subdomainManager);
+app.use(subdomains);
 
 const oneDay = 24 * 3600 * 1000
 

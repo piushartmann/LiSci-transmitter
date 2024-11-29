@@ -64,7 +64,7 @@ function buildProfilePic(profilePic, username, short = false) {
 
         let authorProfilePicName = document.createElement("span");
         authorProfilePicName.textContent = username;
-        authorProfilePicName.className = "author-name-tooltip";
+        authorProfilePicName.className = "tooltip";
         authorProfilePic.appendChild(authorProfilePicName);
 
         if (!short) authorDiv.appendChild(authorName);
