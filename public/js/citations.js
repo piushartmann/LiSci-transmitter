@@ -56,7 +56,6 @@ function utf8ToBase64(str) {
 }
 
 async function loadCitations(page, callback) {
-    endReached = false;
 
     let { filter, sortObj } = getFilterSettings();
 
@@ -80,6 +79,8 @@ async function loadCitations(page, callback) {
     citationBox.append(...citations);
     loadLanguage(true);
 
+    endReached = false;
+
     return citations;
 }
 
@@ -96,6 +97,7 @@ const reloadContent = async () => {
         citationBox.innerHTML = "";
         citationBox.replaceChildren(...citations);
         body.style.height = "auto";
+        endReached = false;
     });
 };
 
@@ -236,12 +238,17 @@ function timeSince(date) {
 
 function updateCitations() {
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page') || 1;
+    const { page } = getSearchParams();
+    let { filter, sortObj } = getFilterSettings();
 
-    const url = `/internal/getCitations?page=${page}`
+    filterBase64 = utf8ToBase64(JSON.stringify(filter));
+    sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
 
+    const url = `internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`
+    
     updateCache(url, "reloadContent");
+
+    endReached = false;
 }
 
 function submitCitation() {
