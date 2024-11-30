@@ -80,13 +80,13 @@ async function loadCitations(page, callback) {
     });
     if (callback) {
         callback(citations);
-        loadLanguage(true);
-        return;
     }
-    citationBox.append(...citations);
-    loadLanguage(true);
+    else {
+        citationBox.append(...citations);
+    }
 
-    endReached = false;
+    loadLanguage(true);
+    response.totalCitations <= citationBox.children.length ? endReached = true : endReached = false;
 
     return citations;
 }
@@ -395,14 +395,12 @@ window.addEventListener('scroll', () => {
     if (isLoading || endReached) return; // Prevent multiple triggers if already loading or end is reached.
 
     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
-        if (endReached) return; // Prevent loading if end is reached
         isLoading = true; // Set loading state
         currentPage++;
         loadCitations(currentPage).then((citations) => {
             isLoading = false; // Reset loading state once done
             console.log(citations);
             if (typeof citations === "undefined" || citations.length === 0) {
-                endReached = true; // Set endReached if no more citations are loaded
             }
         });
     }
