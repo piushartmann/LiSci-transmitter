@@ -576,6 +576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setupModal();
 
+    //iosPWASplash('/images/splashScreen.png', '#ffffff');
     console.log('Base script loaded!');
 });
 

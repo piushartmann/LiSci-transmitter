@@ -63,6 +63,8 @@
     border-radius: 16px;
     width: min-content;
     transform: translate(10px);
+    margin: 10px;
+    margin-left: 0;
 }
 
 #filterCheckbox:checked+#filterSurrounding {

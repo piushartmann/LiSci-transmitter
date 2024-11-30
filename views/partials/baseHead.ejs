@@ -2,12 +2,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<% if (typeof prefetches !== "undefined") { %>
-  <% for( let i = 0; i < prefetches.length; i++ ) { %>
-    <link rel="prefetch" href="<%= prefetches[i] %>" />
-  <% } %>
-<% } %>
-
 <script src="/js/other/marked.min.js"></script>
 <script src="/js/partials/header.js"></script>
 <link rel="stylesheet" href="/css/style.css">
@@ -16,6 +10,9 @@
 <link rel="manifest" href="/manifest.json" />
 <link rel="icon" type="image/x-icon" href="/images/favicon.jpg">
 <script src="/js/base.js"></script>
-<script>
-  //iosPWASplash('/images/splashScreen.png', '#ffffff');
-</script>
+
+<% if (typeof prefetches !== "undefined") { %>
+  <% for( let i = 0; i < prefetches.length; i++ ) { %>
+    <link rel="prefetch" href="<%= prefetches[i] %>" />
+  <% } %>
+<% } %>

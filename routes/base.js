@@ -15,8 +15,7 @@ module.exports = (db) => {
     const citationsPageSize = config.citationsPageSize;
     const version = process.env.VERSION;
     const basePrefetches = [
-        "/icons/add-section.svg",
-        "/icons/like-locked.svg"
+
     ];
 
 
@@ -25,7 +24,7 @@ module.exports = (db) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
         return res.render(view, {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version, prefetches: res.locals.additionalPrefetches,
             ...additionalRenderData
         });
     }
@@ -52,7 +51,10 @@ module.exports = (db) => {
             ])
             return await renderView(req, res, 'index', {
                 currentPage: currentPage, prank: prank, pages: pages
-            });
+            },
+                [
+                    "/icons/like-locked.svg",
+                ]);
         } else {
             return await renderView(req, res, 'landing');
         }
@@ -102,7 +104,10 @@ module.exports = (db) => {
 
         return await renderView(req, res, 'citations', {
             currentPage: currentPage, pages: pages
-        });
+        },
+            [
+                "/icons/add-section.svg",
+            ]);
     });
 
     router.get('/settings', async (req, res) => {
