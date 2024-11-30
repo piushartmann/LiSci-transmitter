@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     allUsers = await fetch('internal/getAllUsers')
         .then(response => response.json());
     const allUsernames = allUsers.map(user => user.username);
-    autocomplete(userAutoComplete, allUsernames);
+    autocomplete(userAutoComplete, allUsernames, (username) => selectUser(username));
 
     const addUserButton = document.getElementById('createUserSubmit');
 

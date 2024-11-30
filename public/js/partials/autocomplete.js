@@ -1,4 +1,4 @@
-function autocomplete(input, arr) {
+function autocomplete(input, arr, callback = () => { }) {
     var currentFocus;
     input.addEventListener("input", function (e) {
         var autocompleteContainer, autocompleteItem, index, inputValue = this.value;
@@ -17,6 +17,7 @@ function autocomplete(input, arr) {
                 autocompleteItem.innerHTML += "<input type='hidden' value='" + arr[index] + "'>";
                 autocompleteItem.addEventListener("click", function (e) {
                     input.value = this.getElementsByTagName("input")[0].value;
+                    callback(this.getElementsByTagName("input")[0].value);
                     closeAllLists();
                 });
                 autocompleteContainer.appendChild(autocompleteItem);

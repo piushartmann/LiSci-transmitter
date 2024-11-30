@@ -9,22 +9,23 @@ const bodyParser = require('body-parser');
 const webpush = require('web-push')
 const app = express();
 const ws = require('express-ws')(app);
+const MongoConnector = require('./server/MongoConnector').MongoConnector;
 const versioning = require('./server/versioning');
 const subdomains = require('./server/subdomainManager');
 
+//set up subdomains
 app.use(subdomains);
 
 const oneDay = 24 * 3600 * 1000
 
-const MongoConnector = require('./server/MongoConnector').MongoConnector;
-
-//use dotenv in development environment
+//set up environment variables
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
 const gamesDirectory = path.join(__dirname, "games")
 
+//get version from git
 const version = require('child_process')
     .execSync('git rev-parse HEAD')
     .toString().trim();
@@ -60,19 +61,18 @@ gameConfig.reverse()
 
 console.log("Loaded games:", gameConfig.map(config => "'" + config.name + "'").join(", "));
 
-//set view engine
-app.set('view engine', 'ejs');
-
 //set up views
+app.set('view engine', 'ejs');
 let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
 let publicDirs = [path.join(__dirname, 'public')];
 gameConfig.forEach(config => {
     const publicDir = path.join(__dirname, 'games', config.url, (config.public || 'public'))
     app.use("/" + config.url, express.static(publicDir));
-
+    
     publicDirs.push(publicDir);
     views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
 })
+
 app.set('views', views);
 
 //set up versioning
@@ -83,13 +83,11 @@ app.use(express.static(path.join(__dirname, 'public'), {
     setHeaders: function (res, path) {
         res.setHeader("Cache-Control", "public, max-age=86400");
     },
-    
 }));
 
 //use body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 
 //use db to store session
 app.use(session({
@@ -137,6 +135,7 @@ app.use('/games', require('./routes/games')(db, s3Client, webpush, gameConfig));
 app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
 app.use('/api', require('./routes/api')(db, s3Client, webpush));
 
+//start server
 app.listen(port, () => {
     console.log(`Server is running on ${port}`);
 });
