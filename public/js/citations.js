@@ -1,5 +1,6 @@
 let currentPage = 1;
 let previousAuthors = [];
+let endReached = false;
 
 document.addEventListener("DOMContentLoaded", async function () {
     previousAuthors = await loadPreviousAuthors();
@@ -29,15 +30,40 @@ function addNewContext(first = false) {
 
 window.onload = function () {
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page') || 1;
+    const { page } = getSearchParams();
 
     loadCitations(page);
+
     currentPage = page;
 }
 
+function getSearchParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let page = urlParams.get('page');
+
+    page ? page : 1;
+
+    return { page };
+}
+
+function utf8ToBase64(str) {
+    const utf8Bytes = new TextEncoder().encode(str);
+    let binaryString = '';
+    for (let i = 0; i < utf8Bytes.length; i++) {
+        binaryString += String.fromCharCode(utf8Bytes[i]);
+    }
+    return btoa(binaryString);
+}
+
 async function loadCitations(page, callback) {
-    let response = await fetch(`internal/getCitations?page=${page}`)
+    endReached = false;
+
+    let { filter, sortObj } = getFilterSettings();
+
+    filterBase64 = utf8ToBase64(JSON.stringify(filter));
+    sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
+
+    let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`);
     response = await response.json()
 
     const citationBox = document.getElementById("citationBox");
@@ -53,17 +79,23 @@ async function loadCitations(page, callback) {
     }
     citationBox.append(...citations);
     loadLanguage(true);
+
+    return citations;
 }
 
 const reloadContent = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const page = urlParams.get('page') || 1;
+    const { page } = getSearchParams();
+
+    const body = document.querySelector("body");
 
     const citationBox = document.getElementById("citationBox");
-    citationBox.innerHTML = "";
 
     loadCitations(page, (citations) => {
+        const bodyHeight = window.getComputedStyle(body).height;
+        body.style.height = bodyHeight;
+        citationBox.innerHTML = "";
         citationBox.replaceChildren(...citations);
+        body.style.height = "auto";
     });
 };
 
@@ -222,9 +254,6 @@ function submitCitation() {
         return bannedChars.includes(char);
     }
 
-    console.log(authorElements);
-    console.log(contentElements);
-
     if (authorElements.length !== contentElements.length) return;
 
     const context = authorElements.map((authorElement, index) => {
@@ -244,8 +273,6 @@ function submitCitation() {
             content: content
         }
     });
-
-    console.log(context);
 
     fetch('internal/createCitation', {
         method: 'POST',
@@ -351,13 +378,50 @@ let scrollTimeout;
 let isLoading = false;
 
 window.addEventListener('scroll', () => {
-    if (isLoading) return; // Prevent multiple triggers if already loading.
+    if (isLoading || endReached) return; // Prevent multiple triggers if already loading or end is reached.
 
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+        if (endReached) return; // Prevent loading if end is reached
         isLoading = true; // Set loading state
         currentPage++;
-        loadCitations(currentPage).then(() => {
+        loadCitations(currentPage).then((citations) => {
             isLoading = false; // Reset loading state once done
+            console.log(citations);
+            if (typeof citations === "undefined" || citations.length === 0) {
+                endReached = true; // Set endReached if no more citations are loaded
+            }
         });
     }
 });
+
+function getFilterSettings() {
+    const filters = Array.from(document.querySelectorAll(".filter input, .filter select"));
+    const sort = Array.from(document.querySelectorAll(".sortBox input, .sortBox select"));
+
+    let filter = {};
+    let sortObj = {};
+
+    filters.forEach(filterElement => {
+        if (filterElement.id === "filterAuthor") {
+            filter.text = filterElement.value;
+        }
+        else if (filterElement.id === "filterDateFrom") {
+            filter.fromDate = filterElement.value;
+        }
+        else if (filterElement.id === "filterDateTo") {
+            filter.toDate = filterElement.value;
+        }
+    });
+
+    sort.forEach(sortElement => {
+        if (sortElement.id === "sortDate") {
+            sortObj.time = sortElement.value;
+        }
+    });
+
+    return { filter, sortObj };
+}
+
+function updateFilter() {
+    reloadContent();
+}

@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="/css/filter.css">
+
+
+<input type="checkbox" id="filterCheckbox" style="display: none;" />
+<div id="filterSurrounding">
+  <button class="filterButton button" onclick="const checkbox = document.getElementById('filterCheckbox'); checkbox.checked = !checkbox.checked; toggleVisibility('filterBody');">
+    <span>Suchen</span>
+  </button>
+
+  <div class="filterBody" style="display: none;" id="filterBody">
+    <div class="filterBox">
+      <div class="filter">
+        <label for="author">Suchbegriff</label>
+        <input type="text" name="author" placeholder="Suchen" id="filterAuthor" oninput="updateFilter()" />
+      </div>
+      <div class="filter">
+        <label for="dateFrom">Vom</label>
+        <input type="date" name="dateFrom" id="filterDateFrom" placeholder="Datum Auswählen" oninput="updateFilter()" />
+      </div>
+      <div class="filter">
+        <label for="dateTo">Bis</label>
+        <input type="date" name="dateTo" id="filterDateTo" placeholder="Datum Auswählen" oninput="updateFilter()" />
+      </div>
+    </div>
+    <div class="sortBox">
+      <div class="filter">
+        <label for="order">Sortieren</label>
+        <select name="order" id="sortDate" onchange="updateFilter()">
+          <option value="desc">Neuste Zuerst</option>
+          <option value="asc">Älteste Zuerst</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

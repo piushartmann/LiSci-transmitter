@@ -35,11 +35,15 @@ module.exports = (db, s3Client, webpush) => {
             });
         });
 
-        console.log(sanitizedContext);
+        if (sanitizedContext.length === 0) return res.status(400).send("Invalid parameters");
 
         await db.createCitationWithContext(req.session.userID, sanitizedContext);
         return res.status(200).send("Success");
     });
+
+    function base64toUtf8(base64) {
+        return Buffer.from(base64, 'base64').toString('utf8');
+    }
 
     router.get('/getCitations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -48,7 +52,33 @@ module.exports = (db, s3Client, webpush) => {
 
         const page = (req.query.page || 1) - 1;
 
-        const citations = await db.getCitations(citationsPageSize, citationsPageSize * page);
+        let filter = req.query.f;
+        let sort = req.query.s;
+
+        try {
+            filter = filter ? JSON.parse(base64toUtf8(filter)) : {};
+        } catch (e) {
+            return res.status(400).send("Invalid filter parameter");
+        }
+        try {
+            sort = sort ? JSON.parse(base64toUtf8(sort)) : {};
+        } catch (e) {
+            return res.status(400).send("Invalid sort parameter");
+        }
+
+        Object.keys(filter).forEach(key => {
+            if (filter[key] === null || filter[key] === undefined || filter[key] === "") {
+                delete filter[key];
+            }
+        });
+
+        Object.keys(sort).forEach(key => {
+            if (sort[key] === null || sort[key] === undefined || sort[key] === "") {
+                delete sort[key];
+            }
+        });
+
+        const citations = await db.getCitations(citationsPageSize, citationsPageSize * page, filter, sort);
         if (!citations) return res.status(404).send("Citation not found");
 
         let filteredCitations = [];

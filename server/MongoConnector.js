@@ -426,9 +426,64 @@ module.exports.MongoConnector = class MongoConnector {
         return await citation.save();
     }
 
-    async getCitations(limit = 10, offset = 0) {
+    /**
+    * Get a number of citations from the database
+    * @param {number} limit - The number of citations to get
+    * @param {number} offset - The number of citations to skip
+    * @param {object} filter - An object containing the filter parameters
+    * @param {object} sort - An object containing the sort parameters
+    * @returns {array} An array of citations
+    * 
+    * Possible filter parameters:
+    * @param {string} text - The content or author of the citation
+    * @param {string} fromDate - The date from which to get citations
+    * @param {string} toDate - The date to which to get citations
+    * 
+    * Possible sort parameters:
+    * @param {string} time - The sort order for the citations (asc or desc)
+    * 
+    * Example function call:
+    * const citations = await db.getCitations(10, 0, { author: 'John Doe' }, { time: 'desc' });
+     */
+    async getCitations(limit = 10, offset = 0, filter = {}, sort = {}) {
 
-        const citations = await this.Citation.find()
+        const filterObject = {};
+        Object.keys(filter).forEach(key => {
+            if (key === 'text') {
+                filterObject.$or = [
+                    { author: { $regex: new RegExp(filter[key], 'i') } },
+                    { content: { $regex: new RegExp(filter[key], 'i') } },
+                    { 'context.author': { $regex: new RegExp(filter[key], 'i') } },
+                    { 'context.content': { $regex: new RegExp(filter[key], 'i') } }
+                ];
+            }
+            else if (key === 'fromDate') {
+                filterObject.timestamp = filterObject.timestamp || {};
+                filterObject.timestamp.$gte = new Date(filter[key]);
+            }
+            else if (key === 'toDate') {
+                filterObject.timestamp = filterObject.timestamp || {};
+                filterObject.timestamp.$lte = new Date(filter[key]);
+            }
+        });
+
+        const sortObject = {timestamp: -1};
+        Object.keys(sort).forEach(key => {
+            if (key === 'time') {
+                if (sort[key] === 'asc') {
+                    sortObject.timestamp = 1;
+                }
+                else if (sort[key] === 'desc') {
+                    sortObject.timestamp = -1;
+                }
+                else {
+                    console.log('Invalid sort value for time: ' + sort[key]);
+                    sortObject.timestamp = -1;
+                }
+            }
+        });
+
+        const citations = await this.Citation.find(filterObject)
             .populate({
                 path: 'userID',
                 select: 'username',
@@ -438,7 +493,7 @@ module.exports.MongoConnector = class MongoConnector {
                     select: 'value'
                 }
             })
-            .sort({ timestamp: -1 })
+            .sort(sortObject)
             .skip(offset)
             .populate('comments')
             .limit(limit);

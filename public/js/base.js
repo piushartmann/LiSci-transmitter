@@ -508,6 +508,7 @@ function registerServiceWorker() {
                     reloadContent();
                 }
                 else {
+                    console.warn('No content reload function found');
                     window.location.reload();
                 }
             }
@@ -579,3 +580,8 @@ window.addEventListener("focus", () => {
         makeDiscoverable();
     }
 });
+
+function toggleVisibility(id) {
+    const element = document.getElementById(id);
+    element.style.display = element.style.display === 'none' ? element.style.display = '' : element.style.display = 'none'
+}
