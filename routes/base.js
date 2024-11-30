@@ -15,11 +15,8 @@ module.exports = (db) => {
     const citationsPageSize = config.citationsPageSize;
     const version = process.env.VERSION;
     const basePrefetches = [
-        "/css/headers.css",
-        "/css/colors.css",
-        "/images/splashScreen.png",
-        "/images/appIcon.jpg",
-        "/icons/like-locked.svg",
+        "/icons/add-section.svg",
+        "/icons/like-locked.svg"
     ];
 
 
@@ -69,7 +66,10 @@ module.exports = (db) => {
 
         return await renderView(req, res, 'create', {
             isCreatePage: true, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
-        });
+        },
+            [
+                "/icons/add-section.svg",
+            ]);
     });
 
     router.get('/edit/:postID', async (req, res) => {

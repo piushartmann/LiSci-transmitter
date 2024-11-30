@@ -471,51 +471,55 @@ function setupModal() {
 }
 
 function registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-            if (registrations.length === 0) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/serviceworker.js')
-                        .then(() => {
-                            console.log('Service Worker registered');
-                        })
-                        .catch(error => {
-                            console.error('Service Worker registration failed:', error);
-                        });
-                });
-            } else {
-                registrations.forEach(registration => {
-                    registration.update();
-                    registration.onupdatefound = () => {
-                        console.log('Service Worker updating');
-                        location.reload();
-                        return;
-                    };
+    if (loggedIn === true) {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                if (registrations.length === 0) {
                     window.addEventListener('load', () => {
-                        registration.active.postMessage({ type: 'loaded' });
+                        navigator.serviceWorker.register('/serviceworker.js')
+                            .then(() => {
+                                console.log('Service Worker registered');
+                            })
+                            .catch(error => {
+                                console.error('Service Worker registration failed:', error);
+                            });
                     });
-                });
-            }
-        }).catch(error => {
-            console.error('Error checking Service Worker registrations:', error);
-        });
+                } else {
+                    registrations.forEach(registration => {
+                        registration.update();
+                        registration.onupdatefound = () => {
+                            console.log('Service Worker updating');
+                            location.reload();
+                            return;
+                        };
+                        if (loggedIn === true) {
+                            window.addEventListener('load', () => {
+                                registration.active.postMessage({ type: 'loaded' });
+                            });
+                        }
+                    });
+                }
+            }).catch(error => {
+                console.error('Error checking Service Worker registrations:', error);
+            });
 
-        navigator.serviceWorker.addEventListener('message', event => {
-            console.log('Service Worker message received:', event.data);
-            if (event.data.type === 'updateContent') {
-                console.log('Service Worker updating content');
-                if (typeof reloadContent === 'function') {
-                    reloadContent();
+            navigator.serviceWorker.addEventListener('message', event => {
+                console.log('Service Worker message received:', event.data);
+                if (event.data.type === 'updateContent') {
+                    console.log('Service Worker updating content');
+                    if (typeof reloadContent === 'function') {
+                        reloadContent();
+                    }
+                    else {
+                        console.warn('No content reload function found');
+                        window.location.reload();
+                    }
                 }
-                else {
-                    console.warn('No content reload function found');
-                    window.location.reload();
-                }
-            }
-        });
-    }
-    else {
-        console.warn('Service Worker not supported');
+            });
+        }
+        else {
+            console.warn('Service Worker not supported');
+        }
     }
 }
 
