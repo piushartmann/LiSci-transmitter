@@ -90,6 +90,14 @@
     flex-direction: column;
 }
 
+.totalElements {
+    height: 50%;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
 @media (max-width: 768px) {
     .filterBody {
         flex-direction: column;

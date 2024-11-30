@@ -22,6 +22,17 @@ module.exports = (db) => {
         "/icons/like-locked.svg",
     ];
 
+
+    async function renderView(req, res, view, additionalRenderData = {}, additionalPrefetches = []) {
+        res.locals.additionalPrefetches = basePrefetches.concat(additionalPrefetches);
+        const permissions = await db.getUserPermissions(req.session.userID);
+
+        return res.render(view, {
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+            ...additionalRenderData
+        });
+    }
+
     router.get('/', async (req, res) => {
         let currentPage = req.query.page || 1;
         req.session.views = (req.session.views || 0) + 1;
@@ -42,48 +53,34 @@ module.exports = (db) => {
             res.locals.additionalPrefetches = basePrefetches.concat([
 
             ])
-            return res.render('index', {
-                loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+            return await renderView(req, res, 'index', {
                 currentPage: currentPage, prank: prank, pages: pages
             });
         } else {
-            res.locals.additionalPrefetches = basePrefetches.concat([
-
-            ])
-            return res.render('landing', {
-                loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
-            });
+            return await renderView(req, res, 'landing');
         }
 
     });
 
     router.get('/create', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);
         if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot create a new Post");
-        
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('create', {
-            loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+
+        return await renderView(req, res, 'create', {
             isCreatePage: true, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
     });
 
     router.get('/edit/:postID', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);
         if (!permissions.includes("admin") && !permissions.includes("canPost")) return res.status(403).send("You cannot create a new Post");
 
         const postID = req.params.postID;
         const post = await db.getPost(postID);
-        
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('create', {
-            loggedIn: true, username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+
+        return await renderView(req, res, 'create', {
             isCreatePage: true, post: post, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
     });
@@ -91,42 +88,29 @@ module.exports = (db) => {
     router.get('/post/:id', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('postFullscreen', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+        return await renderView(req, res, 'postFullscreen', {
             postID: req.params.id
         });
     });
 
     router.get('/citations', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);
         const currentPage = req.query.page || 1;
         const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
         if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('citations', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+        return await renderView(req, res, 'citations', {
             currentPage: currentPage, pages: pages
-
         });
     });
 
     router.get('/settings', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+        if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('settings', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version,
+        return await renderView(req, res, 'settings', {
             isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID)
         });
     });
@@ -136,26 +120,13 @@ module.exports = (db) => {
     });
 
     router.get('/chat', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
 
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('chat', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
-        });
+        return await renderView(req, res, 'chat');
     });
 
     router.get('/about', async (req, res) => {
-        const permissions = await db.getUserPermissions(req.session.userID);
-
-        res.locals.additionalPrefetches = basePrefetches.concat([
-                
-        ])
-        return res.render('about', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version
-        });
+        return await renderView(req, res, 'about');
     });
 
     return router;

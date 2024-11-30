@@ -64,10 +64,17 @@ async function loadCitations(page, callback) {
 
     let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`);
     response = await response.json()
+    const citationData = response.citations;
+    console.log(response.totalCitations);
+
+    const totalElements = document.getElementById("totalElements");
+    if (totalElements) {
+        totalElements.innerText = response.totalCitations;
+    }
 
     const citationBox = document.getElementById("citationBox");
     const citations = [];
-    response.forEach(citation => {
+    citationData.forEach(citation => {
         citation = buildCitation(citation);
         citations.push(citation);
     });
@@ -245,7 +252,7 @@ function updateCitations() {
     sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
 
     const url = `internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`
-    
+
     updateCache(url, "reloadContent");
 
     endReached = false;

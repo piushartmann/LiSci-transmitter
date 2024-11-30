@@ -115,7 +115,7 @@ module.exports = (db, s3Client, webpush) => {
 
         number = number || 5;
 
-        const citations = await db.getCitations(number, 0, filter, sort);
+        const {citations, totalCitations} = await db.getCitations(number, 0, filter, sort);
         if (!citations || citations.length < 1) return res.send({ citations: [] });
         return res.send(citations);
     });

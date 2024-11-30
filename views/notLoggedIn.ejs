@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <%- include("./partials/baseHead.ejs") %>
+
+  <title>Life Science Transmitter</title>
+</head>
+
+<body>
+
+  <%- include("./partials/header.ejs") %>
+
+  <div style="display: flex; justify-content: center; align-items: center; height: 30vh; text-align: center; flex-direction: column; gap: 20px">
+    <span>Nicht eingeloggt</span>
+    <button class="button" onclick="window.location.href = '/';">Einloggen</button>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+  const loggedIn = false;
+</script>

@@ -498,11 +498,13 @@ module.exports.MongoConnector = class MongoConnector {
             .populate('comments')
             .limit(limit);
 
+        const totalCitations = await this.Citation.countDocuments(filterObject);
+
         let restructuredCitations = citations.map(citation => {
             return this.restructureUser(citation);
         });
 
-        return restructuredCitations;
+        return {citations: restructuredCitations, totalCitations};
     }
 
     restructureUser(object) {

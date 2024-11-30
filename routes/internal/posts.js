@@ -90,7 +90,7 @@ module.exports = (db, s3Client, webpush) => {
 
         const post = await db.getPost(postID);
         const newsIsNew = post.type !== "news" && postType === "news";
-        if (req.session.userID != post.userID._id.toString()) return res.status(403).send("You cannot update this post");
+        if (req.session.userID != post.userID._id.toString() || !permissions.includes("admin")) return res.status(403).send("You cannot update this post");
 
         const sanitizedSections = JSON.parse(sections).map(section => {
             if (section.type === "text" || section.type === "markdown") {

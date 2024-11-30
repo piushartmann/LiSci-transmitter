@@ -78,7 +78,7 @@ module.exports = (db, s3Client, webpush) => {
             }
         });
 
-        const citations = await db.getCitations(citationsPageSize, citationsPageSize * page, filter, sort);
+        const {citations, totalCitations} = await db.getCitations(citationsPageSize, citationsPageSize * page, filter, sort);
         if (!citations) return res.status(404).send("Citation not found");
 
         let filteredCitations = [];
@@ -97,7 +97,7 @@ module.exports = (db, s3Client, webpush) => {
             filteredCitations.push(citationObj);
         });
 
-        return res.status(200).send(filteredCitations);
+        return res.status(200).send(JSON.stringify({citations: filteredCitations, totalCitations}));
     });
 
     router.post('/likeCitation', async (req, res) => {
