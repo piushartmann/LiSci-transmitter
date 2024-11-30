@@ -51,16 +51,16 @@ const userSchema = new Schema({
 });
 
 const citationContextSchema = new Schema({
-    author: { type: String, required: true },
-    content: { type: String, required: true }
+    author: { type: String, required: true, index: true },
+    content: { type: String, required: true, index: true }
 });
 
 const citationSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
-    author: { type: String, required: false },
-    content: { type: String, required: false },
+    author: { type: String, required: false, index: true },
+    content: { type: String, required: false, index: true },
     context: [{ type: citationContextSchema, required: false }],
-    timestamp: { type: Date, default: Date.now },
+    timestamp: { type: Date, default: Date.now, index: true },
     likes: [likeSchema],
     comments: [{ type: ObjectId, ref: 'Comment' }]
 });
