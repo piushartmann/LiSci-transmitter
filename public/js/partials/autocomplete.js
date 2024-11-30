@@ -10,17 +10,23 @@ function autocomplete(input, arr, callback = () => { }) {
         autocompleteContainer.setAttribute("class", "autocomplete-items");
         this.parentNode.insertBefore(autocompleteContainer, this.nextSibling);
         for (index = 0; index < arr.length; index++) {
-            if (arr[index].substr(0, inputValue.length).toUpperCase() == inputValue.toUpperCase()) {
-                autocompleteItem = document.createElement("DIV");
-                autocompleteItem.innerHTML = "<strong>" + arr[index].substr(0, inputValue.length) + "</strong>";
-                autocompleteItem.innerHTML += arr[index].substr(inputValue.length);
-                autocompleteItem.innerHTML += "<input type='hidden' value='" + arr[index] + "'>";
-                autocompleteItem.addEventListener("click", function (e) {
-                    input.value = this.getElementsByTagName("input")[0].value;
-                    callback(this.getElementsByTagName("input")[0].value);
-                    closeAllLists();
-                });
-                autocompleteContainer.appendChild(autocompleteItem);
+            try {
+                if (new RegExp(inputValue, "i").test(arr[index])) {
+                    autocompleteItem = document.createElement("DIV");
+                    autocompleteItem.innerHTML = arr[index].replace(new RegExp(inputValue, "i"), function (match) {
+                        return "<strong>" + match + "</strong>";
+                    });
+                    autocompleteItem.innerHTML += "<input type='hidden' value='" + arr[index] + "'>";
+                    autocompleteItem.addEventListener("click", function (e) {
+                        input.value = this.getElementsByTagName("input")[0].value;
+                        callback(this.getElementsByTagName("input")[0].value);
+                        closeAllLists();
+                    });
+                    autocompleteContainer.appendChild(autocompleteItem);
+                }
+            } catch (e) {
+                console.log("invalid regex");
+                return;
             }
         }
     });

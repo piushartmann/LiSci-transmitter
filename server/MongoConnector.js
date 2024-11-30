@@ -611,7 +611,14 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async getPreviousAuthors() {
-        return await this.Citation.distinct('author');
+        const authors = await this.Citation.aggregate([
+            { $unwind: "$context" },
+            { $group: { _id: "$context.author", count: { $sum: 1 } } },
+            { $match: { count: { $gt: 1 } } },
+            { $project: { _id: 0, author: "$_id", count: 1 } },
+            { $sort: { count: -1 } }
+        ]);
+        return authors.map(author => author.author);
     }
 
     async createGame(players, type, gameState) {
