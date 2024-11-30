@@ -29,21 +29,17 @@ function addNewContext(first = false) {
 }
 
 window.onload = function () {
-
-    const { page } = getSearchParams();
-
-    loadCitations(page);
-
-    currentPage = page;
-}
-
-function getSearchParams() {
     const urlParams = new URLSearchParams(window.location.search);
-    let page = urlParams.get('page');
+    let query = urlParams.get('q');
 
-    page ? page : 1;
+    if (query) {
+        const filterAuthor = document.getElementById("filterAuthor");
+        filterAuthor.value = query;
+    }
 
-    return { page };
+    loadCitations(1);
+
+    currentPage = 1;
 }
 
 function utf8ToBase64(str) {
@@ -100,13 +96,11 @@ async function loadCitations(page, callback) {
 }
 
 const reloadContent = async () => {
-    const { page } = getSearchParams();
-
     const body = document.querySelector("body");
 
     const citationBox = document.getElementById("citationBox");
 
-    loadCitations(page, (citations) => {
+    loadCitations(1, (citations) => {
         const bodyHeight = window.getComputedStyle(body).height;
         body.style.height = bodyHeight;
         citationBox.innerHTML = "";
@@ -253,13 +247,12 @@ function timeSince(date) {
 
 function updateCitations() {
 
-    const { page } = getSearchParams();
     let { filter, sortObj } = getFilterSettings();
 
     filterBase64 = utf8ToBase64(JSON.stringify(filter));
     sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
 
-    const url = `internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`
+    const url = `internal/getCitations?page=${1}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`
 
     updateCache(url, "reloadContent");
 
