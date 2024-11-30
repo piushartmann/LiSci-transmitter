@@ -65,11 +65,19 @@ async function loadCitations(page, callback) {
     let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`);
     response = await response.json()
     const citationData = response.citations;
-    console.log(response.totalCitations);
 
     const totalElements = document.getElementById("totalElements");
     if (totalElements) {
-        totalElements.innerText = response.totalCitations;
+        totalElements.innerText = response.totalCitations === -1 ? 0 : response.totalCitations;
+    }
+
+    const filterAuthor = document.getElementById("filterAuthor");
+    if (filterAuthor) {
+        if (response.totalCitations === -1) {
+            filterAuthor.style.color = "red";
+        } else {
+            filterAuthor.style.color = "black";
+        }
     }
 
     const citationBox = document.getElementById("citationBox");

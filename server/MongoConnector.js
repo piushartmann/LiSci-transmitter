@@ -448,26 +448,30 @@ module.exports.MongoConnector = class MongoConnector {
     async getCitations(limit = 10, offset = 0, filter = {}, sort = {}) {
 
         const filterObject = {};
-        Object.keys(filter).forEach(key => {
-            if (key === 'text') {
-                filterObject.$or = [
-                    { author: { $regex: new RegExp(filter[key], 'i') } },
-                    { content: { $regex: new RegExp(filter[key], 'i') } },
-                    { 'context.author': { $regex: new RegExp(filter[key], 'i') } },
-                    { 'context.content': { $regex: new RegExp(filter[key], 'i') } }
-                ];
-            }
-            else if (key === 'fromDate') {
-                filterObject.timestamp = filterObject.timestamp || {};
-                filterObject.timestamp.$gte = new Date(filter[key]);
-            }
-            else if (key === 'toDate') {
-                filterObject.timestamp = filterObject.timestamp || {};
-                filterObject.timestamp.$lte = new Date(filter[key]);
-            }
-        });
+        try {
+            Object.keys(filter).forEach(key => {
+                if (key === 'text') {
+                    filterObject.$or = [
+                        { author: { $regex: new RegExp(filter[key], 'i') } },
+                        { content: { $regex: new RegExp(filter[key], 'i') } },
+                        { 'context.author': { $regex: new RegExp(filter[key], 'i') } },
+                        { 'context.content': { $regex: new RegExp(filter[key], 'i') } }
+                    ];
+                }
+                else if (key === 'fromDate') {
+                    filterObject.timestamp = filterObject.timestamp || {};
+                    filterObject.timestamp.$gte = new Date(filter[key]);
+                }
+                else if (key === 'toDate') {
+                    filterObject.timestamp = filterObject.timestamp || {};
+                    filterObject.timestamp.$lte = new Date(filter[key]);
+                }
+            });
+        } catch (error) {
+            return { citations: [], totalCitations: -1 };
+        }
 
-        const sortObject = {timestamp: -1};
+        const sortObject = { timestamp: -1 };
         Object.keys(sort).forEach(key => {
             if (key === 'time') {
                 if (sort[key] === 'asc') {
@@ -504,7 +508,7 @@ module.exports.MongoConnector = class MongoConnector {
             return this.restructureUser(citation);
         });
 
-        return {citations: restructuredCitations, totalCitations};
+        return { citations: restructuredCitations, totalCitations };
     }
 
     restructureUser(object) {
