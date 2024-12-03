@@ -94,7 +94,8 @@ module.exports = (db, s3Client, webpush) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key");
 
-        const citations = await db.getCitations(1, 0);
+        let citations = await db.getCitations(1, 0);
+        citations = citations.citations;
         if (!citations || citations.length < 1) return res.status(404).send("No citations found");
         const citation = citations[0];
         return res.send(await db.getCitation(citation._id));
