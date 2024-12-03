@@ -3,6 +3,8 @@ const { MongoConnector } = require('../../server/MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
 
+const config = require('../../config.json');
+
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
@@ -29,6 +31,14 @@ module.exports = (db, s3Client) => {
 
         await db.updateUserData(userID, username, password, postPermissions, preferences);
         return res.status(200).send("Success");
+    });
+
+    router.post('/getPossiblePermissions', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!permissions.includes("admin")) return res.status(403).send("You cannot get possible permissions");
+
+        return res.status(200).send(config.permissions);
     });
 
     router.post('/createUser', async (req, res) => {

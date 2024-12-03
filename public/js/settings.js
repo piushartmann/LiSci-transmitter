@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 body: JSON.stringify({ language: languageSelect.value }),
             });
+            updateCache('/settings');
             window.location.reload();
         }
     });
@@ -68,6 +69,7 @@ function changePushPreference(type, value) {
         },
         body: JSON.stringify({ type, value }),
     });
+    updateCache('/settings');
 }
 
 async function enablePush() {

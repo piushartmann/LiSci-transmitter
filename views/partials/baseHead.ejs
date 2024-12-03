@@ -16,3 +16,7 @@
     <link rel="prefetch" href="<%= prefetches[i] %>" />
   <% } %>
 <% } %>
+
+<script>
+  const loggedIn = <%= typeof username !== 'undefined' ? true : false %>;
+</script>

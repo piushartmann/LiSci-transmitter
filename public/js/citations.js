@@ -436,5 +436,6 @@ function getFilterSettings() {
 }
 
 function updateFilter() {
+    endReached = false;
     reloadContent();
 }

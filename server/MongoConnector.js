@@ -6,6 +6,7 @@ const { generateApiKey } = require('generate-api-key');
 const { title } = require('process');
 const { type } = require('os');
 const { query } = require('express');
+const config = require('../config.json');
 
 
 const likeSchema = new Schema({
@@ -45,7 +46,7 @@ const userSchema = new Schema({
     username: { type: String, required: true, index: true, unique: true },
     passHash: { type: String, required: true },
     pushSubscription: { type: Object, required: false },
-    permissions: [{ type: String, required: true, enum: ['classmate', 'writer', 'admin', 'push', 'canPost', 'games'] }],
+    permissions: [{ type: String, required: true, enum: config.permissions }],
     apiKey: { type: String, required: true },
     preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
 });
@@ -681,5 +682,14 @@ module.exports.MongoConnector = class MongoConnector {
         catch (error) {
             return null;
         }
+    }
+
+    async getPostViews(postID) {
+        const post = await this.Post.findById(postID).populate('viewedBy', 'username profilePic');
+        return post.viewedBy.map(user => ({
+            id: user._id,
+            username: user.username,
+            profilePic: user.profilePic
+        }));
     }
 };

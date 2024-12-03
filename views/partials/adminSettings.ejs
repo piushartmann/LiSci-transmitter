@@ -15,6 +15,10 @@
   </form>
 </div>
 
+<script>
+  const allPermissions = JSON.parse('<%- JSON.stringify(possiblePermissions) %>');
+</script>
+
 <div id="setUserPermissions">
   <div class="setting">
     <h2 data-lang-content="admin_settings edit_user title">Edit User</h2>

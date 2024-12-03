@@ -24,7 +24,10 @@ module.exports = (db, s3Client, webpush) => {
         if (!user) {
             return null;
         }
-        return user;
+        if (user.permissions.includes("apiAccess")) {
+            return user;
+        }
+        return null;
     }
 
     router.get('/', async (req, res) => {
@@ -38,7 +41,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/getPosts', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const currentPage = (req.query.page || 1) - 1;
         const filter = req.query.filter || {};
@@ -60,7 +63,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.get('/getPostPages', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const filter = req.query.filter || "all";
         const pages = Math.ceil(await db.getPostNumber(!user.permissions.includes("classmate"), filter) / postsPageSize);
@@ -69,7 +72,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.get('/getMostRecentPost', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const filter = req.query.filter || "all";
 
@@ -92,7 +95,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.get('/getMostRecentCitation', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         let citations = await db.getCitations(1, 0);
         citations = citations.citations;
@@ -103,7 +106,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/getCitations', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         let { number, filter, sort } = req.body;
         filter = filter || {};
@@ -123,7 +126,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.get('/getComments', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const postID = req.query.postID;
         const comments = await db.loadPostComments(postID);
@@ -137,7 +140,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/createPost', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
         const permissions = db.getUserPermissions(user._id) || [];
         if (!permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
 
@@ -153,7 +156,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/createComment', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const { postID, content, postPermissions } = req.body;
         console.log(postID, content, postPermissions);
@@ -168,7 +171,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/likePost', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const { postID } = req.body;
         try {
@@ -182,7 +185,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/sendPush', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key");
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
         if (!user.permissions.includes("push")) return res.status(403).send("You cannot send a push notification");
 
         const { userID, title, body, icon, badge, urgency } = req.body;
@@ -199,7 +202,7 @@ module.exports = (db, s3Client, webpush) => {
 
     router.post('/createCitation', async (req, res) => {
         const user = await checkAPIKey(req);
-        if (!user) return res.status(401).send("Invalid API key")
+        if (!user) return res.status(401).send("Invalid API key or insufficient permissions")
 
         const { author, content } = req.body;
 

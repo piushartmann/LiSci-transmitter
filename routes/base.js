@@ -116,7 +116,7 @@ module.exports = (db) => {
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
         return await renderView(req, res, 'settings', {
-            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID)
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID), possiblePermissions: config.permissions
         });
     });
 
