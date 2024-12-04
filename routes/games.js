@@ -161,8 +161,8 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
     gameConfigs.forEach(game => {
         try {
             game.relativePath = "../games/" + game.url + "/"
-            game.routerInstance = require(game.relativePath + (game.router || 'router.js'))(db)
             game.logicInstance = require(game.relativePath + (game.logic || 'logic.js'))
+            game.routerInstance = require(game.relativePath + (game.router || 'router.js'))(db, game.logicInstance)
         } catch (error) {
             console.error("Error getting Router or Logic instances for Game: '" + game.name + "'\n" + error.message + "\n" + error.stack.split("\n")[1])
         }

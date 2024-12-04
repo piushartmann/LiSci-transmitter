@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <%- include("./partials/header.ejs") %>
+  <%- include('./partials/base.ejs') %>
 
   <div class="gameBox">
 
@@ -18,7 +18,11 @@
       <h2><%= games[i].name %></h2>
       <p> <%= games[i].description %> </p>
       <% if (games[i].singleplayer) { %>
+      <% if (games[i].difficulties) { %>
+      <button onclick="playSinglePlayerWithDifficulties('<%= games[i].url %>', '<%= JSON.stringify(games[i].difficulties) %>')" class="online-only" data-lang-content="games selector play_singleplayer">Play alone with difficulties</button>
+      <% } else { %>
       <button onclick="playSinglePlayer('<%= games[i].url %>')" class="online-only" data-lang-content="games selector play_singleplayer">Play alone</button>
+      <% } %>
       <% } %>
       <% if (games[i].multiplayer) { %>
       <button class="connectButton online-only" onclick="discoverOtherPlayers('<%= games[i].url %>')" data-lang-content="games selector search_for_others">Search for other Players</button>
@@ -28,25 +32,26 @@
 
   </div>
 
-  <div id="connectionModal" class="modal">
-    <span id="modalClose" class="close" title="Close Modal">&times;</span>
+  <div id="multiplayerModal" class="modal">
+    <h1 id="title" data-lang-content="games selector modal title">Mit wem möchtest du dich verbinden?</h1>
 
-    <form class="modal-content animate">
+    <div id="playerConnections">
 
-      <h1 id="title" data-lang-content="games selector modal title">Mit wem möchtest du dich verbinden?</h1>
+    </div>
 
-      <div id="playerConnections">
-
-      </div>
-
-      <div id="createInvite">
-        <a id="createInviteButton" class="createInviteButton button" data-lang-content="games selector modal create_invite">Create Invite</a>
-        <input id="inviteLink" type="text" readonly style="display: none; width: 390px">
-        <button id="copyLink" style="display: none" data-lang-content="games selector modal copy_link">Copy Link</button>
-      </div>
-
-    </form>
+    <div id="createInvite">
+      <a id="createInviteButton" class="createInviteButton button" data-lang-content="games selector modal create_invite">Create Invite</a>
+      <input id="inviteLink" type="text" readonly style="display: none; width: 390px">
+      <button id="copyLink" style="display: none" data-lang-content="games selector modal copy_link">Copy Link</button>
+    </div>
   </div>
+
+  <div id="difficultiesModal" class="modal">
+    <h1 id="title">Wähle eine Schwierigkeit</h1>
+
+    <div id="difficulties">
+
+    </div>
 
   </div>
 

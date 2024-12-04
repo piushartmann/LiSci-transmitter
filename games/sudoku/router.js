@@ -5,7 +5,25 @@ const path = require('path');
 
 let connections = [];
 
-module.exports = (db) => {
+module.exports = (db, logic) => {
+
+    router.post('/startGame', async (req, res) => {
+        const { opponent, difficulty } = req.body;
+
+        let players;
+        if (!opponent) {
+            players = [req.session.userID];
+        }
+        else {
+            players = [req.session.userID, opponent];
+        }
+
+        console.log("Starting Sudoku with difficulty: " + difficulty);
+
+        const gameID = await logic.newGame(db, players, difficulty);
+
+        return res.status(200).send(JSON.stringify({ gameID: gameID }));
+    });
 
     router.ws('/:gameID', async (ws, req) => {
         const { gameID } = req.params;

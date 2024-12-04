@@ -29,3 +29,31 @@
 .invitedBy {
     background-color: aquamarine;
 }
+
+#difficulties {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+#difficulties .button {
+    width: 100%;
+}
+
+#difficulties .button:nth-child(1) {
+    background-color: #69ec69;
+}
+#difficulties .button:nth-child(2) {
+    background-color: #f8f87a;
+}
+#difficulties .button:nth-child(3) {
+    background-color: #fcb166;
+}
+#difficulties .button:nth-child(4) {
+    background-color: #f85d5d;
+}
+
+#difficulties .button:hover {
+    filter: brightness(0.8);
+}

@@ -3,27 +3,6 @@ let invites = [];
 let users = [];
 let discoverGame = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
-
-    var modal = document.getElementById('connectionModal');
-
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            hideDiscovery();
-        }
-    }
-
-    window.ontouchstart = function (event) {
-        if (event.target == modal) {
-            hideDiscovery();
-        }
-    }
-
-    document.getElementById("modalClose").addEventListener("click", () => {
-        hideDiscovery();
-    });
-});
-
 function buildDiscoveryList(players) {
     const playerConnections = document.getElementById('playerConnections');
     playerConnections.innerHTML = '';
@@ -86,6 +65,32 @@ function playSinglePlayer(game) {
     });
 }
 
+function playSinglePlayerWithDifficulties(game, difficulties) {
+    difficulties = JSON.parse(difficulties);
+
+    const modal = openModal(document.getElementById('difficultiesModal'));
+    difficultiesElement = modal.querySelector('#difficulties');
+
+    difficultiesElement.innerHTML = '';
+    for (const difficulty of difficulties) {
+        const difficultyElement = buildButton("", difficulty, () => {
+            fetch(`/games/${game}/startGame`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ difficulty: difficulty })
+            }).then(async (res) => {
+                if (res.ok) {
+                    const data = await res.json();
+                    window.location.href = `/games/${game}/${data.gameID}`;
+                }
+            });
+        });
+        difficultiesElement.appendChild(difficultyElement);
+    }
+}
+
 function invitePlayer(game, player) {
     console.log("Playing multiplayer");
     console.log(game);
@@ -115,8 +120,8 @@ function uninvitePlayer(game, player) {
 function discoverOtherPlayers(game) {
     console.log("Discovering other players");
 
-    const connectionModal = document.getElementById('connectionModal');
-    connectionModal.style.display = 'block';
+    const connectionModal = document.getElementById('multiplayerModal');
+    openModal(connectionModal);
 
     discoverGame = game;
 
@@ -127,9 +132,7 @@ function discoverOtherPlayers(game) {
 }
 
 function hideDiscovery() {
-    const connectionModal = document.getElementById('connectionModal');
-    connectionModal.style.display = 'none';
-
+    hideModal();
     discoverGame = null;
 }
 

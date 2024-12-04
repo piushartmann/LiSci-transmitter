@@ -70,6 +70,7 @@ const gameSchema = new Schema({
     players: [{ type: ObjectId, ref: 'User', required: true, index: true }],
     type: { type: String, required: true },
     gameState: { type: Object, required: false },
+    difficulty: { type: String, required: false },
     timestamp: { type: Date, default: Date.now },
 });
 
@@ -77,6 +78,7 @@ const gameInviteSchema = new Schema({
     gameInfo: { url: { type: String, required: true }, name: { type: String, required: true }, description: { type: String, required: true } },
     from: { type: ObjectId, ref: 'User', required: true, index: true },
     gameID: { type: ObjectId, ref: 'Game', required: false },
+    difficulty: { type: String, required: false },
     timestamp: { type: Date, default: Date.now },
 });
 
@@ -622,12 +624,18 @@ module.exports.MongoConnector = class MongoConnector {
         return authors.map(author => author.author);
     }
 
-    async createGame(players, type, gameState) {
+    async createGame(players, type, gameState, difficulty = null) {
 
         players = players.map(id => new ObjectId(id));
 
-        const game = new this.Game({ players, type, gameState });
-        return await game.save();
+        if (difficulty) {
+            const game = new this.Game({ players, type, gameState, difficulty });
+            return await game.save();
+        }
+        else {
+            const game = new this.Game({ players, type, gameState });
+            return await game.save();
+        }
     }
 
     async getGame(gameID) {
@@ -639,14 +647,25 @@ module.exports.MongoConnector = class MongoConnector {
         }
     }
 
-    async getGamesFromUsers(userIDs, type) {
-        return await this.Game.find({
-            players: {
-                $size: userIDs.length,
-                $all: userIDs.map(id => new ObjectId(id))
-            },
-            type: type
-        });
+    async getGamesFromUsers(userIDs, type, difficulty = null) {
+        if (difficulty) {
+            return await this.Game.find({
+                players: {
+                    $size: userIDs.length,
+                    $all: userIDs.map(id => new ObjectId(id))
+                },
+                type: type,
+                difficulty: difficulty
+            });
+        } else {
+            return await this.Game.find({
+                players: {
+                    $size: userIDs.length,
+                    $all: userIDs.map(id => new ObjectId(id))
+                },
+                type: type
+            });
+        }
     }
 
     async deleteGame(gameID) {

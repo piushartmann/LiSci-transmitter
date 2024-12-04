@@ -6,5 +6,11 @@
     "multiplayer": false,
     "ejs": "sudoku",
     "priority": 10,
-    "enabled": true
+    "enabled": true,
+    "difficulties": [
+        "easy",
+        "medium",
+        "hard",
+        "expert"
+    ]
 }

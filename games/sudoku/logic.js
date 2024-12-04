@@ -1,13 +1,33 @@
 const path = require('path');
 
-async function newGame(db, players) {
-    const ongoingGame = await db.getGamesFromUsers(players, 'sudoku');
+async function newGame(db, players, difficulty) {
+    const ongoingGame = await db.getGamesFromUsers(players, 'sudoku', difficulty);
     if (ongoingGame[0]) {
         return ongoingGame[0]._id;
     }
 
-    const [removedVals, startingBoard, solvedBoard] = await generateBoard(50);
-    const game = await db.createGame(players, 'sudoku', { board: startingBoard, originalBoard: startingBoard, solvedBoard: solvedBoard, preferences: { showErrors: true, preventErrors: true } });
+    let toRemove = 0;
+    if (difficulty) {
+        switch (difficulty) {
+            case 'easy':
+                toRemove = 30;
+                break;
+            case 'medium':
+                toRemove = 40;
+                break;
+            case 'hard':
+                toRemove = 50;
+                break;
+            case 'expert':
+                toRemove = 60;
+                break;
+            default:
+                toRemove = 40;
+        }
+    }
+
+    const [removedVals, startingBoard, solvedBoard] = await generateBoard(toRemove);
+    const game = await db.createGame(players, 'sudoku', { board: startingBoard, originalBoard: startingBoard, solvedBoard: solvedBoard, preferences: { showErrors: true, preventErrors: true } }, difficulty);
     if (!game) {
         return null;
     }

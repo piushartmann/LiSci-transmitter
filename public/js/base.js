@@ -2,11 +2,16 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
 
     let button = document.createElement("button");
     button.className = "button";
+    button.type = "button";
     button.onclick = onclick;
 
-    let buttonIcon = document.createElement("img");
-    buttonIcon.className = "icon";
-    buttonIcon.src = icon;
+    if (icon != "" && icon != null) {
+        let buttonIcon = document.createElement("img");
+        buttonIcon.className = "icon";
+        buttonIcon.src = icon;
+        button.appendChild(buttonIcon);
+        button.icon = buttonIcon;
+    }
 
     let buttonLabel = document.createElement("p");
     buttonLabel.className = "label";
@@ -20,7 +25,6 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
         buttonLabel.textContent = languageContent;
     }
 
-    button.appendChild(buttonIcon);
     button.appendChild(buttonLabel);
 
     if (typeof languageContentShort !== "undefined") {
@@ -41,7 +45,6 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
         buttonLabel.classList.add("short-label");
     }
 
-    button.icon = buttonIcon;
     button.label = buttonLabel;
 
     return button;
@@ -136,6 +139,7 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
                 likeButton.icon.src = "/icons/like-unfilled.svg";
                 liked = false;
             }
+            updateCache(window.location.href, "updateContent");
         }
     }
     return likeButton;
@@ -299,18 +303,17 @@ function addPWABar() {
 }
 
 function hideModal() {
-    const commentModal = document.getElementById('modal');
-    const commentContainer = document.getElementById('modal-content');
-    commentModal.style.display = 'none';
+    const modal = document.getElementById('modal');
+    modal.style.display = 'none';
 }
 
 function openModal(content) {
-    const commentModal = document.getElementById('modal');
-    const commentContainer = document.getElementById('modal-content');
-    if (typeof content === 'string') {
-        commentContainer.innerHTML = content;
-    }
-    commentModal.style.display = 'block';
+    const modal = document.getElementById('modal');
+    const modalContent = document.querySelector('#modal .modal-content');
+    if (typeof content === 'object') content = content.innerHTML;
+    modalContent.innerHTML = content;
+    modal.style.display = 'block';
+    return modal;
 }
 
 function loadLanguage(update = false) {

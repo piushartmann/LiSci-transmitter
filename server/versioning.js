@@ -140,7 +140,8 @@ function ejs(viewDirs, publicDirs) {
         const { prefetches, fetches } = makePrefetches(view, additionalPrefetches);
 
         prefetches.forEach(prefetch => {
-            html = html.replace(prefetch, fetches[prefetch]);
+            const regex = new RegExp(prefetch, 'g');
+            html = html.replace(regex, fetches[prefetch]);
         });
 
         send(html);

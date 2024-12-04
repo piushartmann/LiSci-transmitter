@@ -12,7 +12,7 @@
 </head>
 
 <body>
-  <%- include("./partials/header.ejs") %>
+  <%- include('./partials/base.ejs') %>
 
   <h1 data-lang-content="citations new title">Ein neues Zitat einreichen</h1>
   <div class="newCitationBox" id="newCitationBox">
@@ -45,7 +45,3 @@
 </body>
 
 </html>
-
-<script>
-  const loggedIn = <%= typeof username !== 'undefined' ? true : false %>;
-</script>
