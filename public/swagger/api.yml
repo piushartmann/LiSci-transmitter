@@ -49,11 +49,7 @@ paths:
           name: filter
           schema:
             type: string
-            enum:
-              - all
-              - posts
-              - news
-          description: The filter to apply.
+          description: The filter to apply. Can be a JSON string representing the filter object.
       responses:
         "200":
           description: Successful response
@@ -95,11 +91,7 @@ paths:
           name: filter
           schema:
             type: string
-            enum:
-              - all
-              - posts
-              - news
-          description: The filter to apply.
+          description: The filter to apply. Can be a JSON string representing the filter object.
       responses:
         "200":
           description: Successful response
@@ -130,6 +122,8 @@ paths:
           description: Invalid API key
         "404":
           description: No posts found
+        "400":
+          description: Invalid filter object
   /api/getPostPages:
     get:
       summary: Get Post Pages
@@ -358,5 +352,89 @@ paths:
           description: Successful response
         "401":
           description: Invalid API key
+        "500":
+          description: Internal server error
+  /api/getCitations:
+    post:
+      summary: Get Citations
+      description: Retrieves a list of citations.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number:
+                  type: integer
+                filter:
+                  type: string
+                  description: The filter to apply. Can be a JSON string representing the filter object.
+                sort:
+                  type: string
+                  description: The sort order. Can be a JSON string representing the sort object.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    author:
+                      type: string
+                    content:
+                      type: string
+        "401":
+          description: Invalid API key
+        "400":
+          description: Invalid filter or sort object
+        "500":
+          description: Internal server error
+  /api/getMostRecentCitation:
+    get:
+      summary: Get Most Recent Citation
+      description: Retrieves the most recent citation.
+      parameters:
+        - in: header
+          name: x-api-key
+          required: true
+          schema:
+            type: string
+          description: The API key to validate.
+        - in: query
+          name: filter
+          schema:
+            type: string
+          description: The filter to apply. Can be a JSON string representing the filter object.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  author:
+                    type: string
+                  content:
+                    type: string
+        "401":
+          description: Invalid API key
+        "400":
+          description: Invalid filter object
         "500":
           description: Internal server error

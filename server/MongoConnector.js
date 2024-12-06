@@ -102,10 +102,6 @@ module.exports.MongoConnector = class MongoConnector {
         this.GameInvite = this.mongoose.model('GameInvite', gameInviteSchema);
     }
 
-    async dropDatabase() { //be careful intended for debugging
-        await this.mongoose.connection.dropDatabase();
-    }
-
     async createPost(userID, title, sections, permissions, type) {
         const filteredSections = sections.filter(section => section.content && section.content.trim() !== '');
         const post = new this.Post({ userID, title, sections: filteredSections, permissions, type });
@@ -238,12 +234,6 @@ module.exports.MongoConnector = class MongoConnector {
         return post.comments;
     }
 
-    async loadLikesForPost(postID) {
-        const post = await this.Post.findById(postID)
-            .populate('likes.userID', 'username profilePic');
-        return post.likes;
-    }
-
     async checkLogin(username, password) {
         const user = await this.User.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
         if (!user) {
@@ -258,42 +248,82 @@ module.exports.MongoConnector = class MongoConnector {
         }
     }
 
-    async getPosts(isTeacher, limit = 10, offset = 0, filter = "all") {
-        const query = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+    async getPosts(isTeacher, limit = 10, offset = 0, filter = {}) {
+        const filterObject = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
 
-        if (filter !== "all") {
-            query.type = filter;
+        try {
+            Object.keys(filter).forEach(key => {
+                if (key === 'text') {
+                    filterObject.$or = [
+                        { title: { $regex: new RegExp(filter[key], 'i') } },
+                        { 'sections.type': { $in: ['text', 'markdown'] }, 'sections.content': { $regex: new RegExp(filter[key], 'i') } },
+                        { 'sections.type': 'file', 'sections.summary': { $regex: new RegExp(filter[key], 'i') } }
+                    ];
+                }
+                else if (key === 'fromDate') {
+                    filterObject.timestamp = filterObject.timestamp || {};
+                    filterObject.timestamp.$gte = new Date(filter[key]);
+                }
+                else if (key === 'toDate') {
+                    filterObject.timestamp = filterObject.timestamp || {};
+                    filterObject.timestamp.$lte = new Date(filter[key]);
+                }
+                else if (key === 'type') {
+                    filterObject.type = filter[key];
+                }
+            });
+        } catch (error) {
+            return { posts: [], totalPosts: -1 };
         }
 
-        function generateRandomProfilePic() {
-            return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
-        }
+        const sortObject = { timestamp: -1 };
+        Object.keys(filter).forEach(key => {
+            if (key === 'time') {
+                if (filter[key] === 'asc') {
+                    sortObject.timestamp = 1;
+                }
+                else if (filter[key] === 'desc') {
+                    sortObject.timestamp = -1;
+                }
+                else {
+                    console.log('Invalid sort value for time: ' + filter[key]);
+                    sortObject.timestamp = -1;
+                }
+            }
+        });
 
-        const posts = await this.Post.find(query)
+        let query = this.Post.find(filterObject)
             .populate({
+            path: 'userID',
+            select: 'username',
+            populate: {
+                path: 'preferences',
+                match: { key: 'profilePic' },
+                select: 'value'
+            }
+            })
+            .populate({
+            path: 'comments',
+            populate: {
                 path: 'userID',
                 select: 'username',
                 populate: {
-                    path: 'preferences',
-                    match: { key: 'profilePic' },
-                    select: 'value'
+                path: 'preferences',
+                match: { key: 'profilePic' },
+                select: 'value'
                 }
+            }
             })
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'userID',
-                    select: 'username',
-                    populate: {
-                        path: 'preferences',
-                        match: { key: 'profilePic' },
-                        select: 'value'
-                    }
-                }
-            })
-            .sort({ timestamp: -1 })
-            .skip(offset)
-            .limit(limit);
+            .sort(sortObject)
+            .skip(offset);
+
+        if (limit !== -1) {
+            query = query.limit(limit);
+        }
+
+        const posts = await query;
+
+        const totalPosts = await this.Post.countDocuments(filterObject);
 
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
@@ -319,7 +349,7 @@ module.exports.MongoConnector = class MongoConnector {
             return restructuredPost;
         });
 
-        return restructuredPosts;
+        return { posts: restructuredPosts, totalPosts };
     }
 
     async markPostAsRead(userID, postID) {
@@ -365,6 +395,9 @@ module.exports.MongoConnector = class MongoConnector {
             .sort({ timestamp: -1 });
 
         let restructuredPost = this.restructureUser(post);
+        if (!restructuredPost) {
+            return null;
+        }
 
         restructuredPost.comments = restructuredPost.comments.map(comment => {
             if (comment.userID.profilePic) {
@@ -515,11 +548,12 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     restructureUser(object) {
-
+        if (!object) {
+            return null;
+        }
         function generateRandomProfilePic() {
             return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
         }
-
         let restructuredObject = object.toObject();
         if (restructuredObject.userID) {
             if (restructuredObject.userID.preferences && restructuredObject.userID.preferences.length > 0) {

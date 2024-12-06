@@ -144,7 +144,7 @@ module.exports = (db, s3Client, webpush) => {
         const isTeacher = !(permissions.includes("classmate"));
         let page = (req.query.page || 1) - 1;
 
-        const filter = req.query.filter || "all";
+        const filter = req.query.filter || {};
 
         const totalPosts = await db.getPostNumber(isTeacher, filter);
 
@@ -152,7 +152,8 @@ module.exports = (db, s3Client, webpush) => {
             page = Math.ceil(totalPosts / postsPageSize) - 1;
         }
 
-        const posts = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page, filter);
+        const postData = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page, filter);
+        const posts = postData.posts;
         let filteredPosts = [];
         posts.forEach(post => {
             let postObj = post;

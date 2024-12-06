@@ -31,7 +31,7 @@ module.exports = (db, s3Client, webpush) => {
     }
 
     router.get('/', async (req, res) => {
-        return res.render('swaggerui.ejs', { filepath: '/swagger/api.yml' });
+        return res.render('swaggerui', { filepath: '/swagger/api.yml' });
     });
 
     router.get('/checkKey', async (req, res) => {
@@ -44,8 +44,9 @@ module.exports = (db, s3Client, webpush) => {
         if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
         const currentPage = (req.query.page || 1) - 1;
-        const filter = req.query.filter || {};
-        const posts = await db.getPosts(!user.permissions.includes("classmate"), postsPageSize, postsPageSize * currentPage, filter);
+        const filter = req.body.filter || {};
+        const postData = await db.getPosts(!user.permissions.includes("classmate"), postsPageSize, postsPageSize * currentPage, filter);
+        const posts = postData.posts;
         if (!posts) return res.status(404).send("No posts found");
         const filteredPosts = await Promise.all(posts.map(async post => ({
             user: post.userID.username,
@@ -54,7 +55,7 @@ module.exports = (db, s3Client, webpush) => {
             mediaPath: post.mediaPath,
             type: post.type,
             likes: post.likes.length,
-            liked: (await db.loadLikesForPost(post._id)).map(like => like.userID.id.toString()).includes(user._id.toString()),
+            liked: post.likes.map(like => like.userID.toString()).includes(user._id.toString()),
 
         })));
 
@@ -74,12 +75,11 @@ module.exports = (db, s3Client, webpush) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
-        const filter = req.query.filter || "all";
+        const filter = req.query.filter || {};
 
         const posts = await db.getPosts(!user.permissions.includes("classmate"), 1, 0, filter);
         if (!posts || posts.length < 1) return res.status(404).send("No posts found");
-        const post = posts[0];
-        const likes = await db.loadLikesForPost(post._id);
+        const post = posts.posts[0];
         return res.send({
             id: post._id,
             user: post.userID.username,
@@ -88,7 +88,7 @@ module.exports = (db, s3Client, webpush) => {
             mediaPath: post.mediaPath,
             type: post.type,
             likes: post.likes.length,
-            liked: likes.map(like => like.userID.id.toString()).includes(user._id.toString()),
+            liked: post.likes.map(like => like.userID.id.toString()).includes(user._id.toString()),
         });
 
     });
@@ -97,11 +97,13 @@ module.exports = (db, s3Client, webpush) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
 
-        let citations = await db.getCitations(1, 0);
-        citations = citations.citations;
-        if (!citations || citations.length < 1) return res.status(404).send("No citations found");
-        const citation = citations[0];
-        return res.send(await db.getCitation(citation._id));
+        let filter = req.query.filter || {};
+        typeof filter === "string" ? filter = JSON.parse(filter) : filter;
+        if (typeof filter !== "object") return res.status(400).send("Invalid filter object");
+
+        const {citations, totalCitations} = await db.getCitations(1, 0, filter);
+        if (!citations || citations.length < 1) return res.send({ citations: [] });
+        return res.send(citations[0]);
     });
 
     router.post('/getCitations', async (req, res) => {
