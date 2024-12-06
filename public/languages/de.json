@@ -1,4 +1,8 @@
 {
+    "name": "Life Science Transmitter",
+    "landing": {
+        "description": "Das ist der Life Science Transmitter, die Zeitungs website des 12.3 Life Science Profils."
+    },
     "header": {
         "home": "Startseite",
         "citations": "Zitate",
@@ -8,6 +12,11 @@
         "settings": "Einstellungen",
         "logout": "Abmelden",
         "login": "Anmelden"
+    },
+    "not_logged_in": {
+        "title": "Du bist nicht angemeldet",
+        "description": "Bitte melde dich an, um fortzufahren.",
+        "login": "Hier anmelden:"
     },
     "login_form": {
         "username": "Benutzername",
@@ -60,7 +69,9 @@
             "image": "Bild",
             "file": "Datei",
             "markdown": "Markdown"
-        }
+        },
+        "newPostTitle": "Neuer Post",
+        "updatePostTitle": "Post bearbeiten"
     },
     "settings": {
         "title": "Einstellungen",
@@ -76,7 +87,8 @@
         },
         "pick_profile_picture": "Profilbildfarbe auswählen",
         "api_key": "API Key",
-        "language": "Sprache"
+        "language": "Sprache",
+        "enable": "Aktivieren"
     },
     "admin_settings": {
         "title": "Admin Einstellungen",
@@ -113,6 +125,30 @@
                 "show_errors": "Fehler anzeigen",
                 "prevent_errors": "Fehler verhindern"
             }
+        },
+        "title": "Spiele",
+        "difficulties": {
+            "title": "Wähle eine Schwierigkeit"
         }
+    },
+    "filter": {
+        "search": "Suche",
+        "searchTerm": "Suchbegriff",
+        "from": "Von",
+        "to": "Bis",
+        "results": "Ergebnisse",
+        "sort": {
+            "title": "Sortieren nach",
+            "newest": "Neueste zuerst",
+            "oldest": "Älteste zuerst"
+        }
+    },
+    "languages": {
+        "de": "Deutsch",
+        "en": "Englisch",
+        "pl": "Polnisch (ai)",
+        "tlh-Latn": "Klingonisch (ai)",
+        "elv": "Elbisch",
+        "dwa": "Zwergisch"
     }
 }

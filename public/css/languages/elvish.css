@@ -1,5 +1,5 @@
-* {
-    font-family: 'Tengwar Feanor Regular';
+[data-lang-content], [data-lang-content-value], [data-lang-content-placeholder] {
+    font-family: 'Tengwar Feanor Regular' !important;
 }
 
 @font-face {

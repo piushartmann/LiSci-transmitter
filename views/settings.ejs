@@ -4,7 +4,7 @@
 <head>
   <%- include("./partials/baseHead.ejs") %>
   <script src="/js/settings.js"></script>
-  <title>Settings</title>
+  <title data-lang-content="settings title">Settings</title>
   <link rel="stylesheet" href="/css/settings.css">
   <% if (isAdmin) { %>
   <link rel="stylesheet" href="/css/adminSettings.css">
@@ -40,16 +40,16 @@
         </div>
       </div>
       <% } else { %>
-      <button id="enablePush">Enable</button>
+      <button id="enablePush" data-lang-content="settings enable">Enable</button>
       <% } %>
 
     </div>
 
     <div class="profilePictureContainer setting">
       <label for="head" data-lang-content="settings pick_profile_picture">Pick Profile Picture Color</label>
-      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;"">
+      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;">
         <%= username.charAt(0).toUpperCase() %>
-        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value=<%= profilePic.content %> />
+        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value="<%= profilePic.content %>" />
       </p>
       <button id="profilePictureColorSubmit" class="online-only" >Save</button>
     </div>
@@ -62,12 +62,9 @@
     <div class="languageContainer setting">
       <label for="language" data-lang-content="settings language">Language</label>
       <select id="language" class="online-only">
-        <option value="de" <%= preferences.find(p => p.key === 'language')?.value === 'de' ? 'selected' : '' %>>Deutsch</option>
-        <option value="en" <%= preferences.find(p => p.key === 'language')?.value === 'en' ? 'selected' : '' %>>English</option>
-        <option value="pl" <%= preferences.find(p => p.key === 'language')?.value === 'pl' ? 'selected' : '' %>>Polski (ai)</option>
-        <option value="tlh" <%= preferences.find(p => p.key === 'language')?.value === 'tlh' ? 'selected' : '' %>>Klingon (ai)</option>
-        <option value="elv" <%= preferences.find(p => p.key === 'language')?.value === 'elv' ? 'selected' : '' %>>Elvish</option>
-        <option value="dwa" <%= preferences.find(p => p.key === 'language')?.value === 'dwa' ? 'selected' : '' %>>Dwarvish</option>
+        <% for( let i = 0; i < languages.length; i++ ) { %>
+          <option value="<%= languages[i] %>" <%= preferences.find(p => p.key === 'language')?.value === languages[i] ? 'selected' : '' %> data-lang-content="languages <%= languages[i] %>"><%= languages[i] %></option>
+        <% } %>
       </select>
     </div>
 

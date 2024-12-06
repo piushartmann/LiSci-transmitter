@@ -1,4 +1,8 @@
 {
+    "name": "yay'",
+    "landing": {
+        "description": "tlhIngan Humanpu' neH lutu'pu'bogh tIqlIj."
+    },
     "header": {
         "home": "juH",
         "citations": "tlhaw'DIyuS",
@@ -8,6 +12,11 @@
         "settings": "'aw'",
         "logout": "yoS",
         "login": "QonoS"
+    },
+    "not_logged_in": {
+        "title": "bImaSbe'",
+        "description": "wejpuH.",
+        "login": "jIvuv'a' 'e' yIboS."
     },
     "login_form": {
         "username": "qaStaHvIS",
@@ -60,7 +69,9 @@
             "image": "qelI'",
             "file": "teywI'",
             "markdown": "majQa'"
-        }
+        },
+        "newPostTitle": "ngem",
+        "updatePostTitle": "yoS qIjDaq"
     },
     "settings": {
         "title": "'aw'",
@@ -76,7 +87,8 @@
         },
         "pick_profile_picture": "nuvpu' ghotpu'",
         "api_key": "tlhIngan",
-        "language": "Hol"
+        "language": "Hol",
+        "enable": "DaH 'entepray'"
     },
     "admin_settings": {
         "title": "'amerIjqu'",
@@ -113,6 +125,30 @@
                 "show_errors": "qagh'a'",
                 "prevent_errors": "bagh"
             }
+        },
+        "title": "ghIlghameSvaD jatlh",
+        "difficulties": {
+            "title": "chojmeH ghu'"
         }
+    },
+    "filter": {
+        "search": "SoQ",
+        "searchTerm": "toy'wI'",
+        "from": "Vo'",
+        "to": "Hoch",
+        "results": "reynalDo",
+        "sort": {
+            "title": "jIQoS",
+            "newest": "wa'DIch",
+            "oldest": "lalDanyaS"
+        }
+    },
+    "languages": {
+        "german": "DoyIchlan",
+        "english": "Te ra'",
+        "polish": "ta' qechvam.",
+        "klingon": "tlhIngan pagh tlhInganpu'",
+        "elvish": "'eSqIl",
+        "dwarvish": "polHa'"
     }
 }

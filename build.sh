@@ -11,3 +11,5 @@ find ./public -type f -name '*.js' -exec sh -c '
 ' sh {} +
 
 echo "Minification complete"
+
+node ".\translate_language_file.js"

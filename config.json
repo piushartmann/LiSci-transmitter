@@ -3,7 +3,19 @@
     "citationsPageSize": 10,
     "openAISummarizeTextPrompt": "Gebe eine kurze zusammenfassung auf Deutsch, was in dem Text enhalten ist. Der Text stammt aus einer PDF die zu lang ist um sie in einer Chat app direkt einzubetten. Stattdessen wir sie hinter einem Knop gezeigt, der Benutzer solle aber schon einmal eine Zusammenfassung des Dokumentes bekommen. Fasse den Text also kurz zusammen. Es ist klar das es eine Zeitung gibt namens LiSci-Transmitter, das musst du nicht sagen, auch dass sie von Cornelius möller ist nicht relevant. Gebe einfach eine sehr Kurze zusammenfassung was diese Woche in der Zeitung passiert ist. Halte dich wirklich so kurz wie möglich. Der Text muss nicht immer eine neue Ausgabe sein, erwähne wenn sie es ist sehr sehr kurz! Fasse den gesammten Text in maximal 3 Sätzen zusammen. Alle Personen die die Zeitung lesen, kenn auch die Personen die darin vorkommen, also du musst personen nicht erst vorstellen. Der Text muss keine Zeitung sein, fasse auch andere Texte gut und kurz zusammen.",
     "openAICreateTitlePrompt": "Erstelle einen Titel für diese PDF Datei. Oft wird der Text die Zeitung 'Life Science Transmitter sein' der Titel ist in diesem Fall: 'Transmitter Zeitung' das Datum sollte nicht enthalten sein. Nur 'Transmitter' bzw wenn es eine sonderausgabe ein passender titel dafür. Wenn es nicht die Zeitung gib dem Text ein ähnlich kurzen (max 3 worte) und aussagekräftigen titel.",
-    "openAIGenerateCrosswordWordsPrompt": "Erstelle Fragen-Antwort paare für ein Kreuzworträtsel. Gib die paare ein die in das Kreuzworträtsel eingefügt werden sollen. Trenne die Paare mit einem Komma. Die Fragen sollten aus den Texten stammen die in der Zeitung 'Life Science Transmitter' erschienen sind. Dafür sind diese Texte in der User message enthalten. Die Fragen und Antworten können auch spezifisch sein, also auch Namen und ereignisse die sich ereignet haben. Gestalte die Fragen so lustig wie möglich. Sie sollten dinge anspielen, die dem Life-Science Profil passiert sind. Frage die Fragen im stil der Zeitungen. Die Antworten sollten nicht zu schwer sein, und in einem Kreuzworträtsel lösbar sein. Die Antworten ungefähr zwei Wörter lang sein. Die Lösung des Kreuzworträtsels sollte maximal 10 Zeichen Lang sein. Generiere auch Hinweise für jedes der Rätsel.", 
+    "openAIGenerateCrosswordWordsPrompt": "Erstelle Fragen-Antwort paare für ein Kreuzworträtsel. Gib die paare ein die in das Kreuzworträtsel eingefügt werden sollen. Trenne die Paare mit einem Komma. Die Fragen sollten aus den Texten stammen die in der Zeitung 'Life Science Transmitter' erschienen sind. Dafür sind diese Texte in der User message enthalten. Die Fragen und Antworten können auch spezifisch sein, also auch Namen und ereignisse die sich ereignet haben. Gestalte die Fragen so lustig wie möglich. Sie sollten dinge anspielen, die dem Life-Science Profil passiert sind. Frage die Fragen im stil der Zeitungen. Die Antworten sollten nicht zu schwer sein, und in einem Kreuzworträtsel lösbar sein. Die Antworten ungefähr zwei Wörter lang sein. Die Lösung des Kreuzworträtsels sollte maximal 10 Zeichen Lang sein. Generiere auch Hinweise für jedes der Rätsel.",
+    "languages": {
+        "manuallyTranslated": [
+            "en",
+            "de"
+        ],
+        "aiTranslated": [
+            "tlh-Latn",
+            "pl",
+            "elv",
+            "dwa"
+        ]
+    },
     "permissions": [
         "classmate",
         "writer",

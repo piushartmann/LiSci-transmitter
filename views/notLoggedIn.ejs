@@ -4,7 +4,7 @@
 <head>
   <%- include("./partials/baseHead.ejs") %>
 
-  <title>Life Science Transmitter</title>
+  <title data-lang-content="not_logged_in title">Life Science Transmitter</title>
 </head>
 
 <body>
@@ -12,8 +12,9 @@
  <%- include('./partials/base.ejs') %>
 
   <div style="display: flex; justify-content: center; align-items: center; height: 30vh; text-align: center; flex-direction: column; gap: 20px">
-    <span>Nicht eingeloggt</span>
-    <button class="button" onclick="window.location.href = '/';">Einloggen</button>
+    <span data-lang-content="not_logged_in title">Nicht eingeloggt</span>
+    <span data-lang-content="not_logged_in description">Bitte melde dich an, um fortzufahren.</span>
+    <button class="button" onclick="window.location.href = '/';" data-lang-content="not_logged_in login">Einloggen</button>
   </div>
 
 </body>

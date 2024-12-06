@@ -5,9 +5,9 @@
   <%- include("./partials/baseHead.ejs") %>
 
   <% if (typeof post != "undefined") { %>
-  <title>Edit a Post</title>
+  <title data-lang-content="create newPostTitle">Edit a Post</title>
   <% } else { %>
-  <title>Create a New Post</title>
+  <title data-lang-content="create updatePostTitle">Create a New Post</title>
   <% } %>
   <link rel="stylesheet" href="/css/create.css">
   <link rel="stylesheet" href="/css/sections.css">

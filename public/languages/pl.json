@@ -1,4 +1,8 @@
 {
+    "name": "Nadajnik nauk przyrodniczych",
+    "landing": {
+        "description": "Witamy w Life Science Transmitter, Twojej platformie do wszystkiego, co związane z naukami przyrodniczymi."
+    },
     "header": {
         "home": "Dom",
         "citations": "Cytatów",
@@ -8,6 +12,11 @@
         "settings": "Ustawienia",
         "logout": "Wyloguj",
         "login": "Login"
+    },
+    "not_logged_in": {
+        "title": "Nie jesteś zalogowany",
+        "description": "Zaloguj się, aby kontynuować.",
+        "login": "Zaloguj się tutaj:"
     },
     "login_form": {
         "username": "Nazwa użytkownika",
@@ -32,7 +41,7 @@
         "new": {
             "title": "Utwórz nowy cytat",
             "sentence": {
-                "0": "Herr Treetzen",
+                "0": "Pan Treetzen",
                 "1": "powiedziany",
                 "2": "Zabawny cytat",
                 "3": "."
@@ -42,7 +51,7 @@
         "title": "Cytatów"
     },
     "posts": {
-        "file_view_fallback": "Datei anzeigen",
+        "file_view_fallback": "Wyświetl plik",
         "only_show_news": "Pokaż tylko wiadomości"
     },
     "create": {
@@ -60,7 +69,9 @@
             "image": "Obraz",
             "file": "Plik",
             "markdown": "Markdown"
-        }
+        },
+        "newPostTitle": "Nowy post",
+        "updatePostTitle": "Aktualizuj post"
     },
     "settings": {
         "title": "Ustawienia",
@@ -76,7 +87,8 @@
         },
         "pick_profile_picture": "Wybierz kolor zdjęcia profilowego",
         "api_key": "Klucz API",
-        "language": "Język"
+        "language": "Język",
+        "enable": "Umożliwiać"
     },
     "admin_settings": {
         "title": "Ustawienia administratora",
@@ -113,6 +125,30 @@
                 "show_errors": "Pokaż błędy",
                 "prevent_errors": "Zapobieganie błędom"
             }
+        },
+        "title": "Igrzyska",
+        "difficulties": {
+            "title": "Wybierz poziom trudności"
         }
+    },
+    "filter": {
+        "search": "Szukać",
+        "searchTerm": "Wyszukiwane hasło",
+        "from": "Z",
+        "to": "Do",
+        "results": "Wyniki",
+        "sort": {
+            "title": "Sortuj wg:",
+            "newest": "Od najnowszych",
+            "oldest": "Od najstarszych"
+        }
+    },
+    "languages": {
+        "german": "Niemiecki",
+        "english": "Angielski",
+        "polish": "Polski (ai)",
+        "klingon": "Klingoński (ai)",
+        "elvish": "Łabski",
+        "dwarvish": "Krasnolud"
     }
 }

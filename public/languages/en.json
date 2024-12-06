@@ -1,4 +1,8 @@
 {
+    "name": "Life Science Transmitter",
+    "landing": {
+        "description": "Welcome to the Life Science Transmitter, your go-to platform for all things related to life sciences."
+    },
     "header": {
         "home": "Home",
         "citations": "Citations",
@@ -8,6 +12,11 @@
         "settings": "Settings",
         "logout": "Logout",
         "login": "Login"
+    },
+    "not_logged_in": {
+        "title": "You are not logged in",
+        "description": "Please log in to continue.",
+        "login": "Login here:"
     },
     "login_form": {
         "username": "Username",
@@ -60,7 +69,9 @@
             "image": "Image",
             "file": "File",
             "markdown": "Markdown"
-        }
+        },
+        "newPostTitle": "New Post",
+        "updatePostTitle": "Update Post"
     },
     "settings": {
         "title": "Settings",
@@ -76,7 +87,8 @@
         },
         "pick_profile_picture": "Pick profile picture color",
         "api_key": "API Key",
-        "language": "Language"
+        "language": "Language",
+        "enable": "Enable"
     },
     "admin_settings": {
         "title": "Admin Settings",
@@ -113,6 +125,30 @@
                 "show_errors": "Show errors",
                 "prevent_errors": "Prevent errors"
             }
+        },
+        "title": "Games",
+        "difficulties": {
+            "title": "Wähle eine Schwierigkeit"
         }
+    },
+    "filter": {
+        "search": "Search",
+        "searchTerm": "Search Term",
+        "from": "From",
+        "to": "To",
+        "results": "Results",
+        "sort": {
+            "title": "Sort by",
+            "newest": "Newest first",
+            "oldest": "Oldest first"
+        }
+    },
+    "languages": {
+        "de": "German",
+        "en": "English",
+        "pl": "Polnish (ai)",
+        "tlh-Latn": "Klingon (ai)",
+        "elv": "Elvish",
+        "dwa": "Dwarvish"
     }
 }

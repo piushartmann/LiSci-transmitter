@@ -4,34 +4,34 @@
 <input type="checkbox" id="filterCheckbox" style="display: none;" />
 <div id="filterSurrounding">
   <button class="filterButton button" onclick="const checkbox = document.getElementById('filterCheckbox'); checkbox.checked = !checkbox.checked; toggleVisibility('filterBody');">
-    <span>Suchen</span>
+    <span data-lang-content="filter search">Suchen</span>
   </button>
 
   <div class="filterBody" style="display: none;" id="filterBody">
     <div class="filterBox">
       <div class="filter">
-        <label for="author">Suchbegriff</label>
+        <label for="author" data-lang-content="filter searchTerm">Suchbegriff</label>
         <input type="text" name="author" placeholder="Suchen" id="filterAuthor" oninput="updateFilter()" />
       </div>
       <div class="filter">
-        <label for="dateFrom">Vom</label>
+        <label for="dateFrom" data-lang-content="filter from">Vom</label>
         <input type="date" name="dateFrom" id="filterDateFrom" placeholder="Datum Auswählen" oninput="updateFilter()" />
       </div>
       <div class="filter">
-        <label for="dateTo">Bis</label>
+        <label for="dateTo" data-lang-content="filter to">Bis</label>
         <input type="date" name="dateTo" id="filterDateTo" placeholder="Datum Auswählen" oninput="updateFilter()" />
       </div>
       <div class="totalElements">
         <span id="totalElements">0</span>
-        <span> Ergebnisse</span>
+        <span data-lang-content="filter results"> Ergebnisse</span>
       </div>
     </div>
     <div class="sortBox">
       <div class="filter">
-        <label for="order">Sortieren</label>
+        <label for="order" data-lang-content="filter sort title">Sortieren</label>
         <select name="order" id="sortDate" onchange="updateFilter()">
-          <option value="desc">Neuste Zuerst</option>
-          <option value="asc">Älteste Zuerst</option>
+          <option value="desc" data-lang-content="filter sort newest">Neuste Zuerst</option>
+          <option value="asc" data-lang-content="filter sort newest">Älteste Zuerst</option>
         </select>
       </div>
     </div>

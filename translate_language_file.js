@@ -1,9 +1,11 @@
 const { translate: bingTranslate } = require('bing-translate-api');
 const fs = require('fs');
 const path = require('path');
+const config = require('./config.json');
 
-const baseLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', 'en.json')));
-let targetLanguages = ["tlh-Latn", "pl", 'elv', 'dwa'];
+const targetLanguages = config.languages.aiTranslated;
+const mainLanguage = config.languages.manuallyTranslated[0];
+const baseLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', `${mainLanguage}.json`)));
 
 async function translate(text, fromLanguage, toLanguage) {
 
@@ -117,7 +119,7 @@ function translateFiles(targetLanguage) {
     // Clone the baseLanguageFile to avoid modifying the original object
     const languageFileCopy = JSON.parse(JSON.stringify(baseLanguageFile));
     
-    translateObject(languageFileCopy, 'en', targetLanguage).then(translation => {
+    translateObject(languageFileCopy, mainLanguage, targetLanguage).then(translation => {
         if (targetLanguage === 'tlh-Latn') {
             targetLanguage = 'tlh';
         }

@@ -1,4 +1,8 @@
 {
+    "name": "LIfE ScIEncE TrAnsmIttEr",
+    "landing": {
+        "description": "WElcOmE tO thE LIfE ScIEncE TrAnsmIttEr, yOUr gO-tO plAtfOrm fOr All thIngs rElAtEd tO lIfE scIEncEs."
+    },
     "header": {
         "home": "HOmE",
         "citations": "CItAtIOns",
@@ -8,6 +12,11 @@
         "settings": "SEttIngs",
         "logout": "LOgOUt",
         "login": "LOgIn"
+    },
+    "not_logged_in": {
+        "title": "YOU ArE nOt lOggEd In",
+        "description": "PlEAsE lOg In tO cOntInUE.",
+        "login": "LOgIn hErE:"
     },
     "login_form": {
         "username": "UsErnAmE",
@@ -60,7 +69,9 @@
             "image": "ImAgE",
             "file": "FIlE",
             "markdown": "MArkdOwn"
-        }
+        },
+        "newPostTitle": "NEw POst",
+        "updatePostTitle": "UpdAtE POst"
     },
     "settings": {
         "title": "SEttIngs",
@@ -76,7 +87,8 @@
         },
         "pick_profile_picture": "PIck prOfIlE pIctUrE cOlOr",
         "api_key": "API KEy",
-        "language": "LAngUAgE"
+        "language": "LAngUAgE",
+        "enable": "EnAblE"
     },
     "admin_settings": {
         "title": "AdmIn SEttIngs",
@@ -113,6 +125,30 @@
                 "show_errors": "ShOw ErrOrs",
                 "prevent_errors": "PrEvEnt ErrOrs"
             }
+        },
+        "title": "GAmEs",
+        "difficulties": {
+            "title": "WählE EInE SchwIErIgkEIt"
         }
+    },
+    "filter": {
+        "search": "SEArch",
+        "searchTerm": "SEArch TErm",
+        "from": "FrOm",
+        "to": "TO",
+        "results": "REsUlts",
+        "sort": {
+            "title": "SOrt by",
+            "newest": "NEwEst fIrst",
+            "oldest": "OldEst fIrst"
+        }
+    },
+    "languages": {
+        "german": "GErmAn",
+        "english": "EnglIsh",
+        "polish": "POlskI (AI)",
+        "klingon": "KlIngOn (AI)",
+        "elvish": "ElbIsh",
+        "dwarvish": "dwArvIsh"
     }
 }
