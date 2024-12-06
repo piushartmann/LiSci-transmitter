@@ -294,25 +294,25 @@ module.exports.MongoConnector = class MongoConnector {
 
         let query = this.Post.find(filterObject)
             .populate({
-            path: 'userID',
-            select: 'username',
-            populate: {
-                path: 'preferences',
-                match: { key: 'profilePic' },
-                select: 'value'
-            }
-            })
-            .populate({
-            path: 'comments',
-            populate: {
                 path: 'userID',
                 select: 'username',
                 populate: {
-                path: 'preferences',
-                match: { key: 'profilePic' },
-                select: 'value'
+                    path: 'preferences',
+                    match: { key: 'profilePic' },
+                    select: 'value'
                 }
-            }
+            })
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'userID',
+                    select: 'username',
+                    populate: {
+                        path: 'preferences',
+                        match: { key: 'profilePic' },
+                        select: 'value'
+                    }
+                }
             })
             .sort(sortObject)
             .skip(offset);
@@ -581,11 +581,14 @@ module.exports.MongoConnector = class MongoConnector {
         return await this.Citation.findByIdAndDelete(citationID);
     }
 
-    async updateCitation(citationID, author, content) {
-        const citation = await this.Citation.findById(citationID);
-        citation.author = author;
-        citation.content = content;
-        return await citation.save();
+    async updateCitation(citationID, context) {
+        try {
+            const citation = await this.Citation.findById(citationID);
+            citation.context = context;
+            return await citation.save();
+        } catch (error) {
+            return null;
+        }
     }
 
     async setSubscription(userID, subscription) {

@@ -331,6 +331,11 @@ a {
     flex-direction: column;
 }
 
+.horizontal {
+    display: flex;
+    flex-direction: row;
+}
+
 /* Keyframes for fade-in animation */
 @keyframes fadeIn {
     0% {

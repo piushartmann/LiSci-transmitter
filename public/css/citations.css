@@ -70,7 +70,7 @@
 }
 
 
-#citationSubmit {
+.citationSubmit {
     padding: 10px 20px;
     background-color: #000;
     color: #fff;
@@ -143,6 +143,18 @@
 
 .addSection img svg {
     fill: #a81919;
+}
+
+#submitButtons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 2vh;
+    gap: 10px;
+}
+
+#submitButtons button {
+    width: 100%;
 }
 
 @media (max-width: 768px) {

@@ -1,6 +1,7 @@
 let currentPage = 1;
 let previousAuthors = [];
 let endReached = false;
+let loadedCitations = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
     previousAuthors = await loadPreviousAuthors();
@@ -82,6 +83,7 @@ async function loadCitations(page, callback) {
         citation = buildCitation(citation);
         citations.push(citation);
     });
+    loadedCitations.push(...citationData);
     if (callback) {
         callback(citations);
     }
@@ -99,6 +101,8 @@ const reloadContent = async () => {
     const body = document.querySelector("body");
 
     const citationBox = document.getElementById("citationBox");
+
+    loadedCitations = [];
 
     loadCitations(1, (citations) => {
         const bodyHeight = window.getComputedStyle(body).height;
@@ -314,49 +318,84 @@ function submitCitation() {
 }
 
 function deleteCitation(id) {
-    fetch('internal/deleteCitation', {
-        method: 'POST',
-        body: new URLSearchParams({ citationID: id }),
-        enctype: 'x-www-form-urlencoded',
-    })
-        .then(response => {
-            if (response.status === 200) {
-                updateCitations();
-            }
-        });
+    if (confirm("Bist du sicher, dass du dieses Zitat löschen möchtest?")) {
+        fetch('internal/deleteCitation', {
+            method: 'POST',
+            body: new URLSearchParams({ citationID: id }),
+            enctype: 'x-www-form-urlencoded',
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    updateCitations();
+                }
+            });
+    }
 }
 
 function editCitation(id) {
-    let citationContainer = document.querySelector(`.citation[data-id='${id}']`);
-    let contentDiv = citationContainer.querySelector('.content');
-    let authorDiv = citationContainer.querySelector('.author');
+    const citationBox = document.getElementById("newCitationBox");
+    const citation = loadedCitations.find(citation => citation._id === id);
+    if (!citation) return;
+    if (!citation.canEdit) return;
 
-    let contentText = contentDiv.innerText.replace(/"/g, '');
-    let authorText = authorDiv.innerText.replace('-', '');
+    if (!citation.context || citation.context.length === 0) {
+        citation.context = [{
+            author: citation.author,
+            content: citation.content
+        }];
+    }
 
-    contentDiv.innerHTML = `<textarea class="edit-content">${contentText}</textarea>`;
-    authorDiv.innerHTML = `<input type="text" class="edit-author" value="${authorText}">`;
+    citationBox.innerHTML = "";
 
-    let buttonRow = citationContainer.querySelector('.edit-buttons');
-    buttonRow.innerHTML = '';
+    citation.context.forEach(context => {
+        const sentence = document.createElement("div");
+        sentence.className = "sentenceStructure";
+        sentence.innerHTML = document.getElementById("baseStructure").innerHTML;
 
-    let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id), "interaction save");
+        const author = sentence.querySelector(".author textarea");
+        author.value = context.author;
 
-    buttonRow.appendChild(saveButton);
+        const content = sentence.querySelector(".content textarea");
+        content.value = context.content;
 
-    let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => cancelEditCitation(id, contentText, authorText), "interaction cancel");
+        const deleteButton = buildButton("/icons/delete.svg", "", () => sentence.remove());
+        deleteButton.style.border = "none";
+        sentence.appendChild(deleteButton);
 
-    buttonRow.appendChild(cancelButton);
+        citationBox.appendChild(sentence);
+    });
+
+    const submitButton = document.getElementById('citationSubmit');
+    submitButton.style.display = "none";
+
+    const submitButtons = document.getElementById('submitButtons');
+    submitButtons.style.display = "flex";
+
+    const saveButton = document.getElementById('citationSave');
+
+    saveButton.onclick = () => saveCitation(id);
+
+    window.scrollTo(0, 0);
 }
 
+//let saveButton = buildButton("/icons/save.svg", "Save", () => saveCitation(id), "interaction save");
+
+//let cancelButton = buildButton("/icons/cancel.svg", "Cancel", () => endEditCitation(id, contentText, authorText), "interaction cancel");
+
 function saveCitation(id) {
-    let citationContainer = document.querySelector(`.citation[data-id='${id}']`);
-    let newContent = citationContainer.querySelector('.edit-content').value;
-    let newAuthor = citationContainer.querySelector('.edit-author').value;
+    const contextInput = Array.from(document.querySelectorAll(".sentenceStructure")).map(sentence => {
+        return { author: sentence.querySelector(".author textarea"), content: sentence.querySelector(".content textarea") };
+    });
+    
+    if (contextInput.length === 0) return;
+
+    const newContext = contextInput.map(context => {
+        return { author: context.author.value, content: context.content.value };
+    });
 
     fetch('internal/updateCitation', {
         method: 'POST',
-        body: JSON.stringify({ citationID: id, content: newContent, author: newAuthor }),
+        body: JSON.stringify({ citationID: id, context: newContext }),
         headers: {
             'Content-Type': 'application/json'
         }
@@ -364,28 +403,20 @@ function saveCitation(id) {
         .then(response => {
             if (response.status === 200) {
                 updateCitations();
+                endEditCitation();
             }
         });
 }
 
-function cancelEditCitation(id, originalContent, originalAuthor) {
-    let citationContainer = document.querySelector(`.citation[data-id='${id}']`);
-    let contentDiv = citationContainer.querySelector('.content');
-    let authorDiv = citationContainer.querySelector('.author');
+function endEditCitation() {
+    const citationBox = document.getElementById("newCitationBox");
+    citationBox.innerHTML = "";
+    addNewContext(true);
+    const submitButton = document.getElementById('citationSubmit');
+    submitButton.style.display = "block";
 
-    contentDiv.innerHTML = `<p>"${originalContent}"</p>`;
-    authorDiv.innerHTML = `<p>-${originalAuthor}</p>`;
-
-    let buttonRow = citationContainer.querySelector('.edit-buttons');
-    buttonRow.innerHTML = '';
-
-    let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(id), "interaction delete");
-
-    buttonRow.appendChild(deleteButton);
-
-    let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(id), "interaction edit");
-
-    buttonRow.appendChild(editButton);
+    const submitButtons = document.getElementById('submitButtons');
+    submitButtons.style.display = "none";
 }
 
 let scrollTimeout;

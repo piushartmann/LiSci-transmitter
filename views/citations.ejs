@@ -23,7 +23,11 @@
     <button onclick="addNewContext()" class="addSection">
       <img src="/icons/add-section.svg" alt="Add Section">
     </button>
-    <button id="citationSubmit" class="online-only" onclick="submitCitation()" data-lang-content="citations new submit">Submit</button>
+    <button id="citationSubmit" class="online-only citationSubmit" onclick="submitCitation()" data-lang-content="citations new submit">Submit</button>
+    <div id="submitButtons" style="display: none;">
+      <button id="citationCancle" class="online-only citationSubmit" onclick="endEditCitation()" data-lang-content="citations edit cancel">Cancel</button>
+      <button id="citationSave" class="online-only citationSubmit" onclick="submitCitation()" data-lang-content="citations edit Save">Save</button>
+    </div>
   </div>
 
   <h1 data-lang-content="citations title">Zitate</h1>
