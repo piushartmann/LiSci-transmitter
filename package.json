@@ -24,9 +24,13 @@
   },
   "scripts": {
     "start": "node app.js",
-    "build:digitalocean": "sh ./build.sh"
+    "build:digitalocean": "sh ./build.sh",
+    "test": "jest"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.2",
+    "supertest": "^7.0.0",
     "terser": "^5.36.0"
   }
 }

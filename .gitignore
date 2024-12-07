@@ -2,3 +2,4 @@ node_modules
 adminConsole.js
 .env
 .DS_Store
+coverage

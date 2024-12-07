@@ -13,6 +13,7 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
 
     let discoverUsers = [];
     let invites = [];
+    const { renderView } = require('./helper')(db);
 
     router.get('*', async (req, res, next) => {
         // always allow access to the invite page
@@ -41,16 +42,15 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
         const prefetches = [
-            "/css/games.css",
-            "/js/games.js",
-        ];
-
-        return res.render('games', {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-            games: gameConfigs, prefetches: prefetches
-        });
+    "/css/games.css",
+    "/js/games.js",
+    ];
+    
+    await renderView(req, res, 'games', {
+        games: gameConfigs
+    }, prefetches);
     });
-
+    
     router.get('/:game/newInviteLink', async (req, res) => {
         const gameURL = req.params.game;
         const gameConfig = gameConfigs.find(g => g.url === gameURL);

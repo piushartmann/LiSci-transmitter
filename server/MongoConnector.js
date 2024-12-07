@@ -92,7 +92,7 @@ module.exports.MongoConnector = class MongoConnector {
     constructor(database, url = "mongodb://localhost:27017") {
         this.mongoose = mongoose;
         this.url = url;
-        this.mongoose.connect(this.url, { dbName: database });
+        this.connectPromise = this.mongoose.connect(this.url, { dbName: database });
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
@@ -328,6 +328,10 @@ module.exports.MongoConnector = class MongoConnector {
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
 
+            function generateRandomProfilePic() {
+                return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
+            }
+            
             restructuredPost.comments = restructuredPost.comments.map(comment => {
                 if (comment.userID.profilePic) {
                     return comment;
@@ -397,6 +401,10 @@ module.exports.MongoConnector = class MongoConnector {
         let restructuredPost = this.restructureUser(post);
         if (!restructuredPost) {
             return null;
+        }
+
+        function generateRandomProfilePic() {
+            return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
         }
 
         restructuredPost.comments = restructuredPost.comments.map(comment => {
@@ -607,14 +615,23 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async setPreference(userID, key, value) {
-        const user = await this.User.findById(userID);
-        const preferenceIndex = user.preferences.findIndex(pref => pref.key === key);
-        if (preferenceIndex !== -1) {
-            user.preferences[preferenceIndex].value = value;
-        } else {
-            user.preferences.push({ key, value });
+        try {
+            const user = await this.User.findById(userID);
+            if (!user) return null;
+            if (!user.preferences) {
+                user.preferences = [];
+            }
+            const preferenceIndex = user.preferences.findIndex(pref => pref.key === key);
+            if (preferenceIndex !== -1) {
+                user.preferences[preferenceIndex].value = value;
+            } else {
+                user.preferences.push({ key, value });
+            }
+            return user.save();
         }
-        return user.save();
+        catch (error) {
+            return null;
+        }
     }
 
     async getPreference(userID, key) {
@@ -628,6 +645,7 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPreferences(userID) {
         const user = await this.User.findById(userID);
+        if (!user) return null;
         return user.preferences;
     }
 

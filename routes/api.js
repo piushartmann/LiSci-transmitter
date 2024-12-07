@@ -143,12 +143,12 @@ module.exports = (db, s3Client, webpush) => {
     router.post('/createPost', async (req, res) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
-        const permissions = db.getUserPermissions(user._id) || [];
+        const permissions = user.permissions;
         if (!permissions.includes("canPost")) return res.status(403).send("You cannot create a post");
 
         const { title, content, type, postPermissions, mediaPath } = req.body;
         try {
-            const post = await db.createPost(user._id, title, content, type, postPermissions, mediaPath);
+            await db.createPost(user._id, title, content, type, postPermissions, mediaPath);
             return res.status(200).send("Success");
         }
         catch (error) {

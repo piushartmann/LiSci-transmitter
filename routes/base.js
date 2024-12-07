@@ -4,6 +4,7 @@ const fs = require('fs');
 const { MongoConnector } = require('../server/MongoConnector');
 const { lang } = require('bing-translate-api');
 const router = Router();
+const helperModule = require('./helper')
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -14,23 +15,7 @@ module.exports = (db) => {
     const config = require('../config.json');
     const postsPageSize = config.postsPageSize;
     const citationsPageSize = config.citationsPageSize;
-    const version = process.env.VERSION;
-    const basePrefetches = [
-
-    ];
-
-
-    async function renderView(req, res, view, additionalRenderData = {}, additionalPrefetches = []) {
-        res.locals.additionalPrefetches = basePrefetches.concat(additionalPrefetches);
-        const permissions = await db.getUserPermissions(req.session.userID);
-        const preferences = await db.getPreferences(req.session.userID);
-        const profilePic = await db.getPreference(req.session.userID, 'profilePic');
-        
-        return res.render(view, {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {},
-            ...additionalRenderData
-        });
-    }
+    const { renderView } = helperModule(db);
 
     router.get('/', async (req, res) => {
         let currentPage = req.query.page || 1;
@@ -49,9 +34,6 @@ module.exports = (db) => {
         const prank = req.session.username == "Merlin" ? '<img src="/images/pigeon.png" alt="Pigeon" class="pigeon" id="prank">' : "";
 
         if (req.session.userID) {
-            res.locals.additionalPrefetches = basePrefetches.concat([
-
-            ])
             return await renderView(req, res, 'index', {
                 currentPage: currentPage, prank: prank, pages: pages
             },
@@ -61,7 +43,6 @@ module.exports = (db) => {
         } else {
             return await renderView(req, res, 'landing');
         }
-
     });
 
     router.get('/create', async (req, res) => {
@@ -119,7 +100,7 @@ module.exports = (db) => {
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
         return await renderView(req, res, 'settings', {
-            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), possiblePermissions: config.permissions,
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey'), isAdmin: permissions.includes("admin"), enabledPush: pushEnabled, possiblePermissions: config.permissions,
             languages: config.languages.manuallyTranslated.concat(config.languages.aiTranslated)
         });
     });

@@ -1,8 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 
-const subdomains = fs.readdirSync(path.join(__dirname, "subdomains"))
-    .filter(file => fs.statSync(path.join(path.join(__dirname, "subdomains"), file)).isDirectory());
+const subdomainsDir = path.join(__dirname, "subdomains");
+let subdomains = [];
+
+if (fs.existsSync(subdomainsDir) && fs.statSync(subdomainsDir).isDirectory()) {
+    subdomains = fs.readdirSync(subdomainsDir)
+        .filter(file => fs.statSync(path.join(subdomainsDir, file)).isDirectory());
+}
 
 function subdomainMiddleware(req, res, next) {
     if (req.subdomains.length > 0) {

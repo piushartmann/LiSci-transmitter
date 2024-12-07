@@ -68,7 +68,7 @@ let publicDirs = [path.join(__dirname, 'public')];
 gameConfig.forEach(config => {
     const publicDir = path.join(__dirname, 'games', config.url, (config.public || 'public'))
     app.use("/" + config.url, express.static(publicDir));
-    
+
     publicDirs.push(publicDir);
     views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
 })
@@ -128,14 +128,21 @@ webpush.setVapidDetails(
 
 //connect to db
 const db = new MongoConnector("transmitter", connectionString);
+db.connectPromise.then(() => {
+    console.log("Connected to database");
 
-//use routes
-app.use('/', require('./routes/base')(db));
-app.use('/games', require('./routes/games')(db, s3Client, webpush, gameConfig));
-app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
-app.use('/api', require('./routes/api')(db, s3Client, webpush));
+    //use routes
+    app.use('/', require('./routes/base')(db));
+    app.use('/games', require('./routes/games')(db, s3Client, webpush, gameConfig));
+    app.use('/internal', require('./routes/internal')(db, s3Client, webpush));
+    app.use('/api', require('./routes/api')(db, s3Client, webpush));
 
-//start server
-app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
+    //start server
+    app.listen(port, () => {
+        console.log(`Server is running on ${port}`);
+    });
+    
+}).catch((err) => {
+    console.error(err);
+    process.exit(1);
 });
