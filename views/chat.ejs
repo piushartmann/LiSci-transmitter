@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="<%= preferences.find(p => p.key === 'language')?.value %>">
+<html lang="<%= (preferences && preferences.find(p => p.key === 'language')?.value) || 'de' %>">
 
 <head>
-  <%- include("partials/baseHead.ejs") %>
+  <%- include("./partials/baseHead.ejs") %>
   <title>chat</title>
   <link rel="stylesheet" href="css/chat.css">
   <script src="js/chat.js"></script>

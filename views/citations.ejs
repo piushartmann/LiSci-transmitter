@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= preferences.find(p => p.key === 'language')?.value %>">
+<html lang="<%= (preferences && preferences.find(p => p.key === 'language')?.value) || 'de' %>">
 
 <head>
   <%- include("./partials/baseHead.ejs") %>
@@ -38,11 +38,11 @@
 
   <div id="baseStructure" style="display: none;">
     <div class="author autocomplete">
-      <textarea type="text" name="author" class="online-only" placeholder="Herr Treetzen" pattern='[^"]+' oninput='this.value = this.value.replace(/[\n]/g,"")' required data-lang-content-placeholder="citations new sentence 0"></textarea>
+      <textarea type="text" name="author" class="online-only" placeholder="Herr Treetzen" oninput='textAreaOnInput(this)' required data-lang-content-placeholder="citations new sentence 0"></textarea>
     </div>
     <p data-lang-content="citations new sentence 1"> hat </p>
     <div class="content">
-      <textarea type="text" name="content" class="online-only" placeholder="ein lustiges Zitat" pattern='[^"]+' oninput='this.value = this.value.replace(/[\n]/g,"")' required data-lang-content-placeholder="citations new sentence 2"></textarea>
+      <textarea type="text" name="content" class="online-only" placeholder="ein lustiges Zitat" oninput='textAreaOnInput(this)' required data-lang-content-placeholder="citations new sentence 2"></textarea>
     </div>
     <p data-lang-content="citations new sentence 3"> gesagt.</p>
   </div>

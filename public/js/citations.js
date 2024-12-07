@@ -8,6 +8,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     addNewContext(true);
 });
 
+function textAreaOnInput(textarea) {
+    textarea.value = textarea.value.replace(/[\n]/g, "");
+    textarea.style.height = "";
+    textarea.style.height = textarea.scrollHeight + "px";
+}
+
 function addNewContext(first = false) {
     const citationBox = document.getElementById("newCitationBox");
     const baseStructure = document.getElementById("baseStructure");
@@ -17,7 +23,9 @@ function addNewContext(first = false) {
     sentence.innerHTML = baseStructure.innerHTML;
 
     const author = sentence.querySelector(".author textarea");
-    autocomplete(author, previousAuthors);
+    autocomplete(author, previousAuthors, () => {
+        textAreaOnInput(author, true);
+    });
 
     if (!first) {
         const deleteButton = buildButton("/icons/delete.svg", "", () => sentence.remove());
@@ -181,17 +189,14 @@ function buildCitation(citation) {
     let interactionButtons = document.createElement("div");
     interactionButtons.className = "interaction-buttons";
 
-    let editButtons = document.createElement("div");
-    editButtons.className = "edit-buttons";
-
     interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length, loggedIn));
 
     if (citation.canEdit) {
-        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "interaction delete");
-        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id), "interaction edit");
+        let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "interaction delete", "");
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id), "interaction edit", "");
 
-        editButtons.appendChild(deleteButton);
-        editButtons.appendChild(editButton);
+        interactionButtons.appendChild(deleteButton);
+        interactionButtons.appendChild(editButton);
     }
 
     metaDiv.className = "meta-info";
@@ -205,15 +210,15 @@ function buildCitation(citation) {
     dateDiv.appendChild(dateTooltip);
 
     metaDiv.appendChild(dateDiv);
-
-    citationContainer.appendChild(contextDiv);
+    metaDiv.appendChild(userDiv);
+    if (citation.context.length > 1) {
+        citationContainer.appendChild(contextDiv);
+    }
     citationContainer.appendChild(sectionDiv);
     citationContainer.appendChild(authorDiv);
-    citationContainer.appendChild(userDiv);
     citationContainer.appendChild(buttonRow);
-    citationContainer.appendChild(metaDiv);
     buttonRow.appendChild(interactionButtons);
-    buttonRow.appendChild(editButtons);
+    buttonRow.appendChild(metaDiv);
 
     return citationContainer;
 }
@@ -304,14 +309,9 @@ function submitCitation() {
     })
         .then(response => {
             if (response.status === 200) {
-                authorElements.forEach(authorElement => {
-                    authorElement.value = "";
-                }
-                );
-                contentElements.forEach(contentElement => {
-                    contentElement.value = "";
-                }
-                );
+                const citationBox = document.getElementById("newCitationBox");
+                citationBox.innerHTML = "";
+                addNewContext(true);
                 updateCitations();
             }
         });
@@ -386,7 +386,7 @@ function saveCitation(id) {
     const contextInput = Array.from(document.querySelectorAll(".sentenceStructure")).map(sentence => {
         return { author: sentence.querySelector(".author textarea"), content: sentence.querySelector(".content textarea") };
     });
-    
+
     if (contextInput.length === 0) return;
 
     const newContext = contextInput.map(context => {

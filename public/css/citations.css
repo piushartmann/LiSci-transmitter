@@ -1,17 +1,30 @@
 .citation {
+    position: relative;
     margin: 10px;
     padding: 10px;
     border: 1px solid var(--post-outline-color);
     border-radius: 8px;
     background-color: var(--post-background-color);
-    position: relative;
+    padding-top: 15px;
+    overflow: hidden;
 }
 
 .citation .content {
     font-size: 1.2em;
     font-weight: bold;
     margin-bottom: 10px;
-    width: 87%;
+    width: 100%;
+}
+
+.citation .content p {
+    margin: 0;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.citation .author p {
+    word-break: break-all;
+    white-space: normal;
 }
 
 .context-item {
@@ -45,11 +58,11 @@
 }
 
 .sentenceStructure .author {
-    width: max(25%, 140px);
+    width: 20%;
 }
 
 .sentenceStructure .content {
-    width: max(100%, 140px);
+    width: 100%;
 }
 
 .sentenceStructure .content,
@@ -100,22 +113,29 @@
 }
 
 .username {
-    position: absolute;
-    top: 0px;
     right: 15px;
 }
 
 .meta-info {
-    position: absolute;
-    top: 65px;
-    right: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 45px;
 }
 
 .meta-info .date {
+    position: relative;
     font-size: 0.8em;
+    text-align: right;
+    right: 15px;
 }
 
-.meta-info:hover .tooltip {
+.username:hover .tooltip {
+    visibility: visible;
+    animation: tooltipFadeIn 0.2s forwards;
+}
+
+.date:hover .tooltip {
     visibility: visible;
     animation: tooltipFadeIn 0.2s forwards;
 }
@@ -179,17 +199,13 @@
         margin: 5px;
     }
 
-    .username {
-        bottom: 40px;
-        right: 72px;
-    }
-
     .author-info {
         position: inherit;
         top: 0px;
+        margin: 0;
     }
 
-    .meta-info {
-        bottom: 15px;
+    .date {
+        display: none;
     }
 }

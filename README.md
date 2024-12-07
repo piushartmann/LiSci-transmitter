@@ -20,6 +20,15 @@ Ask me irl or <a href="mailto:admin@liscitransmitter.live">send an Email</a>
 
 Everything is accessible [here](https://liscitransmitter.live/about)
 
+### TODO
+
+- website redesign
+- Add more Sections:
+  - Tierlists
+  - Voting
+- add memes to posts
+
+
 ## Developer section
 
 ### Help
@@ -41,10 +50,15 @@ The Website will make requests that are not on the public API using an internal 
 
 The JavaScript on the site is minified to optimize speed using terser but the source maps are available at filepath/filename.js.map
 
-### TODO
+### EJS structure
+Head: <br>
+  <%- include("partials/baseHead.ejs") %> -> some of the basic Head Elements, like Viewport settings but also basic imports and automatic prefetches <br>
+  The Custom Head Elements like the Page title and Page imports
 
-- website redesign
-- Add more Sections:
-  - Tierlists
-  - Voting
-- add memes to posts
+Body: <br>
+  <%- include('./partials/base.ejs') %> -> Some HTML elements that should be present on every document, like the header and the base Modal structure <br>
+  The Custom body Elements that make the Page
+
+### Standard js
+Some JS are loaded per default in the baseHead like the Header.js and the Base.js file <br>
+The Base.js file has some standard function for every page to access like the code to connect to the websocket and to load a language file. Also Modal and Button Builders are here.
