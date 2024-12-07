@@ -2,8 +2,6 @@ const path = require('path');
 const fs = require('fs');
 
 function ejs(viewDirs, publicDirs) {
-    console.log(viewDirs);
-
     return middleware;
 
 

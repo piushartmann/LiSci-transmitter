@@ -22,5 +22,29 @@
 			"data-lang-content=\"$1\""
 		],
 		"description": "insert data-lang-content attribute"
-	}
+	},
+	"data-lang-content-value": {
+		"scope": "html,ejs",
+		"prefix": "langv",
+		"body": [
+			"data-lang-content-value=\"$1\""
+		],
+		"description": "insert data-lang-value attribute"
+	},
+	"data-lang-content-placeholder": {
+		"scope": "html,ejs",
+		"prefix": "langp",
+		"body": [
+			"data-lang-content-placeholder=\"$1\""
+		],
+		"description": "insert data-lang-placeholder attribute"
+	},
+	"data-lang-arguments": {
+		"scope": "html,ejs",
+		"prefix": "langarg",
+		"body": [
+			"data-lang-arguments=\"$1\""
+		],
+		"description": "insert data-lang-arguments attribute"
+	},
 }

@@ -23,9 +23,11 @@ module.exports = (db) => {
     async function renderView(req, res, view, additionalRenderData = {}, additionalPrefetches = []) {
         res.locals.additionalPrefetches = basePrefetches.concat(additionalPrefetches);
         const permissions = await db.getUserPermissions(req.session.userID);
-
+        const preferences = await db.getPreferences(req.session.userID);
+        const profilePic = await db.getPreference(req.session.userID, 'profilePic');
+        
         return res.render(view, {
-            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: await db.getPreference(req.session.userID, 'profilePic'), version: version, prefetches: res.locals.additionalPrefetches,
+            loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {},
             ...additionalRenderData
         });
     }
@@ -117,7 +119,7 @@ module.exports = (db) => {
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
 
         return await renderView(req, res, 'settings', {
-            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), preferences: await db.getPreferences(req.session.userID), possiblePermissions: config.permissions,
+            isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey', isAdmin = permissions.includes("admin"), enabledPush = pushEnabled), possiblePermissions: config.permissions,
             languages: config.languages.manuallyTranslated.concat(config.languages.aiTranslated)
         });
     });

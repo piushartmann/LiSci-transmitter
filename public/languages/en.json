@@ -51,6 +51,7 @@
         "title": "Citations"
     },
     "posts": {
+        "hello": "Hello, {username}!",
         "file_view_fallback": "Datei anzeigen",
         "only_show_news": "Only show news"
     },

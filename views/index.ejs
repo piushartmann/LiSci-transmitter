@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="<%= preferences.find(p => p.key === 'language')?.value %>">
 
 <head>
   <%- include("./partials/baseHead.ejs") %>
@@ -16,7 +16,7 @@
  <%- include('./partials/base.ejs') %>
   <%- prank %>
 
-  <h1>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
+  <h1 data-lang-content="posts hello" data-lang-arguments='{"username": "<%= typeof username !=='undefined' ? username : 'World' %>"}'>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
   <label for="onlyNews" data-lang-content="posts only_show_news">Nur Zeitungen anzeigen</label>
   <input type="checkbox" id="onlyNews" name="onlyNews">
 

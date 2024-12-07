@@ -400,10 +400,14 @@ function applyLanguage(languageFile, redraw = false) {
 
                 const arguments = element.getAttribute(`data-lang-arguments`);
                 if (arguments) {
-                    const args = JSON.parse(arguments);
-                    Object.keys(args).forEach(arg => {
-                        json = json.replace(`{${arg}}`, args[arg]);
-                    });
+                    try {
+                        const args = JSON.parse(arguments);
+                        Object.keys(args).forEach(arg => {
+                            json = json.replace(`{${arg}}`, args[arg]);
+                        });
+                    }catch(e){
+                        console.warn(`Could not parse language arguments for ${key} \n ${e}`);
+                    }
                 }
 
                 if (json) {
