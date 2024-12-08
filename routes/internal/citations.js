@@ -2,6 +2,7 @@ const { Router, json } = require('express');
 const { MongoConnector } = require('../../server/MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
+const pushLib = require('../../server/pushNotifications.js');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -14,6 +15,8 @@ sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embe
 module.exports = (db, s3Client, webpush) => {
     const config = require('../../config.json');
     const citationsPageSize = config.citationsPageSize;
+
+    const push = pushLib(db, webpush);
 
     router.post('/createCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -38,6 +41,9 @@ module.exports = (db, s3Client, webpush) => {
         if (sanitizedContext.length === 0) return res.status(400).send("Invalid parameters");
 
         await db.createCitationWithContext(req.session.userID, sanitizedContext);
+
+        //push.sendToEveryone("newCitation", 'Neues Zitat', `${sanitizedContext[0].author}: ${sanitizedContext[0].content}` + sanitizedContext.length > 1 ? "..." : "");
+
         return res.status(200).send("Success");
     });
 
@@ -136,13 +142,13 @@ module.exports = (db, s3Client, webpush) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
         const { citationID, context } = req.body;
-        
+
         if (!citationID || !context) return res.status(400).send("Missing parameters");
 
         const sanitizedContext = sanitizeHtml(JSON.stringify(context));
 
         if (typeof citationID !== "string" || typeof sanitizedContext !== "string") return res.status(400).send("Invalid parameters");
-        
+
         let contextJson;
         try {
             contextJson = JSON.parse(sanitizedContext);
