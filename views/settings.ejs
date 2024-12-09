@@ -13,7 +13,7 @@
 </head>
 
 <body>
- <%- include('./partials/base.ejs') %>
+  <%- include('./partials/base.ejs') %>
 
   <div class="settingsBox">
     <h1 data-lang-content="settings title">Settings</h1>
@@ -46,12 +46,28 @@
     </div>
 
     <div class="profilePictureContainer setting">
-      <label for="head" data-lang-content="settings pick_profile_picture">Pick Profile Picture Color</label>
-      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;">
+      <label for="head" data-lang-content="settings pick_profile_picture_color">Pick Profile Picture Color</label>
+      <p class="defaultProfilePicture clickable" id="profilePictureColorPreview" style="background-color: <%= profilePic.content%>;">
         <%= username.charAt(0).toUpperCase() %>
-        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value="<%= profilePic.content %>" />
+        <input type="color" id="profilePictureColorPicker" class="hiddenInput" value="<%= profilePic.content %>" />
       </p>
-      <button id="profilePictureColorSubmit" class="online-only" >Save</button>
+      <button id="profilePictureColorSubmit" class="online-only">Save</button>
+
+      <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('', 'profilePictureModal')">Pick Profile Picture</button>
+    </div>
+
+    <div class="modal" id="profilePictureModal">
+      <h1 id="title">Pick Profile Picture</h1>
+
+      <div class="pickPicture">
+        <% if (profilePic.type == "default") { %>
+          <p class="defaultProfilePicture enlarged clickable" style="background-color: <%= profilePic.content%>;" onclick="document.getElementById('profilePicture').click()">
+            <%= username.charAt(0).toUpperCase() %>
+            <input type="file" id="profilePicture" accept="image/*" class="hiddenInput" onchange="onProfilePictureChange(this)"/>
+        </p>
+        <% } %>
+        <img id="profilePicturePreview" class="hidden" />
+      </div>
     </div>
 
     <div class="apiKeysContainer setting">
@@ -63,7 +79,7 @@
       <label for="language" data-lang-content="settings language">Language</label>
       <select id="language" class="online-only">
         <% for( let i = 0; i < languages.length; i++ ) { %>
-          <option value="<%= languages[i] %>" <%= preferences.find(p => p.key === 'language')?.value === languages[i] ? 'selected' : '' %> data-lang-content="languages <%= languages[i] %>"><%= languages[i] %></option>
+        <option value="<%= languages[i] %>" <%= preferences.find(p => p.key === 'language')?.value === languages[i] ? 'selected' : '' %> data-lang-content="languages <%= languages[i] %>"><%= languages[i] %></option>
         <% } %>
       </select>
     </div>

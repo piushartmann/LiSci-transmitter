@@ -79,7 +79,7 @@ async function enablePush() {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.subscribe({
             applicationServerKey:
-            "BA6ytZNJcaQnbML4C9w17snFJ_S5KmOzQamZddcchIPuyVPMfDBhNNvzCVkyUMxraUa-mfi8wBHP1gkyCDl50QA",
+                "BA6ytZNJcaQnbML4C9w17snFJ_S5KmOzQamZddcchIPuyVPMfDBhNNvzCVkyUMxraUa-mfi8wBHP1gkyCDl50QA",
             userVisibleOnly: true,
         });
 
@@ -94,3 +94,12 @@ async function enablePush() {
         window.location.reload();
     }
 }
+
+function onProfilePictureChange(element) {
+    console.log('profilePicture changed');
+    const file = element.files[0];
+    const localUrl = URL.createObjectURL(file);
+    const preview = document.getElementById('profilePicturePreview');
+    preview.src = localUrl;
+    preview.classList.remove('hidden');
+};

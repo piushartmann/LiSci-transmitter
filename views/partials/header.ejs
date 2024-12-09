@@ -26,7 +26,7 @@
 
     <% if (loggedIn) { %>
     <% if (profilePic.type == "default") { %>
-    <p class="defaultProfilePicture profilePicture" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
+    <p class="defaultProfilePicture auto-hiding" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
       <%= username.charAt(0).toUpperCase() %>
     </p>
     <% } %>

@@ -26,11 +26,11 @@ label {
     margin: 20px 0;
 }
 
-.profilePicturePreview {
+.profilePictureColorPreview {
     border: 0;
 }
 
-.ColorPicker {
+.hiddenInput {
     position: absolute;
     color: transparent;
     z-index: -1;
@@ -62,9 +62,44 @@ label {
     color: #000;
 }
 
+.defaultProfilePicture.enlarged {
+    position: relative;
+    transform: scale(10);
+}
+
+.pickPicture {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+    height: 400px;
+}
+
+.pickPicture {
+    position: relative;
+    overflow: hidden;
+    clip-path: circle(200px at center);
+}
+
+#profilePicturePreview {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    cursor: move;
+}
+
 @media (max-width: 768px) {
     .setting {
         width: 100%;
+    }
+
+    .pickPicture {
+        height: 200px;
+    }
+
+    .defaultProfilePicture.enlarged {
+        transform: scale(5);
     }
     
 }

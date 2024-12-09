@@ -245,10 +245,6 @@ header a {
         margin: 0 0 0 10px;
     }
 
-    .profilePicture {
-        display: none !important;
-    }
-
     .mobileMenuButton {
         display: block;
     }

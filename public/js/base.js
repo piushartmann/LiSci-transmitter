@@ -307,7 +307,8 @@ function hideModal() {
     modal.style.display = 'none';
 }
 
-function openModal(content) {
+function openModal(content, id="modal") {
+    if (content === "" || !content) content = document.getElementById(id);
     const modal = document.getElementById('modal');
     const modalContent = document.querySelector('#modal .modal-content');
     if (typeof content === 'object') content = content.innerHTML;
