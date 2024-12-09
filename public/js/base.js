@@ -406,7 +406,7 @@ function applyLanguage(languageFile, redraw = false) {
                         Object.keys(args).forEach(arg => {
                             json = json.replace(`{${arg}}`, args[arg]);
                         });
-                    }catch(e){
+                    } catch (e) {
                         console.warn(`Could not parse language arguments for ${key} \n ${e}`);
                     }
                 }
@@ -414,11 +414,11 @@ function applyLanguage(languageFile, redraw = false) {
                 if (json) {
                     element[input] = json;
                 } else {
-                    console.warn(`Could not find language content for ${key}`);
+                    console.warn(`Could not find language content for: "${key}"`);
                 }
             }
             catch (e) {
-                console.warn(`Could not find language content for ${key}`);
+                console.warn(`Could not find language content for: "${key}"`);
             }
 
             convertedItems.push(element);
@@ -483,15 +483,13 @@ function registerServiceWorker() {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
                 if (registrations.length === 0) {
-                    window.addEventListener('load', () => {
-                        navigator.serviceWorker.register('/serviceworker.js')
-                            .then(() => {
-                                console.log('Service Worker registered');
-                            })
-                            .catch(error => {
-                                console.error('Service Worker registration failed:', error);
-                            });
-                    });
+                    navigator.serviceWorker.register('/serviceworker.js')
+                        .then(() => {
+                            console.log('Service Worker registered');
+                        })
+                        .catch(error => {
+                            console.error('Service Worker registration failed:', error);
+                        });
                 } else {
                     registrations.forEach(registration => {
                         registration.update();
@@ -501,9 +499,7 @@ function registerServiceWorker() {
                             return;
                         };
                         if (loggedIn === true) {
-                            window.addEventListener('load', () => {
-                                registration.active.postMessage({ type: 'loaded' });
-                            });
+                            registration.active.postMessage({ type: 'loaded' });
                         }
                     });
                 }
@@ -553,6 +549,11 @@ function cacheBust() {
 }
 
 function checkOnline() {
+    //dont go offline when testing on localhost
+    if (window.location.hostname == "localhost") {
+        return;
+    }
+
     if (navigator.onLine) {
         document.body.classList.remove('offline');
     } else {
@@ -579,7 +580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addPWABar();
     }
 
-    makeDiscoverable();
+    if (loggedIn) makeDiscoverable();
     registerServiceWorker();
 
     setupModal();
@@ -590,11 +591,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 window.addEventListener("focus", () => {
     if (typeof gamesWS !== 'undefined' && gamesWS.readyState === WebSocket.CLOSED) {
-        makeDiscoverable();
+        if (loggedIn) makeDiscoverable();
     }
 });
 
-function toggleVisibility(id) {
+function toggleVisibility(id, setVis = null) {
     const element = document.getElementById(id);
-    element.style.display = element.style.display === 'none' ? element.style.display = '' : element.style.display = 'none'
+    if (setVis === null) {
+        element.style.display = element.style.display === 'none' ? element.style.display = '' : element.style.display = 'none'
+    } else {
+        element.style.display = setVis ? element.style.display = '' : element.style.display = 'none'
+    }
 }

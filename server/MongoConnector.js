@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
-const { title } = require('process');
+const { title, off } = require('process');
 const { type } = require('os');
 const { query } = require('express');
 const config = require('../config.json');
@@ -250,6 +250,7 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getPosts(isTeacher, limit = 10, offset = 0, filter = {}) {
         const filterObject = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
+        if (offset < 0) offset = 0;
 
         try {
             Object.keys(filter).forEach(key => {

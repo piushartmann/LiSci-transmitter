@@ -6,6 +6,16 @@ let loadedCitations = [];
 document.addEventListener("DOMContentLoaded", async function () {
     previousAuthors = await loadPreviousAuthors();
     addNewContext(true);
+
+    document.addEventListener('keydown', async (e) => {
+        if (e.ctrlKey && (e.keyCode == 70 || e.keyCode == 102)) {
+            e.preventDefault();
+            const checkbox = document.getElementById('filterCheckbox');
+            checkbox.checked = true;
+            toggleVisibility('filterBody', true);
+            document.getElementById('filterAuthor').select();
+        }
+    })
 });
 
 function textAreaOnInput(textarea) {

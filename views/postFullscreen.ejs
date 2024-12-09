@@ -19,7 +19,6 @@
 </html>
 
 <script>
-  const loggedIn = <%= typeof username !== 'undefined' ? true : false %>;
   document.addEventListener('DOMContentLoaded', async () => {
     const req = await fetch(`/internal/getPost/<%= postID %>`);
     const post = req.json();

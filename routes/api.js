@@ -7,11 +7,11 @@ const router = Router();
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
  * @param {number} pageSize - The number of posts per page.
- * @param {webpush} webpush - The webpush instance.
+ * @param {webpush} push - The webpush instance.
  * @returns {Router} The router instance.
  */
 
-module.exports = (db, s3Client, webpush) => {
+module.exports = (db, s3Client, push) => {
     const config = require('../config.json');
     const postsPageSize = config.postsPageSize;
 
@@ -191,15 +191,8 @@ module.exports = (db, s3Client, webpush) => {
         if (!user.permissions.includes("push")) return res.status(403).send("You cannot send a push notification");
 
         const { userID, title, body, icon, badge, urgency } = req.body;
-        const subscription = await db.getSubscription(userID);
-        const pushData = { title, body, icon, badge, urgency };
-        try {
-            webpush.sendNotification(subscription, JSON.stringify(pushData));
-            return res.status(200).send("Success");
-        }
-        catch (error) {
-            return res.status(500).send(error.message);
-        }
+        if (!userID || !title || !body) return res.status(401).send('Invalid Request');
+        push.send(title, body, userID)
     });
 
     router.post('/createCitation', async (req, res) => {

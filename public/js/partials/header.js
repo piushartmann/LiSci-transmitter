@@ -1,11 +1,3 @@
-function showLoginPopup() {
-    document.getElementById("loginPopup").style.display = "block";
-}
-
-function hideLoginPopup() {
-    document.getElementById("loginPopup").style.display = "none";
-}
-
 function logout() {
     fetch('/internal/logout', {
         method: 'GET',
@@ -19,26 +11,6 @@ function logout() {
                 window.location.href = '/';
             }
         });
-}
-
-async function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    response = await fetch('/internal/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: username, password: password }),
-    })
-
-    if (response.status === 200) {
-        window.location.href = '/';
-    } else {
-        username.value = "";
-        password.value = "";
-    }
 }
 
 function toggleMenu() {

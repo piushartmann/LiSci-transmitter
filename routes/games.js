@@ -175,10 +175,9 @@ module.exports = (db, s3Client, webpush, gameConfigs) => {
         gameConfig.routerInstance.get('/:gameID', async (req, res) => {
             const permissions = await db.getUserPermissions(req.session.userID);
 
-            return res.render("game", {
-                loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions, profilePic: await db.getPreference(req.session.userID, 'profilePic'),
-                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
-            });
+            return await renderView(req, res, 'game', {
+            title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
+        });
         });
 
         gameConfig.routerInstance.post('/startGame', async (req, res) => {

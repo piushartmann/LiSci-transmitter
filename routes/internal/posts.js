@@ -3,7 +3,6 @@ const { MongoConnector } = require('../../server/MongoConnector.js');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
 const openAI = require('../../server/openAI');
-const pushLib = require('../../server/pushNotifications.js');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -13,11 +12,9 @@ const pushLib = require('../../server/pushNotifications.js');
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-module.exports = (db, s3Client, webpush) => {
+module.exports = (db, s3Client, push) => {
     const config = require('../../config.json');
     const postsPageSize = config.postsPageSize;
-
-    const push = pushLib(db, webpush);
 
     async function markPostsAsRead(userID, posts) {
         for (let i = 0; i < posts.length; i++) {

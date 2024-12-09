@@ -7,6 +7,8 @@ const { MongoConnector } = require('./MongoConnector');
 
 module.exports = (db, webpush) => {
     async function send(title, body, userID) {
+
+        console.log(`Sending: ${title} with ${body}`)
         const subscription = await db.getSubscription(userID);
         if (!subscription) return;
 

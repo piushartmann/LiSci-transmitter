@@ -21,7 +21,8 @@
     "login_form": {
         "username": "Benutzername",
         "password": "Passwort",
-        "cancel": "Abbrechen"
+        "cancel": "Abbrechen",
+        "invalid": "Username oder Passwort ist Falsch."
     },
     "comment_modal": {
         "title": "Kommentare",
