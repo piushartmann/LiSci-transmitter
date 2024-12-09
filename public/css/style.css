@@ -6,9 +6,74 @@
     font-family: 'Fredoka', sans-serif;
 }
 
+html,
 body {
-    padding: 0 5% 0 5%;
-    background-color: #f0f0f0;
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    background-image: linear-gradient(0deg, var(--primary-color), rgb(255, 255, 255));
+    background-repeat: no-repeat;
+    overflow: hidden;
+    padding: 10%;
+}
+
+.section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.section-devider::before {
+    left: 0;
+}
+
+.section-devider::before,
+.section-devider::after {
+    position: absolute;
+    content: "";
+    display: block;
+    width: 45%;
+    border-bottom: black 3px solid;
+}
+
+.section-devider::after {
+    right: 0;
+}
+
+.section-devider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-devider img {
+    width: 40px;
+    aspect-ratio: 1/1;
+}
+
+.frame-design {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid black;
+    box-shadow: var(--primary-color) 0px 0px 20px;
+}
+
+.frame-design>p {
+    text-align: center;
+    margin: 0;
+    padding: 10%;
+}
+
+.frame-design.important {
+    aspect-ratio: 16/9;
+    width: 40vmin;
+    outline: 3px solid var(--gold-color);
+    outline-offset: -10px;
 }
 
 .pageSelector {
@@ -388,11 +453,6 @@ a {
 @media (max-width: 768px) and (display-mode: standalone) {
     .pwaBar {
         display: block;
-    }
-
-    body {
-        padding:
-            env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 }
 

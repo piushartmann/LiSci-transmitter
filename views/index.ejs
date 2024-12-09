@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="<%= (preferences && preferences.find(p => p.key === 'language')?.value) || 'de' %>">
+
 <head>
   <%- include("./partials/baseHead.ejs") %>
 
@@ -7,39 +8,58 @@
   <script src="js/index.js"></script>
   <script src="/js/partials/postRenderer.js"></script>
   <script src="/js/partials/commentRenderer.js"></script>
-  <link rel="stylesheet" href="/css/sections.css">
+  <link rel="stylesheet" href="/css/index.css">
 </head>
 
 <body>
 
- <%- include('./partials/base.ejs') %>
-  <%- prank %>
+  <%- include('./partials/base.ejs') %>
 
-  <h1 data-lang-content="posts hello" data-lang-arguments='{"username": "<%= typeof username !=='undefined' ? username : 'World' %>"}'>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
-  <label for="onlyNews" data-lang-content="posts only_show_news">Nur Zeitungen anzeigen</label>
-  <input type="checkbox" id="onlyNews" name="onlyNews">
-
-  <div id="postBox" class="postBox">
-    <!-- this is where the posts will be -->
+  <div class="logo">
+    <a href="/">Life Science Transmitter</a>
   </div>
-  <div id="pageSelector" class="pageSelector"></div>
 
-  <div id="commentModal" class="modal">
-    <span id="modalClose" class="close" title="Close Modal">&times;</span>
+  <div class="content">
+    <div class="section-devider">
+      <img src="/icons/ring-on-fire.svg" alt="section-devider">
+    </div>
 
-    <form class="modal-content animate">
-
-      <h1 id="title" data-lang-content="comment_modal title"></h1>
-      <div class="newCommentContainer">
-        <p for="commentTextarea" data-lang-content="comment_modal new_comment"></p>
-        <textarea id="commentTextarea" class="online-only" data-lang-content-placeholder="comment_modal comment_placeholder" name="comment" required></textarea>
-        <button type="button" id="commentButton" class="commentButton online-only" data-lang-content="comment_modal submit"></button>
+    <div class="section">
+      <div class="frame-design important" id="news">
+        <p>News</p>
       </div>
-      <h2 id="commentTitle" data-lang-content="comment_modal title"></h2>
-      <div id="commentContainer" class="commentContainer">
+      <div class="frame-design important" id="citations">
+        <p>Citations</p>
       </div>
+    </div>
 
-    </form>
+    <div class="section-devider">
+      <img src="/icons/ring-on-fire.svg" alt="section-devider">
+    </div>
+
+    <div class="section">
+      <div class="frame-design" id="games">
+        <p>Spiele</p>
+      </div>
+      <div class="frame-design" id="community-posts">
+        <p>Community Posts</p>
+      </div>
+      <div class="frame-design" id="create-community-post">
+        <p>Post erstellen</p>
+      </div>
+      <div class="frame-design" id="chat">
+        <p>Chat</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="frame-design" id="logout">
+        <p>Logout</p>
+      </div>
+      <div class="frame-design" id="settings">
+        <p>Einstellungen</p>
+      </div>
+    </div>
   </div>
 
 </body>

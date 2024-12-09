@@ -10,7 +10,7 @@
   <title data-lang-content="create updatePostTitle">Create a New Post</title>
   <% } %>
   <link rel="stylesheet" href="/css/create.css">
-  <link rel="stylesheet" href="/css/sections.css">
+  <link rel="stylesheet" href="/css/index.css">
   <script src="/js/create.js"></script>
   <script src="/js/partials/postRenderer.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.mjs" type="module"></script>
@@ -18,7 +18,8 @@
 
 <body>
 
- <%- include('./partials/base.ejs') %>
+ <%- include("./partials/header.ejs") %>
+<%- include('./partials/base.ejs') %>
 
   <div class="article-box">
     <div class="article-container">

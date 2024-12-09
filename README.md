@@ -56,7 +56,8 @@ Head: <br>
   The Custom Head Elements like the Page title and Page imports
 
 Body: <br>
-  <%- include('./partials/base.ejs') %> -> Some HTML elements that should be present on every document, like the header and the base Modal structure <br>
+  <%- include("./partials/header.ejs") %>
+<%- include('./partials/base.ejs') %> -> Some HTML elements that should be present on every document, like the header and the base Modal structure <br>
   The Custom body Elements that make the Page
 
 ### Standard js

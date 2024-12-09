@@ -1,3 +1,29 @@
+.logo {
+    display: block;
+    margin: 0;
+    margin-top: 5vh;
+    width: 100%;
+    height: auto;
+}
+
+.logo a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 3em;
+    color: #000;
+    text-decoration: none;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 70%;
+}
+
 .post {
     margin-bottom: 20px;
     border-radius: 8px;
