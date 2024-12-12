@@ -4,8 +4,8 @@ async function loadPosts(page, filter) {
 
 const urlParams = new URLSearchParams(window.location.search);
 const page = urlParams.get('page') || 1;
-const postsRequest = loadPosts(page, "all");
-const newsRequest = loadPosts(page, "news");
+let postsRequest = loadPosts(page, "all");
+let newsRequest = loadPosts(page, "news");
 
 let posts = [];
 let news = [];
@@ -13,8 +13,8 @@ let news = [];
 const reloadContent = async () => {
     const onlyNewsFilter = document.getElementById("onlyNews").checked;
 
-    const postsRequest = loadPosts(page, "all");
-    const newsRequest = loadPosts(page, "news");
+    postsRequest = loadPosts(page, "all");
+    newsRequest = loadPosts(page, "news");
 
     const newsJson = await (await newsRequest).json();
     const postsJson = await (await postsRequest).json();
@@ -108,6 +108,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const page = urlParams.get('page') || 1;
         changePage(page, newsPages, postsPages, onlyNewsCheckbox.checked);
     });
+
+    reloadContent();
 });
 
 

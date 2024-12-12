@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById('filterAuthor').select();
         }
     })
+
+    reloadContent();
 });
 
 function textAreaOnInput(textarea) {
@@ -110,7 +112,7 @@ async function loadCitations(page, callback) {
     }
 
     loadLanguage(true);
-    response.totalCitations <= citationBox.children.length ? endReached = true : endReached = false;
+    response.totalCitations == citationBox.children.length ? endReached = true : endReached = false;
 
     return citations;
 }
