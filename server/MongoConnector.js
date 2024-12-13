@@ -82,6 +82,14 @@ const gameInviteSchema = new Schema({
     timestamp: { type: Date, default: Date.now },
 });
 
+const fileSchema = new Schema({
+    filename: { type: String, required: true },
+    path: { type: String, required: true },
+    userID: { type: ObjectId, ref: 'User', required: true },
+    timestamp: { type: Date, default: Date.now },
+    valid_until: { type: Date, required: false }
+});
+
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
     hash.update(password);
@@ -100,6 +108,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.Citation = this.mongoose.model('Citation', citationSchema);
         this.Game = this.mongoose.model('Game', gameSchema);
         this.GameInvite = this.mongoose.model('GameInvite', gameInviteSchema);
+        this.File = this.mongoose.model('File', fileSchema);
     }
 
     async createPost(userID, title, sections, permissions, type) {
@@ -332,7 +341,7 @@ module.exports.MongoConnector = class MongoConnector {
             function generateRandomProfilePic() {
                 return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
             }
-            
+
             restructuredPost.comments = restructuredPost.comments.map(comment => {
                 if (comment.userID.profilePic) {
                     return comment;
@@ -766,5 +775,14 @@ module.exports.MongoConnector = class MongoConnector {
             username: user.username,
             profilePic: user.profilePic
         }));
+    }
+
+    async createFileEntry(userID, filename, path, type, valid_until = undefined) {
+        const file = new this.File({ filename, path, userID, valid_until });
+        return await file.save();
+    }
+
+    async deleteFileEntry(path) {
+        return await this.File.findOneAndDelete({ path });
     }
 };

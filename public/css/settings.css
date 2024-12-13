@@ -62,9 +62,17 @@ label {
     color: #000;
 }
 
-.defaultProfilePicture.enlarged {
+.profilePicture.enlarged {
     position: relative;
     transform: scale(10);
+    margin: 0;
+}
+
+.scaleSliderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
 }
 
 .pickPicture {
@@ -83,10 +91,12 @@ label {
 }
 
 #profilePicturePreview {
+    background-color: white;
     position: absolute;
-    width: 100%;
     height: 100%;
     cursor: move;
+    user-select: none;
+    touch-action: manipulation;
 }
 
 @media (max-width: 768px) {
@@ -98,7 +108,7 @@ label {
         height: 200px;
     }
 
-    .defaultProfilePicture.enlarged {
+    .profilePicture.enlarged {
         transform: scale(5);
     }
     

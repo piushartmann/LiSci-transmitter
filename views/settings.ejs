@@ -47,11 +47,16 @@
 
     <div class="profilePictureContainer setting">
       <label for="head" data-lang-content="settings pick_profile_picture_color">Pick Profile Picture Color</label>
-      <p class="defaultProfilePicture clickable" id="profilePictureColorPreview" style="background-color: <%= profilePic.content%>;">
+      <% if (profilePic.type == "default") { %>
+      <p class="profilePicture clickable" id="profilePictureColorPreview" style="background-color: <%= profilePic.content%>;">
         <%= username.charAt(0).toUpperCase() %>
         <input type="color" id="profilePictureColorPicker" class="hiddenInput" value="<%= profilePic.content %>" />
       </p>
       <button id="profilePictureColorSubmit" class="online-only">Save</button>
+      <% } %>
+      <% if (profilePic.type == "custom") { %>
+      <img class="profilePicture" src="https://storage.liscitransmitter.live/<%= profilePic.content %>">
+      <% } %>
 
       <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('', 'profilePictureModal')">Pick Profile Picture</button>
     </div>
@@ -61,12 +66,26 @@
 
       <div class="pickPicture">
         <% if (profilePic.type == "default") { %>
-          <p class="defaultProfilePicture enlarged clickable" style="background-color: <%= profilePic.content%>;" onclick="document.getElementById('profilePicture').click()">
-            <%= username.charAt(0).toUpperCase() %>
-            <input type="file" id="profilePicture" accept="image/*" class="hiddenInput" onchange="onProfilePictureChange(this)"/>
+        <p class="profilePicture enlarged clickable" style="background-color: <%= profilePic.content%>;" onclick="document.getElementById('profilePicture').click()">
+          <%= username.charAt(0).toUpperCase() %>
+          <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp,.heic" class="hiddenInput" onchange="onProfilePictureChange(this)" />
         </p>
         <% } %>
+        <% if (profilePic.type == "custom") { %>
+        <img class="profilePicture enlarged clickable" src="https://storage.liscitransmitter.live/<%= profilePic.content %>" onclick="document.getElementById('profilePicture').click()">
+        <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp,.heic" class="hiddenInput" onchange="onProfilePictureChange(this)" />
+        <% } %>
         <img id="profilePicturePreview" class="hidden" />
+
+      </div>
+
+      <div class="scaleSliderContainer">
+        <label for="scaleSlider" data-lang-content="settings scale">Scale</label>
+        <input type="range" id="scaleSlider" min="1" max="5" step="0.01" value="1" oninput="onScaleChange(this)">
+      </div>
+      <div class="horizontal">
+        <button id="profilePictureReset" class="online-only button" data-lang-content="settings reset" onclick="resetProfilePicture()" type="button">Reset</button>
+        <button id="profilePictureSubmit" class="online-only button" data-lang-content="settings save" onclick="submitProfilePicture()" type="button">Save</button>
       </div>
     </div>
 

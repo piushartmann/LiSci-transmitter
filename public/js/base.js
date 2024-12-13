@@ -61,7 +61,7 @@ function buildProfilePic(profilePic, username, short = false) {
         authorName.className = "author-name";
 
         let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "defaultProfilePicture author-profile-pic";
+        authorProfilePic.className = "profilePicture author-profile-pic";
         authorProfilePic.style = `background-color: ${profilePic.content};`;
         authorProfilePic.textContent = username.charAt(0).toUpperCase();
 
@@ -79,14 +79,14 @@ function buildProfilePic(profilePic, username, short = false) {
         let authorName = document.createElement("p");
         authorName.textContent = username;
         authorName.style = "margin-left: 10px;";
+        authorName.className = "author-name";
 
         let authorProfilePic = document.createElement("img");
-        authorProfilePic.className = "profilePicture";
+        authorProfilePic.className = "profilePicture image";
         authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
         authorProfilePic.alt = username;
-        headerDiv.appendChild(authorProfilePic);
 
-        authorDiv.appendChild(authorName);
+        if (!short) authorDiv.appendChild(authorName);
         authorDiv.appendChild(authorProfilePic);
     }
 
