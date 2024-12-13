@@ -778,7 +778,7 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async createFileEntry(userID, filename, path, type, valid_until = undefined) {
-        const file = new this.File({ filename, path, userID, valid_until });
+        const file = new this.File({ filename, path, type, userID, valid_until });
         return await file.save();
     }
 

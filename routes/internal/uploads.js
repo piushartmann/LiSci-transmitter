@@ -200,7 +200,7 @@ module.exports = (db) => {
                     CacheControl: "max-age=31536000",
                     ContentDisposition: "inline"
                 }));
-                registerFileInDB(req.session.userID, newFilename, s3Path, "profile-picture");
+                registerFileInDB(req.session.userID, newFilename, s3Path, "profile-pictures");
                 const currentProfilePic = await db.getPreference(req.session.userID, 'profilePic');
                 if (currentProfilePic.type === "custom"){
                     console.log("Deleting old profile picture");
