@@ -154,8 +154,6 @@ module.exports = (db) => {
 
         const file = req.file;
 
-        console.log(req.body);
-
         console.log("Uploading profile picture");
 
         // Validate the file
@@ -175,8 +173,11 @@ module.exports = (db) => {
 
             const extractWidth = Math.floor(width / scale);
             const extractHeight = Math.floor(height / scale);
-            const extractLeft = Math.floor(x * width);
-            const extractTop = Math.floor(y * height);
+            let extractLeft = Math.floor(x * width);
+            let extractTop = Math.floor(y * height);
+
+            if (extractWidth + extractLeft > width) extractLeft = 0;
+            if (extractHeight + extractTop > height) extractTop = 0;
 
             if (extractLeft + extractWidth > width || extractTop + extractHeight > height) {
                 console.warn("Invalid crop size");

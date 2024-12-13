@@ -105,6 +105,14 @@ function onProfilePictureChange(element) {
     preview.src = localUrl;
     preview.classList.remove('hidden');
     preview.addEventListener('load', () => {
+        if (preview.naturalWidth < preview.naturalHeight) {
+            preview.style.width = "100%";
+            preview.style.height = "auto";
+        } else {
+            preview.style.height = "100%";
+            preview.style.width = "auto";
+        }
+
         preview.dataset.originalWidth = preview.clientWidth;
         preview.dataset.originalHeight = preview.clientHeight;
         preview.dataset.originalLeft = preview.offsetLeft;
@@ -112,14 +120,16 @@ function onProfilePictureChange(element) {
         preview.dataset.maxScale = Math.max(preview.naturalWidth / preview.clientWidth, preview.naturalHeight / preview.clientHeight) * 4;
         preview.dataset.scale = 1;
         document.getElementById('scaleSlider').max = preview.dataset.maxScale;
+        scalePreview(preview, 1);
         computeBounds(element.parentElement, preview);
         if (debug === true) drawDebugRect();
     });
 };
 
-function computeBounds(parent, preview, imgScale = 1, parentScale = 10) {
-    const xBigger = (preview.dataset.originalWidth * imgScale - parent.clientWidth * parentScale) / 2;
-    const yBigger = (preview.dataset.originalHeight * imgScale - parent.clientHeight * parentScale) / 2;
+function computeBounds(parent, preview, imgScale = 1) {
+    let xBigger = Math.floor((preview.dataset.originalWidth * imgScale - parent.clientWidth) / 2) - 2;
+    let yBigger = Math.floor((preview.dataset.originalHeight * imgScale - parent.clientHeight) / 2) - 2;
+    console.log(preview.dataset.originalWidth, parent.clientWidth, xBigger);
     draggable(preview, { top: yBigger, left: xBigger, right: xBigger, bottom: yBigger });
 }
 
@@ -147,7 +157,6 @@ function scalePreview(preview, scale) {
 /**
  * 
  * function scalePreview(preview, scale) {
-    // TODO: dont reset position on scale change
 
     preview.style.width = `${preview.dataset.originalWidth * scale}px`;
     preview.style.height = `${preview.dataset.originalHeight * scale}px`;
@@ -183,6 +192,8 @@ function draggable(element, constraints = { top: null, left: null, right: null, 
     constraints.left = constraints.left !== null ? element.offsetLeft - constraints.left : null;
     constraints.right = constraints.right !== null ? element.offsetLeft + constraints.right : null;
     constraints.bottom = constraints.bottom !== null ? element.offsetTop + constraints.bottom : null;
+
+    console.log(constraints);
 
     function dragMouseDown(e) {
         e = e || window.event;
@@ -258,16 +269,20 @@ function draggable(element, constraints = { top: null, left: null, right: null, 
 
 function getPositionOfPreviewWithoutScale() {
     const preview = document.getElementById('profilePicturePreview');
-    const relativeX = Math.abs(preview.dataset.originalLeft - preview.offsetLeft) / preview.dataset.originalWidth / preview.dataset.scale;
-    const relativeY = Math.abs(preview.dataset.originalTop - preview.offsetTop) / preview.dataset.originalHeight / preview.dataset.scale;
+    let relativeX = Math.abs(preview.dataset.originalLeft - preview.offsetLeft) / preview.dataset.originalWidth / preview.dataset.scale;
+    let relativeY = Math.abs(preview.dataset.originalTop - preview.offsetTop) / preview.dataset.originalHeight / preview.dataset.scale;
+    if (relativeX < 0) relativeX = 0;
+    if (relativeY < 0) relativeY = 0;
 
     return { x: relativeX, y: relativeY, scale: preview.dataset.scale };
 }
 
 function drawDebugRect() {
-    const { x, y, scale } = getPositionOfPreviewWithoutScale();
-
     const preview = document.getElementById('profilePicturePreview');
+
+    const x = preview.dataset.originalLeft - preview.offsetLeft / preview.dataset.scale;
+    const y = preview.dataset.originalTop - preview.offsetTop / preview.dataset.scale;
+    const scale = preview.dataset.scale;
 
     if (document.getElementById('debugCanvas')) {
         document.getElementById('debugCanvas').remove();
@@ -277,9 +292,10 @@ function drawDebugRect() {
     canvas.width = preview.dataset.originalWidth / scale;
     canvas.height = preview.dataset.originalHeight / scale;
     canvas.style.position = 'absolute';
-    canvas.style.top = `${x * preview.dataset.originalHeight}px`;
-    canvas.style.left = `${y * preview.dataset.originalWidth}px`;
+    canvas.style.top = `${y - parseInt(preview.dataset.originalTop)}px`;
+    canvas.style.left = `${x - parseInt(preview.dataset.originalLeft)}px`;
     canvas.style.background = "red";
+    canvas.style.opacity = 0.5;
     canvas.style.zIndex = 1000;
     document.body.appendChild(canvas);
 
@@ -288,10 +304,11 @@ function drawDebugRect() {
     }
     const canvas2 = document.createElement('canvas');
     canvas2.id = 'debugCanvas2';
-    canvas2.width = preview.dataset.originalWidth;
-    canvas2.height = preview.dataset.originalHeight;
+    canvas2.width = parseInt(preview.dataset.originalWidth) + Math.abs(parseInt(preview.dataset.originalLeft) * 2);
+    canvas2.height = parseInt(preview.dataset.originalHeight) + Math.abs(parseInt(preview.dataset.originalTop) * 2);
     canvas2.style.position = 'absolute';
     canvas2.style.background = "green";
+    canvas2.style.opacity = 0.5;
     canvas2.style.top = 0;
     canvas2.style.left = 0;
     canvas2.style.zIndex = 999;

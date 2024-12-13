@@ -65,16 +65,10 @@
       <h1 id="title">Pick Profile Picture</h1>
 
       <div class="pickPicture">
-        <% if (profilePic.type == "default") { %>
-        <p class="profilePicture enlarged clickable" style="background-color: <%= profilePic.content%>;" onclick="document.getElementById('profilePicture').click()">
-          <%= username.charAt(0).toUpperCase() %>
+        <p class="profilePicture enlarged clickable" onclick="document.getElementById('profilePicture').click()">
+          <span>Click to add Profile Picture</span>
           <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp,.heic" class="hiddenInput" onchange="onProfilePictureChange(this)" />
         </p>
-        <% } %>
-        <% if (profilePic.type == "custom") { %>
-        <img class="profilePicture enlarged clickable" src="https://storage.liscitransmitter.live/<%= profilePic.content %>" onclick="document.getElementById('profilePicture').click()">
-        <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp,.heic" class="hiddenInput" onchange="onProfilePictureChange(this)" />
-        <% } %>
         <img id="profilePicturePreview" class="hidden" />
 
       </div>

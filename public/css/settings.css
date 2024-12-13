@@ -36,6 +36,8 @@ label {
     z-index: -1;
     height: 0;
     width: 0;
+    opacity: 0;
+    visibility: hidden;
 }
 
 .userField {
@@ -49,13 +51,13 @@ label {
     flex-direction: column;
 }
 
-.pushTypes{
+.pushTypes {
     display: flex;
     flex-direction: column;
     justify-content: left;
     align-items: flex-start;
     margin: 10px 0;
-    list-style-type:none;
+    list-style-type: none;
 }
 
 .pushTypes li ::marker {
@@ -64,8 +66,15 @@ label {
 
 .profilePicture.enlarged {
     position: relative;
-    transform: scale(10);
+    width: 400px;
+    height: 400px;
     margin: 0;
+    border: #000 1px solid;
+}
+
+.profilePicture.enlarged span {
+    text-align: center;
+    font-size: 20px;
 }
 
 .scaleSliderContainer {
@@ -80,20 +89,20 @@ label {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 10px 0;
-    height: 400px;
-}
-
-.pickPicture {
-    position: relative;
     overflow: hidden;
-    clip-path: circle(200px at center);
+    margin: 10px auto;
+    height: 402px;
+    width: 402px;
+    clip-path: circle(202px at center);
 }
 
 #profilePicturePreview {
     background-color: white;
     position: absolute;
+    min-height: 400px;
+    min-width: 400px;
     height: 100%;
+    width: auto;
     cursor: move;
     user-select: none;
     touch-action: manipulation;
@@ -105,12 +114,19 @@ label {
     }
 
     .pickPicture {
-        height: 200px;
-        clip-path: circle(100px at center);
+        width: 202px;
+        height: 202px;
+        clip-path: circle(102px at center);
     }
 
     .profilePicture.enlarged {
-        transform: scale(5);
+        width: 200px;
+        height: 200px;
     }
-    
+
+    #profilePicturePreview {
+        min-height: 200px;
+        min-width: 200px;
+    }
+
 }
