@@ -76,6 +76,10 @@ body {
     outline-offset: -10px;
 }
 
+.hidden {
+    display: none;
+}
+
 .pageSelector {
     display: flex;
     justify-content: center;
@@ -172,9 +176,16 @@ body {
     align-items: center;
     justify-content: center;
     margin-right: 5px;
+    height: 45px;
 }
 
 button {
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.clickable {
+    cursor: pointer;
     touch-action: manipulation;
     user-select: none;
 }
@@ -199,7 +210,7 @@ a {
     display: none;
 }
 
-.defaultProfilePicture {
+.profilePicture {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -210,6 +221,12 @@ a {
     font-size: 20px;
     margin: 5px;
     user-select: none;
+    -webkit-user-select: none;
+    aspect-ratio: 1/1;
+}
+
+.profilePicture.image {
+    border: var(--post-outline-color) 1px solid;
 }
 
 .author-info {
@@ -458,6 +475,10 @@ a {
 
 @media (max-width: 768px) {
 
+    .button {
+        height: unset;
+    }
+
     .author-profile-pic:hover .tooltip {
         visibility: visible;
         animation: tooltipFadeIn 0.2s forwards;
@@ -473,6 +494,10 @@ a {
 
     .author-name {
         display: none;
+    }
+
+    .auto-hiding {
+        display: none !important;
     }
 }
 

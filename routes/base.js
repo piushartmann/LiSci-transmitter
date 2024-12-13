@@ -71,14 +71,6 @@ module.exports = (db) => {
         });
     });
 
-    router.get('/post/:id', async (req, res) => {
-        const permissions = await db.getUserPermissions(req.session.userID);
-
-        return await renderView(req, res, 'postFullscreen', {
-            postID: req.params.id
-        });
-    });
-
     router.get('/citations', async (req, res) => {
         if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);

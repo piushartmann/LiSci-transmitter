@@ -11,6 +11,17 @@ const openAI = new OpenAI(process.env.OPENAI_API_KEY);
 
 const config = require('../config.json');
 
+function isValidURL(url) {
+    const allowedDomains = ["https://storage.liscitransmitter.live"];
+    try {
+        const parsedURL = new URL(url);
+        return allowedDomains.includes(parsedURL.origin);
+    } catch (e) {
+        return false;
+    }
+}
+
+
 async function summarizeText(text) {
     const completion = await openAI.chat.completions.create({
         model: "gpt-4o",
@@ -49,6 +60,9 @@ async function summarizePDF(pdfURL) {
 }
 
 async function extractTextFromPDF(pdfURL) {
+    if (!isValidURL(pdfURL)) {
+        throw new Error("Invalid URL");
+    }
     const buffer = await fetch(pdfURL).then((res) => res.arrayBuffer());
 
     const pdf = await getDocumentProxy(new Uint8Array(buffer));

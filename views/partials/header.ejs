@@ -14,7 +14,7 @@
       <% if (usertype.includes("games")) { %>
       <li><a href="/games" data-lang-content="header games"></a></li>
       <% } %>
-      
+
       <li><a href="/about" data-lang-content="header about"></a></li>
     </ul>
   </nav>
@@ -26,9 +26,12 @@
 
     <% if (loggedIn) { %>
     <% if (profilePic.type == "default") { %>
-    <p class="defaultProfilePicture profilePicture" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
+    <p class="profilePicture auto-hiding" style="background-color: <%= profilePic.content%>; cursor: pointer;" onclick="toggleMenu()">
       <%= username.charAt(0).toUpperCase() %>
     </p>
+    <% } %>
+    <% if (profilePic.type == "custom") { %>
+    <img class="profilePicture auto-hiding" src="https://storage.liscitransmitter.live/<%= profilePic.content %>" onclick="toggleMenu()">
     <% } %>
     <% } %>
 
