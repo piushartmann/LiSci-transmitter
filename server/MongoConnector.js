@@ -90,6 +90,11 @@ const fileSchema = new Schema({
     valid_until: { type: Date, required: false }
 });
 
+const chatSchema = new Schema({
+    members: [{ type: ObjectId, ref: 'User', required: true }],
+    messages: [{ type: Object, required: true }]
+});
+
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
     hash.update(password);

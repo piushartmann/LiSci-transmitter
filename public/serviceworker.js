@@ -109,10 +109,7 @@ self.addEventListener('message', async function (event) {
     else if (event.data.type === 'updateCache') {
         try {
             const url = new URL(event.data.url, self.location.origin);
-            await updateCache(url);
-            if (event.data.callbackType === 'reloadContent') {
-                SWreloadContent();
-            }
+            await updateCache(url, event.data.callbackType === 'reloadSite' ? SWreloadSite : SWreloadContent);
         } catch (error) {
             console.error('Invalid URL:', event.data.url);
         }
@@ -174,12 +171,12 @@ async function updateCache(url, callback) {
         const isRequest = requestsToCache.includes(url.pathname + url.search);
 
         const match = isRequest ?
-            cacheMatch && fetchResponse.data === cacheMatch.data :
-            matchEtag === fetchEtag;
+            cacheMatch && fetchResponse.data === cacheMatch.data : // if request, compare data
+            matchEtag === fetchEtag; // if site, compare etag
 
         if (!match) {
             console.log('Cache of ', url.pathname + url.search, ' updated');
-            if (callback) {
+            if (typeof callback === 'function') {
                 callback();
             }
         }

@@ -507,7 +507,7 @@ function registerServiceWorker() {
                 console.error('Error checking Service Worker registrations:', error);
             });
 
-            navigator.serviceWorker.addEventListener('message', event => {
+            navigator.serviceWorker.addEventListener('message', async (event) => {
                 console.log('Service Worker message received:', event.data);
                 if (event.data.type === 'updateContent') {
                     console.log('Service Worker updating content');
