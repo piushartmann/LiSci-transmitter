@@ -13,7 +13,7 @@
 </head>
 
 <body>
- <%- include('./partials/base.ejs') %>
+  <%- include('./partials/base.ejs') %>
 
   <div class="settingsBox">
     <h1 data-lang-content="settings title">Settings</h1>
@@ -46,12 +46,47 @@
     </div>
 
     <div class="profilePictureContainer setting">
-      <label for="head" data-lang-content="settings pick_profile_picture">Pick Profile Picture Color</label>
-      <p class="defaultProfilePicture" id="profilePicturePreview" style="background-color: <%= profilePic.content%>; cursor: pointer;">
+      <label for="head" data-lang-content="settings pick_profile_picture_color">Pick Profile Picture Color</label>
+      <% if (profilePic.type == "default") { %>
+      <p class="profilePicture clickable" id="profilePictureColorPreview" style="background-color: <%= profilePic.content%>;">
         <%= username.charAt(0).toUpperCase() %>
-        <input type="color" id="profilePictureColorPicker" class="ColorPicker" value="<%= profilePic.content %>" />
+        <input type="color" id="profilePictureColorPicker" class="hiddenInput" value="<%= profilePic.content %>" />
       </p>
-      <button id="profilePictureColorSubmit" class="online-only" >Save</button>
+      <button id="profilePictureColorSubmit" class="online-only">Save</button>
+      <% } %>
+      <% if (profilePic.type == "custom") { %>
+      <img class="profilePicture" src="https://storage.liscitransmitter.live/<%= profilePic.content %>">
+      <% } %>
+
+      <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('', 'profilePictureModal')">Pick Profile Picture</button>
+    </div>
+
+    <div class="modal" id="profilePictureModal">
+      <h1 id="title">Pick Profile Picture</h1>
+
+      <div class="pickPicture">
+        <% if (profilePic.type == "default") { %>
+        <p class="profilePicture enlarged clickable" style="background-color: <%= profilePic.content%>;" onclick="document.getElementById('profilePicture').click()">
+          <%= username.charAt(0).toUpperCase() %>
+          <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp,.heic" class="hiddenInput" onchange="onProfilePictureChange(this)" />
+        </p>
+        <% } %>
+        <% if (profilePic.type == "custom") { %>
+        <img class="profilePicture enlarged clickable" src="https://storage.liscitransmitter.live/<%= profilePic.content %>" onclick="document.getElementById('profilePicture').click()">
+        <input type="file" id="profilePicture" accept=".jpg,.jpeg,.png,.webp,.heic" class="hiddenInput" onchange="onProfilePictureChange(this)" />
+        <% } %>
+        <img id="profilePicturePreview" class="hidden" />
+
+      </div>
+
+      <div class="scaleSliderContainer">
+        <label for="scaleSlider" data-lang-content="settings scale">Scale</label>
+        <input type="range" id="scaleSlider" min="1" max="5" step="0.01" value="1" oninput="onScaleChange(this)">
+      </div>
+      <div class="horizontal">
+        <button id="profilePictureReset" class="online-only button" data-lang-content="settings reset" onclick="resetProfilePicture()" type="button">Reset</button>
+        <button id="profilePictureSubmit" class="online-only button" data-lang-content="settings save" onclick="submitProfilePicture()" type="button">Save</button>
+      </div>
     </div>
 
     <div class="apiKeysContainer setting">
@@ -63,7 +98,7 @@
       <label for="language" data-lang-content="settings language">Language</label>
       <select id="language" class="online-only">
         <% for( let i = 0; i < languages.length; i++ ) { %>
-          <option value="<%= languages[i] %>" <%= preferences.find(p => p.key === 'language')?.value === languages[i] ? 'selected' : '' %> data-lang-content="languages <%= languages[i] %>"><%= languages[i] %></option>
+        <option value="<%= languages[i] %>" <%= preferences.find(p => p.key === 'language')?.value === languages[i] ? 'selected' : '' %> data-lang-content="languages <%= languages[i] %>"><%= languages[i] %></option>
         <% } %>
       </select>
     </div>

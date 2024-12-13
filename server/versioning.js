@@ -26,20 +26,24 @@ function ejs(viewDirs, publicDirs) {
             const versionedPrefetches = [];
             prefetches.forEach(prefetchURL => {
 
-                let file;
-                for (const viewPath of publicDirs) {
-                    file = path.join(viewPath, prefetchURL);
-                    if (fs.existsSync(file)) {
-                        break;
+                try {
+                    let file;
+                    for (const viewPath of publicDirs) {
+                        file = path.join(viewPath, prefetchURL);
+                        if (fs.existsSync(file)) {
+                            break;
+                        }
                     }
-                }
 
-                if (!fs.existsSync(file)) {
+                    if (!fs.existsSync(file)) {
+                        versionedPrefetches.push(prefetchURL);
+                        return;
+                    }
+                    const fileHash = require('crypto').createHash('md5').update(fs.readFileSync(file)).digest('hex').substring(0, 5);
+                    versionedPrefetches.push(`${prefetchURL}?v=${fileHash}`);
+                } catch (e) {
                     versionedPrefetches.push(prefetchURL);
-                    return;
                 }
-                const fileHash = require('crypto').createHash('md5').update(fs.readFileSync(file)).digest('hex').substring(0, 5);
-                versionedPrefetches.push(`${prefetchURL}?v=${fileHash}`);
             });
             return versionedPrefetches;
         }
@@ -52,7 +56,7 @@ function ejs(viewDirs, publicDirs) {
                     break;
                 }
             }
-            
+
             let indexFileContent = fs.readFileSync(indexFilePath, 'utf-8');
 
             // Resolve dependencies

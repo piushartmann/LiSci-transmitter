@@ -87,7 +87,7 @@
                 "comments": "Comments (coming soon)"
             }
         },
-        "pick_profile_picture": "Pick profile picture color",
+        "pick_profile_picture_color": "Pick profile picture color",
         "api_key": "API Key",
         "language": "Language",
         "enable": "Enable"

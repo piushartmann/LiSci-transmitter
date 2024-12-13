@@ -6,7 +6,7 @@ const oneDay = 24 * 3600 * 1000
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
- * @param {multer} s3Client - The s3 client instance.
+ * @param {import('aws-sdk').S3} s3Client - The s3 client instance.
  * @returns {Router} The router instance.
  */
 

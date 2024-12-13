@@ -26,11 +26,11 @@ label {
     margin: 20px 0;
 }
 
-.profilePicturePreview {
+.profilePictureColorPreview {
     border: 0;
 }
 
-.ColorPicker {
+.hiddenInput {
     position: absolute;
     color: transparent;
     z-index: -1;
@@ -62,9 +62,54 @@ label {
     color: #000;
 }
 
+.profilePicture.enlarged {
+    position: relative;
+    transform: scale(10);
+    margin: 0;
+}
+
+.scaleSliderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.pickPicture {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+    height: 400px;
+}
+
+.pickPicture {
+    position: relative;
+    overflow: hidden;
+    clip-path: circle(200px at center);
+}
+
+#profilePicturePreview {
+    background-color: white;
+    position: absolute;
+    height: 100%;
+    cursor: move;
+    user-select: none;
+    touch-action: manipulation;
+}
+
 @media (max-width: 768px) {
     .setting {
         width: 100%;
+    }
+
+    .pickPicture {
+        height: 200px;
+    }
+
+    .profilePicture.enlarged {
+        transform: scale(5);
     }
     
 }

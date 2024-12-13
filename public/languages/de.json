@@ -87,7 +87,7 @@
                 "comments": "Kommentare (kommen bald)"
             }
         },
-        "pick_profile_picture": "Profilbildfarbe auswählen",
+        "pick_profile_picture_color": "Profilbildfarbe auswählen",
         "api_key": "API Key",
         "language": "Sprache",
         "enable": "Aktivieren"
