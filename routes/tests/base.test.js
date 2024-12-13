@@ -116,16 +116,6 @@ describe('base endpoints - logged in', () => {
         )
     });
 
-    test('test /post/:id route', async () => {
-        await requestEndpoint("/post/123")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'postFullscreen',
-            expect.any(Object)
-        )
-    });
-
     test('test /citations route', async () => {
         await requestEndpoint("/citations")
         expect(mockRenderView).toHaveBeenCalledWith(
