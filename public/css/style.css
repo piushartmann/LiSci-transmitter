@@ -146,6 +146,7 @@ a {
 }
 
 .profilePicture {
+    position: relative;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -171,11 +172,6 @@ a {
     margin: 10px;
 }
 
-
-.author-profile-pic {
-    position: relative;
-}
-
 .tooltip {
     visibility: hidden;
     width: 50px;
@@ -189,7 +185,7 @@ a {
     left: 50%;
     margin-left: -50px;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     font-size: 1em;
     touch-action: manipulation;
 }
@@ -199,6 +195,7 @@ a {
     position: absolute;
     top: 100%;
     left: 50%;
+    z-index: 10;
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
@@ -419,7 +416,7 @@ a {
         height: unset;
     }
 
-    .author-profile-pic:hover .tooltip {
+    .author-info:hover .tooltip {
         visibility: visible;
         animation: tooltipFadeIn 0.2s forwards;
     }

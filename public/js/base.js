@@ -56,12 +56,12 @@ function buildProfilePic(profilePic, username, short = false) {
         authorDiv.className = "author-info";
 
         let authorName = document.createElement("p");
-        authorName.textContent = short ? "" : username;
+        authorName.textContent = username;
         authorName.style = "margin-left: 10px;";
         authorName.className = "author-name";
 
         let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "profilePicture author-profile-pic";
+        authorProfilePic.className = "profilePicture";
         authorProfilePic.style = `background-color: ${profilePic.content};`;
         authorProfilePic.textContent = username.charAt(0).toUpperCase();
 
@@ -81,13 +81,23 @@ function buildProfilePic(profilePic, username, short = false) {
         authorName.style = "margin-left: 10px;";
         authorName.className = "author-name";
 
+        let authorProfilePicName = document.createElement("span");
+        authorProfilePicName.textContent = username;
+        authorProfilePicName.className = "tooltip";
+
+        let authorProfilePicWrapper = document.createElement("div");
+        authorProfilePicWrapper.className = "profilePicture";
+
         let authorProfilePic = document.createElement("img");
         authorProfilePic.className = "profilePicture image";
         authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
         authorProfilePic.alt = username;
 
+        authorProfilePicWrapper.appendChild(authorProfilePic);
+        authorProfilePicWrapper.appendChild(authorProfilePicName);
+
         if (!short) authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
+        authorDiv.appendChild(authorProfilePicWrapper);
     }
 
     return authorDiv;
@@ -307,7 +317,7 @@ function hideModal() {
     modal.style.display = 'none';
 }
 
-function openModal(content, id="modal") {
+function openModal(content, id = "modal") {
     if (content === "" || !content) content = document.getElementById(id);
     const modal = document.getElementById('modal');
     const modalContent = document.querySelector('#modal .modal-content');

@@ -130,10 +130,6 @@
     right: 15px;
 }
 
-.username:hover .tooltip {
-    visibility: visible;
-    animation: tooltipFadeIn 0.2s forwards;
-}
 
 .date:hover .tooltip {
     visibility: visible;
@@ -203,9 +199,5 @@
         position: inherit;
         top: 0px;
         margin: 0;
-    }
-
-    .date {
-        display: none;
     }
 }
