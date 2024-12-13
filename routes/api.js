@@ -7,7 +7,7 @@ const router = Router();
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {multer} s3Client - The s3 client instance.
  * @param {number} pageSize - The number of posts per page.
- * @param {webpush} push - The webpush instance.
+ * @param {pushLib} push - The webpush instance.
  * @returns {Router} The router instance.
  */
 
@@ -190,9 +190,10 @@ module.exports = (db, s3Client, push) => {
         if (!user) return res.status(401).send("Invalid API key or insufficient permissions");
         if (!user.permissions.includes("push")) return res.status(403).send("You cannot send a push notification");
 
-        const { userID, title, body, icon, badge, urgency } = req.body;
+        const { userID, title, body} = req.body;
         if (!userID || !title || !body) return res.status(401).send('Invalid Request');
         push.send(title, body, userID)
+        return res.status(200).send("Success");
     });
 
     router.post('/createCitation', async (req, res) => {

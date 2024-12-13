@@ -6,27 +6,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const profilePictureColorPicker = document.getElementById('profilePictureColorPicker');
     const profilePicturePreview = document.getElementById('profilePictureColorPreview');
-    profilePictureColorPicker.addEventListener('input', () => {
-        profilePicturePreview.style.backgroundColor = profilePictureColorPicker.value;
-    });
-
-    profilePicturePreview.addEventListener('click', () => {
-        profilePictureColorPicker.focus();
-        profilePictureColorPicker.click();
-    });
-
-    const profilePictureColorSubmit = document.getElementById('profilePictureColorSubmit');
-    profilePictureColorSubmit.addEventListener('click', async () => {
-        const color = profilePictureColorPicker.value;
-        await fetch('internal/setProfilePictureColor', {
-            method: 'post',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ color: color }),
+    if (profilePicturePreview !== null) {
+        profilePictureColorPicker.addEventListener('input', () => {
+            profilePicturePreview.style.backgroundColor = profilePictureColorPicker.value;
         });
-        window.location.reload();
-    });
+
+        profilePicturePreview.addEventListener('click', () => {
+            profilePictureColorPicker.focus();
+            profilePictureColorPicker.click();
+        });
+
+        const profilePictureColorSubmit = document.getElementById('profilePictureColorSubmit');
+        profilePictureColorSubmit.addEventListener('click', async () => {
+            const color = profilePictureColorPicker.value;
+            await fetch('internal/setProfilePictureColor', {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ color: color }),
+            });
+            window.location.reload();
+        });
+    }
 
     const newsPushCheckbox = document.getElementById('newsPushCheckbox');
     newsPushCheckbox.addEventListener('change', () => {

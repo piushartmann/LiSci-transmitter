@@ -9,6 +9,7 @@ beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
     mongoConnector = new MongoConnector('testdb', uri);
+    mongoConnector.push = { sendToEveryone: jest.fn() };
 });
 
 afterAll(async () => {

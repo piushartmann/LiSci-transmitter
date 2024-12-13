@@ -9,7 +9,7 @@ const router = Router();
  * @returns {Router} The router instance.
 */
 
-module.exports = (db, s3Client, webpush, gameConfigs) => {
+module.exports = (db, s3Client, gameConfigs) => {
 
     let discoverUsers = [];
     let invites = [];

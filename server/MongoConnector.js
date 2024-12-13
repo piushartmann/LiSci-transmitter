@@ -3,10 +3,8 @@ const crypto = require('crypto');
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
-const { title, off } = require('process');
-const { type } = require('os');
-const { query } = require('express');
 const config = require('../config.json');
+const pushLib = require('./pushNotifications.js');
 
 
 const likeSchema = new Schema({
@@ -102,7 +100,7 @@ function hashPassword(password) {
 }
 
 module.exports.MongoConnector = class MongoConnector {
-    constructor(database, url = "mongodb://localhost:27017") {
+    constructor(database, url = "mongodb://localhost:27017", webpush) {
         this.mongoose = mongoose;
         this.url = url;
         this.connectPromise = this.mongoose.connect(this.url, { dbName: database });
@@ -114,11 +112,23 @@ module.exports.MongoConnector = class MongoConnector {
         this.Game = this.mongoose.model('Game', gameSchema);
         this.GameInvite = this.mongoose.model('GameInvite', gameInviteSchema);
         this.File = this.mongoose.model('File', fileSchema);
+
+        this.push = pushLib(this, webpush);
     }
 
     async createPost(userID, title, sections, permissions, type) {
         const filteredSections = sections.filter(section => section.content && section.content.trim() !== '');
         const post = new this.Post({ userID, title, sections: filteredSections, permissions, type });
+
+        const user = await this.User.findById(userID);
+        if (!user) return null;
+        if (type === "news") {
+            this.push.sendToEveryone("newsNotifications", 'Neue Zeitung', `Neue Zeitung: "${title}" von ${user.username}`);
+        }
+        else {
+            this.push.sendToEveryone("postNotifications", 'Neuer Post', `Neuer Post: "${title}" von ${user.username}`);
+        }
+
         return await post.save();
     }
 
@@ -182,7 +192,10 @@ module.exports.MongoConnector = class MongoConnector {
     async commentPost(postID, userID, content, permissions) {
         const comment = await this.Comment.create({ userID, content, permissions });
         const post = await this.Post.findById(postID);
+        if (!post) return null;
         post.comments.push(comment);
+
+        this.push.sendToEveryone("commentNotifications", 'Neuer Kommentar', `Neuer Kommentar von ${comment.userID.username} auf "${post.title}"`);
         return await post.save();
     }
 
@@ -481,11 +494,13 @@ module.exports.MongoConnector = class MongoConnector {
 
     async createCitation(userID, author, content) {
         const citation = new this.Citation({ userID, author, content });
+        this.push.sendToEveryone("citationNotifications", 'Neues Zitat', `${author}: ${content}`);
         return await citation.save();
     }
 
     async createCitationWithContext(userID, context, timestamp) {
         const citation = new this.Citation({ userID, context, timestamp: timestamp || Date.now() });
+        this.push.sendToEveryone("citationNotifications", 'Neues Zitat', `${context[0].author}: ${context[0].content}` + context.length > 1 ? "..." : "");
         return await citation.save();
     }
 
@@ -629,7 +644,10 @@ module.exports.MongoConnector = class MongoConnector {
         return user.pushSubscription;
     }
 
-    async getAllSubscriptions() {
+    async getAllSubscriptions(type) {
+        if (type == "urgent") return await this.User.find({ pushSubscription: { $exists: true } });
+        if (typeof type !== "undefined") return await this.User.find({ pushSubscription: { $exists: true }, preferences: { $elemMatch: { key: type, value: true } } });
+
         return await this.User.find({ pushSubscription: { $exists: true } });
     }
 

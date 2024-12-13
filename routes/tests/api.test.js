@@ -2,14 +2,13 @@ const request = require('supertest');
 const express = require('express');
 const apiRouter = require('../api');
 const { MongoConnector } = require('../../server/MongoConnector');
-const webpush = require('web-push');
 
 jest.mock('../../server/MongoConnector');
-jest.mock('web-push');
 
 const app = express();
 app.use(express.json());
 const mockDB = new MongoConnector();
+const webpush = { send: jest.fn() };
 app.use('/api', apiRouter(mockDB, {}, webpush));
 
 describe('API Routes - valid Key', () => {

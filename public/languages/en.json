@@ -83,8 +83,8 @@
             "checkboxes": {
                 "news": "News",
                 "posts": "Posts",
-                "citations": "Citations (coming soon)",
-                "comments": "Comments (coming soon)"
+                "citations": "Citations",
+                "comments": "Comments"
             }
         },
         "pick_profile_picture_color": "Pick profile picture color",

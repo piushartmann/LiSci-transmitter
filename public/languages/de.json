@@ -83,8 +83,8 @@
             "checkboxes": {
                 "news": "Zeitungen",
                 "posts": "Posts",
-                "citations": "Zitate (kommen bald)",
-                "comments": "Kommentare (kommen bald)"
+                "citations": "Zitate",
+                "comments": "Kommentare"
             }
         },
         "pick_profile_picture_color": "Profilbildfarbe auswählen",

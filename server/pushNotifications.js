@@ -1,5 +1,3 @@
-const { MongoConnector } = require('./MongoConnector');
-
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @param {webpush} webpush - The webpush instance.
@@ -23,22 +21,13 @@ module.exports = (db, webpush) => {
     }
 
     async function sendToEveryone(type, title, body) {
-        const users = await db.getAllSubscriptions();
+        console.log(`Sending new ${type} notification to everyone`);
+        const users = await db.getAllSubscriptions(type);
+        console.log(`Found ${users.length} users`);
 
         for (const user of users) {
             try {
-                if (type === "urgent") {
-                    send(title, body, user._id);
-                }
-                else if (type === "newNews" && await db.getPreference(user._id, "newsNotifications")) {
-                    send(title, body, user._id);
-                }
-                else if (type === "newPost" && await db.getPreference(user._id, "postNotifications")) {
-                    send(title, body, user._id);
-                }
-                else if (type === "newCitation" && await db.getPreference(user._id, "citationNotification")) {
-                    send(title, body, user._id);
-                }
+                send(title, body, user._id);
             }
             catch (error) {
                 console.warn(error);

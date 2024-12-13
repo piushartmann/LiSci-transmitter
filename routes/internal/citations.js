@@ -2,7 +2,6 @@ const { Router, json } = require('express');
 const { MongoConnector } = require('../../server/MongoConnector');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
-const pushLib = require('../../server/pushNotifications.js');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -12,11 +11,9 @@ const pushLib = require('../../server/pushNotifications.js');
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-module.exports = (db, s3Client, webpush) => {
+module.exports = (db, s3Client) => {
     const config = require('../../config.json');
     const citationsPageSize = config.citationsPageSize;
-
-    const push = pushLib(db, webpush);
 
     router.post('/createCitation', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -41,8 +38,6 @@ module.exports = (db, s3Client, webpush) => {
         if (sanitizedContext.length === 0) return res.status(400).send("Invalid parameters");
 
         await db.createCitationWithContext(req.session.userID, sanitizedContext);
-
-        //push.sendToEveryone("newCitation", 'Neues Zitat', `${sanitizedContext[0].author}: ${sanitizedContext[0].content}` + sanitizedContext.length > 1 ? "..." : "");
 
         return res.status(200).send("Success");
     });

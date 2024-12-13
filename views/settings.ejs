@@ -31,11 +31,11 @@
           </li>
           <li>
             <input type="checkbox" id="citationsPushCheckbox" class="online-only" name="citations" value="citations" <%= preferences.find(p => p.key === 'citationNotifications')?.value ? 'checked' : '' %>>
-            <label for="citations" data-lang-content="settings push checkboxes citations">Citations (coming)</label>
+            <label for="citations" data-lang-content="settings push checkboxes citations">Citations</label>
           </li>
           <li>
             <input type="checkbox" id="commentsPushCheckbox" class="online-only" name="comments" value="comments" <%= preferences.find(p => p.key === 'commentNotifications')?.value ? 'checked' : '' %>>
-            <label for="comments" data-lang-content="settings push checkboxes comments">Comments (coming)</label>
+            <label for="comments" data-lang-content="settings push checkboxes comments">Comments</label>
           </li>
         </div>
       </div>

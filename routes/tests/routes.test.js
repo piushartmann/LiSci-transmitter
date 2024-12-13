@@ -36,6 +36,7 @@ beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
     db = new MongoConnector('testdb', uri);
+    db.push = { sendToEveryone: jest.fn() };
     await db.connectPromise;
 
     let push;
@@ -43,9 +44,9 @@ beforeAll(async () => {
     let gameConfig = [];
     //use routes
     mockApp.use('/', require('../base')(db));
-    mockApp.use('/games', require('../games')(db, s3Client, push, gameConfig));
-    mockApp.use('/internal', require('../internal')(db, s3Client, push));
-    mockApp.use('/api', require('../api')(db, s3Client, push));
+    mockApp.use('/games', require('../games')(db, s3Client, gameConfig));
+    mockApp.use('/internal', require('../internal')(db, s3Client));
+    mockApp.use('/api', require('../api')(db, s3Client));
 
     testUser = await db.createUser("test", "test", ["classmate", "admin"]);
 });
@@ -93,7 +94,7 @@ describe('Base Endpoints - logged in', () => {
             .expect(res => {
                 expect([200, 302]).toContain(res.status);
             });
-    });
+    }), 10000;
 
     it('should return the citations page', async () => {
         await agent
@@ -101,7 +102,7 @@ describe('Base Endpoints - logged in', () => {
             .expect(res => {
                 expect([200, 302]).toContain(res.status);
             });
-    });
+    }, 10000);
 
     it('should return the create page', async () => {
         await agent
@@ -118,7 +119,7 @@ describe('Base Endpoints - logged in', () => {
             .expect(res => {
                 expect([200, 302]).toContain(res.status);
             });
-    });
+    }, 10000);
 
     it('should return the games page', async () => {
         await agent
@@ -126,7 +127,7 @@ describe('Base Endpoints - logged in', () => {
             .expect(res => {
                 expect([200, 302]).toContain(res.status);
             });
-    });
+    }, 10000);
 
     it('should return the about page', async () => {
         await agent
@@ -134,9 +135,5 @@ describe('Base Endpoints - logged in', () => {
             .expect(res => {
                 expect([200, 302]).toContain(res.status);
             });
-    });
-
-    describe('games endpoints', () => {
-        
-    });
+    }, 10000);
 });

@@ -12,7 +12,6 @@ const ws = require('express-ws')(app);
 const MongoConnector = require('./server/MongoConnector').MongoConnector;
 const versioning = require('./server/versioning');
 const subdomains = require('./server/subdomainManager');
-const pushLib = require('./server/pushNotifications.js');
 
 //set up subdomains
 app.use(subdomains);
@@ -127,18 +126,16 @@ webpush.setVapidDetails(
     process.env.VAPID_PRIVATE_KEY
 );
 
-
 //connect to db
-const db = new MongoConnector("transmitter", connectionString);
+const db = new MongoConnector("transmitter", connectionString, webpush);
 db.connectPromise.then(() => {
     console.log("Connected to database");
     
-    const push = pushLib(db, webpush);
     //use routes
     app.use('/', require('./routes/base')(db));
-    app.use('/games', require('./routes/games')(db, s3Client, push, gameConfig));
-    app.use('/internal', require('./routes/internal')(db, s3Client, push));
-    app.use('/api', require('./routes/api')(db, s3Client, push));
+    app.use('/games', require('./routes/games')(db, s3Client, gameConfig));
+    app.use('/internal', require('./routes/internal')(db, s3Client));
+    app.use('/api', require('./routes/api')(db, s3Client, db.push));
 
     //start server
     app.listen(port, () => {
