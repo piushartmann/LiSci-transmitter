@@ -66,6 +66,8 @@ module.exports = (db) => {
         const postID = req.params.postID;
         const post = await db.getPost(postID);
 
+        if (!post) return res.status(404).send("Post not found");
+
         return await renderView(req, res, 'create', {
             isCreatePage: true, post: post, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });

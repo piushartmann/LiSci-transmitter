@@ -146,3 +146,71 @@ describe('base endpoints - logged in', () => {
         )
     });
 });
+
+describe('base endpoints - not logged in', () => {
+    
+        beforeEach(() => {
+            mockDB.getUserPermissions.mockResolvedValue([]);
+            mockDB.getPreferences.mockResolvedValue([]);
+            mockDB.getPreference.mockResolvedValue('profilePic.png');
+            mockDB.getPostNumber.mockResolvedValue(10);
+            mockDB.getNewsNumber.mockResolvedValue(10);
+            mockDB.getUserData.mockResolvedValue("apiKey");
+    
+            app.use('/', mockBase);
+        });
+    
+        test('test / route', async () => {
+            await requestEndpoint("/")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'landing'
+            )
+        });
+    
+        test('test /create route', async () => {
+            await requestEndpoint("/create")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /edit/:postID route', async () => {
+            await requestEndpoint("/edit/123")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /citations route', async () => {
+            await requestEndpoint("/citations")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /settings route', async () => {
+            await requestEndpoint("/settings")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /about route', async () => {
+            await requestEndpoint("/about")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'about'
+            )
+        });
+});
