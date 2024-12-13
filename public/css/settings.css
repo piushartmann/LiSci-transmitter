@@ -106,6 +106,7 @@ label {
 
     .pickPicture {
         height: 200px;
+        clip-path: circle(100px at center);
     }
 
     .profilePicture.enlarged {

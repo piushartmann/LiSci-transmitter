@@ -176,6 +176,7 @@ function debugSetScale(scale) {
 function draggable(element, constraints = { top: null, left: null, right: null, bottom: null }) {
     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     element.onmousedown = dragMouseDown;
+    element.ontouchstart = dragTouchStart;
 
     //make constraints relative current position
     constraints.top = constraints.top !== null ? element.offsetTop - constraints.top : null;
@@ -190,6 +191,15 @@ function draggable(element, constraints = { top: null, left: null, right: null, 
         pos4 = e.clientY;
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
+    }
+
+    function dragTouchStart(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.touches[0].clientX;
+        pos4 = e.touches[0].clientY;
+        document.ontouchend = closeDragElement;
+        document.ontouchmove = elementDragTouch;
     }
 
     function elementDrag(e) {
@@ -215,9 +225,34 @@ function draggable(element, constraints = { top: null, left: null, right: null, 
         if (debug === true) drawDebugRect();
     }
 
+    function elementDragTouch(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.touches[0].clientX;
+        pos2 = pos4 - e.touches[0].clientY;
+        pos3 = e.touches[0].clientX;
+        pos4 = e.touches[0].clientY;
+
+        let newTop = element.offsetTop - pos2;
+        let newLeft = element.offsetLeft - pos1;
+
+        // Apply constraints
+        if (newTop <= constraints.top && constraints.top != null) newTop = constraints.top;
+        if (newLeft <= constraints.left && constraints.left != null) newLeft = constraints.left;
+        if (newTop >= constraints.bottom && constraints.bottom != null) newTop = constraints.bottom;
+        if (newLeft >= constraints.right && constraints.right != null) newLeft = constraints.right;
+
+        element.style.top = newTop + "px";
+        element.style.left = newLeft + "px";
+
+        if (debug === true) drawDebugRect();
+    }
+
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
+        document.ontouchend = null;
+        document.ontouchmove = null;
     }
 }
 
