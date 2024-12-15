@@ -72,14 +72,24 @@ function utf8ToBase64(str) {
     return btoa(binaryString);
 }
 
-async function loadCitations(page, callback) {
+async function loadCitations(page, callback, reloading = false) {
 
     let { filter, sortObj } = getFilterSettings();
 
     filterBase64 = utf8ToBase64(JSON.stringify(filter));
     sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
 
-    let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`);
+    let headers = {};
+    if (reloading) {
+        headers = {
+            'cache-refresh': 'true'
+        }
+    }
+
+    let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`, {
+        headers: headers
+    });
+
     response = await response.json()
     const citationData = response.citations;
 
@@ -131,7 +141,7 @@ const reloadContent = async () => {
         citationBox.replaceChildren(...citations);
         body.style.height = "auto";
         endReached = false;
-    });
+    }, true);
 };
 
 async function loadPreviousAuthors() {

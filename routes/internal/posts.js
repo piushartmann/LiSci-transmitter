@@ -130,6 +130,7 @@ module.exports = (db, s3Client) => {
     router.get('/getPosts', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const isTeacher = !(permissions.includes("classmate"));
+        if (!req.query) return res.status(400).send("Missing parameters");
         let page = (req.query.page || 1) - 1;
 
         const filter = req.query.filter || {};

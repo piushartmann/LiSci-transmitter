@@ -142,10 +142,16 @@ self.addEventListener('fetch', function (event) {
                 reloadType = event.request.headers.get('reloadType') || sitesToPreload.includes(url.pathname + url.search) === true ? 'refreshSite' : 'refreshContent';
 
                 if (reloadType === 'refreshSite') {
-                    await updateCache(url, SWreloadSite);
+                    if (event.request.headers.get('cache-refresh') === 'true') {
+                        return response;
+                    }
+                    updateCache(url, SWreloadSite);
                 }
                 else if (reloadType === 'refreshContent') {
-                    await updateCache(url, SWreloadContent);
+                    if (event.request.headers.get('cache-refresh') === 'true') {
+                        return response;
+                    }
+                    updateCache(url, SWreloadContent);
                 }
                 return response;
             }
@@ -159,27 +165,29 @@ self.addEventListener('fetch', function (event) {
 
 async function updateCache(url, callback) {
     try {
+        console.log('Updating cache of:', url.pathname + url.search);
         const fetchRequest = fetch(url)
         const cache = await caches.open('preload');
         const cacheMatch = await cache.match(url);
         const fetchResponse = await fetchRequest;
 
-        const matchEtag = cacheMatch ? cacheMatch.headers.get('etag') : null;
-        const fetchEtag = fetchResponse.headers.get('etag');
         await cache.put(url, fetchResponse.clone());
 
-        const isRequest = requestsToCache.includes(url.pathname + url.search);
-
-        const match = isRequest ?
-            cacheMatch && fetchResponse.data === cacheMatch.data : // if request, compare data
-            matchEtag === fetchEtag; // if site, compare etag
-
-        if (!match) {
-            console.log('Cache of ', url.pathname + url.search, ' updated');
-            if (typeof callback === 'function') {
-                callback();
+        if (cacheMatch) {
+            const cacheMatchText = await cacheMatch.text();
+            const fetchResponseText = await fetchResponse.clone().text();
+            if (cacheMatchText === fetchResponseText) {
+                console.log('Cache and fetch response are identical for:', url.pathname + url.search);
+                return;
             }
         }
+
+        console.log('Cache of ', url.pathname + url.search, ' updated');
+        if (typeof callback === 'function') {
+            console.log('Reloading Content because of: ', url.pathname + url.search);
+            callback();
+        }
+
     } catch (error) {
         console.error(error, 'on UpdateCache with url:', url);
     }

@@ -149,7 +149,9 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
                 likeButton.icon.src = "/icons/like-unfilled.svg";
                 liked = false;
             }
-            updateCache(window.location.href, "updateContent");
+            if (likeButton.refreshTarget) {
+                updateCache(likeButton.refreshTarget, "reloadContent");
+            }
         }
     }
     return likeButton;
