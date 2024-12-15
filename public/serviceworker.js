@@ -136,16 +136,16 @@ self.addEventListener('fetch', function (event) {
     const url = new URL(event.request.url);
 
     event.respondWith(
-        caches.match(url.pathname + url.search).then(function (response) {
+        caches.match(url.pathname + url.search).then(async function (response) {
             if (response) {
                 console.log('Page: ', url.pathname, ' served from cache');
                 reloadType = event.request.headers.get('reloadType') || sitesToPreload.includes(url.pathname + url.search) === true ? 'refreshSite' : 'refreshContent';
 
                 if (reloadType === 'refreshSite') {
-                    updateCache(url, SWreloadSite);
+                    await updateCache(url, SWreloadSite);
                 }
                 else if (reloadType === 'refreshContent') {
-                    updateCache(url, SWreloadContent);
+                    await updateCache(url, SWreloadContent);
                 }
                 return response;
             }
