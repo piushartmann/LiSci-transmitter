@@ -88,9 +88,16 @@
             }
         },
         "pick_profile_picture_color": "Profilbildfarbe auswählen",
+        "pick_profile_picture": "Profilbild auswählen",
         "api_key": "API Key",
         "language": "Sprache",
-        "enable": "Aktivieren"
+        "enable": "Aktivieren",
+        "pick_profile_picture_modal": {
+            "title": "Profilbild auswählen",
+            "click_to_add": "Klicke um ein Profilbild hinzuzufügen",
+            "scale": "Scale",
+            "reset": "Reset"
+        }
     },
     "admin_settings": {
         "title": "Admin Einstellungen",

@@ -104,6 +104,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.mongoose = mongoose;
         this.url = url;
         this.connectPromise = this.mongoose.connect(this.url, { dbName: database });
+        this.db = this.mongoose.connection;
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
@@ -289,12 +290,18 @@ module.exports.MongoConnector = class MongoConnector {
                     ];
                 }
                 else if (key === 'fromDate') {
-                    filterObject.timestamp = filterObject.timestamp || {};
-                    filterObject.timestamp.$gte = new Date(filter[key]);
+                    const fromDate = new Date(filter[key]);
+                    if (!isNaN(fromDate.getTime())) {
+                        filterObject.timestamp = filterObject.timestamp || {};
+                        filterObject.timestamp.$gte = fromDate;
+                    }
                 }
                 else if (key === 'toDate') {
-                    filterObject.timestamp = filterObject.timestamp || {};
-                    filterObject.timestamp.$lte = new Date(filter[key]);
+                    const toDate = new Date(filter[key]);
+                    if (!isNaN(toDate.getTime())) {
+                        filterObject.timestamp = filterObject.timestamp || {};
+                        filterObject.timestamp.$lte = toDate;
+                    }
                 }
                 else if (key === 'type') {
                     filterObject.type = filter[key];
@@ -811,5 +818,16 @@ module.exports.MongoConnector = class MongoConnector {
 
     async deleteFileEntry(path) {
         return await this.File.findOneAndDelete({ path });
+    }
+
+    async clearCollections() {
+        const collections = await this.mongoose.connection.db.collections();
+        for (let collection of collections) {
+            await collection.deleteMany({});
+        }
+    }
+
+    async disconnect() {
+        await this.mongoose.connection.close();
     }
 };

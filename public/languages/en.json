@@ -88,9 +88,16 @@
             }
         },
         "pick_profile_picture_color": "Pick profile picture color",
+        "pick_profile_picture": "Pick profile picture",
         "api_key": "API Key",
         "language": "Language",
-        "enable": "Enable"
+        "enable": "Enable",
+        "pick_profile_picture_modal": {
+            "title": "Pick profile picture",
+            "click_to_add": "Click to add Profile Picture",
+            "scale": "Scale",
+            "reset": "Reset"
+        }
     },
     "admin_settings": {
         "title": "Admin Settings",

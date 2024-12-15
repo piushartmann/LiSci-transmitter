@@ -402,6 +402,8 @@ function applyLanguage(languageFile, redraw = false) {
         totalChanges += elements.length;
         elements.forEach(element => {
             const key = element.getAttribute(query);
+            if (key === "none") return;
+            if (key === "") return;
             const dirs = key.split(' ');
             let json = languageFile
             try {

@@ -99,10 +99,6 @@ module.exports = (db) => {
         });
     });
 
-    router.get('/archive', async (req, res) => {
-        return res.send("Das Archiv kommt bald!");
-    });
-
     router.get('/chat', async (req, res) => {
         if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
 
