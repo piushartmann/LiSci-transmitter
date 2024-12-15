@@ -196,7 +196,10 @@ module.exports.MongoConnector = class MongoConnector {
         if (!post) return null;
         post.comments.push(comment);
 
-        this.push.sendToEveryone("commentNotifications", 'Neuer Kommentar', `Neuer Kommentar von ${comment.userID.username} auf "${post.title}"`);
+        const user = await this.User.findById(userID);
+        if (!user) return null;
+
+        this.push.sendToEveryone("commentNotifications", 'Neuer Kommentar', `Neuer Kommentar von ${user.username} auf "${post.title}"`);
         return await post.save();
     }
 

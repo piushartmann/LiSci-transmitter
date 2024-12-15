@@ -1,0 +1,13 @@
+{
+    "material-icon-theme.folders.associations": {
+        "swagger": "Docs",
+        "games": "Components"
+    },
+    "material-icon-theme.files.associations": {
+        "favicon.jpg": "Favicon",
+        "app.js": "Exe",
+        "config.json": "Settings",
+        "manifest.json": "Settings",
+        "MongoConnector.js": "Database",
+    },
+}
