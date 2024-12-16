@@ -21,7 +21,8 @@
     "login_form": {
         "username": "UsErnAmE",
         "password": "PAsswOrd",
-        "cancel": "CAncEl"
+        "cancel": "CAncEl",
+        "invalid": "UsErnAmE Or PAsswOrd Is InvAlId."
     },
     "comment_modal": {
         "title": "COmmEnts",
@@ -51,6 +52,7 @@
         "title": "CItAtIOns"
     },
     "posts": {
+        "hello": "HEllO, {UsErnAmE}!",
         "file_view_fallback": "DAtEI AnzEIgEn",
         "only_show_news": "Only shOw nEws"
     },
@@ -81,14 +83,21 @@
             "checkboxes": {
                 "news": "NEws",
                 "posts": "POsts",
-                "citations": "CItAtIOns (cOmIng sOOn)",
-                "comments": "COmmEnts (cOmIng sOOn)"
+                "citations": "CItAtIOns",
+                "comments": "COmmEnts"
             }
         },
-        "pick_profile_picture": "PIck prOfIlE pIctUrE cOlOr",
+        "pick_profile_picture_color": "PIck prOfIlE pIctUrE cOlOr",
+        "pick_profile_picture": "PIck prOfIlE pIctUrE",
         "api_key": "API KEy",
         "language": "LAngUAgE",
-        "enable": "EnAblE"
+        "enable": "EnAblE",
+        "pick_profile_picture_modal": {
+            "title": "PIck prOfIlE pIctUrE",
+            "click_to_add": "ClIck tO Add PrOfIlE PIctUrE",
+            "scale": "ScAlE",
+            "reset": "REsEt"
+        }
     },
     "admin_settings": {
         "title": "AdmIn SEttIngs",
@@ -144,11 +153,12 @@
         }
     },
     "languages": {
-        "german": "GErmAn",
-        "english": "EnglIsh",
-        "polish": "POlskI (AI)",
-        "klingon": "KlIngOn (AI)",
-        "elvish": "ElbIsh",
-        "dwarvish": "dwArvIsh"
+        "de": "GErmAn",
+        "en": "EnglIsh",
+        "pl": "POlnIsh (AI)",
+        "tlh-Latn": "KlIngOn (AI)",
+        "elv": "ElvIsh",
+        "dwa": "DwArvIsh",
+        "nl": "DUtch"
     }
 }

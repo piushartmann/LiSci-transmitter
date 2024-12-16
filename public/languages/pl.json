@@ -21,7 +21,8 @@
     "login_form": {
         "username": "Nazwa użytkownika",
         "password": "Hasło",
-        "cancel": "Anuluj"
+        "cancel": "Anuluj",
+        "invalid": "Nazwa użytkownika lub hasło są nieprawidłowe."
     },
     "comment_modal": {
         "title": "Komentarze",
@@ -51,6 +52,7 @@
         "title": "Cytatów"
     },
     "posts": {
+        "hello": "Cześć, {username}!",
         "file_view_fallback": "Wyświetl plik",
         "only_show_news": "Pokaż tylko wiadomości"
     },
@@ -81,14 +83,21 @@
             "checkboxes": {
                 "news": "Wiadomości",
                 "posts": "Posty",
-                "citations": "Cytaty (wkrótce)",
-                "comments": "Komentarze (wkrótce)"
+                "citations": "Cytatów",
+                "comments": "Komentarze"
             }
         },
-        "pick_profile_picture": "Wybierz kolor zdjęcia profilowego",
+        "pick_profile_picture_color": "Wybierz kolor zdjęcia profilowego",
+        "pick_profile_picture": "Wybierz zdjęcie profilowe",
         "api_key": "Klucz API",
         "language": "Język",
-        "enable": "Umożliwiać"
+        "enable": "Umożliwiać",
+        "pick_profile_picture_modal": {
+            "title": "Wybierz zdjęcie profilowe",
+            "click_to_add": "Kliknij, aby dodać zdjęcie profilowe",
+            "scale": "Skala",
+            "reset": "Resetować"
+        }
     },
     "admin_settings": {
         "title": "Ustawienia administratora",
@@ -144,11 +153,12 @@
         }
     },
     "languages": {
-        "german": "Niemiecki",
-        "english": "Angielski",
-        "polish": "Polski (ai)",
-        "klingon": "Klingoński (ai)",
-        "elvish": "Łabski",
-        "dwarvish": "Krasnolud"
+        "de": "Niemiecki",
+        "en": "Angielski",
+        "pl": "Polski (ai)",
+        "tlh-Latn": "Klingoński (ai)",
+        "elv": "Elficki",
+        "dwa": "Krasnolud",
+        "nl": "Holenderski"
     }
 }

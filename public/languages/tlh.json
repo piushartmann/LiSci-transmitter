@@ -21,7 +21,8 @@
     "login_form": {
         "username": "qaStaHvIS",
         "password": "polonyuS",
-        "cancel": "qIl"
+        "cancel": "qIl",
+        "invalid": "batlh QImeyDaq ba' targh ghaH."
     },
     "comment_modal": {
         "title": "Ha'DIbaH",
@@ -51,6 +52,7 @@
         "title": "tlhaw'DIyuS"
     },
     "posts": {
+        "hello": ", ghIlgh}ameS {,!",
         "file_view_fallback": "taHqeq",
         "only_show_news": "wa' mIv'a'"
     },
@@ -81,14 +83,21 @@
             "checkboxes": {
                 "news": "De'",
                 "posts": "pe'vIl",
-                "citations": "DameH mIw vIta'meH",
-                "comments": "DapoyqangmoHmeH ghoS."
+                "citations": "tlhaw'DIyuS",
+                "comments": "Ha'DIbaH"
             }
         },
-        "pick_profile_picture": "nuvpu' ghotpu'",
+        "pick_profile_picture_color": "nuvpu' ghotpu'",
+        "pick_profile_picture": "nIt",
         "api_key": "tlhIngan",
         "language": "Hol",
-        "enable": "DaH 'entepray'"
+        "enable": "DaH 'entepray'",
+        "pick_profile_picture_modal": {
+            "title": "nIt",
+            "click_to_add": "gho'rup nuvpu'",
+            "scale": "ghij",
+            "reset": "yIvuv"
+        }
     },
     "admin_settings": {
         "title": "'amerIjqu'",
@@ -144,11 +153,12 @@
         }
     },
     "languages": {
-        "german": "DoyIchlan",
-        "english": "Te ra'",
-        "polish": "ta' qechvam.",
-        "klingon": "tlhIngan pagh tlhInganpu'",
-        "elvish": "'eSqIl",
-        "dwarvish": "polHa'"
+        "de": "DoyIchlan",
+        "en": "Te ra'",
+        "pl": "SuvwI'pu' ghaHbe'chugh je,",
+        "tlh-Latn": "tlhIngan pagh tlhInganpu'",
+        "elv": "ghIl",
+        "dwa": "DenIr",
+        "nl": "QIH"
     }
 }
