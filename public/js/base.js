@@ -586,6 +586,8 @@ function checkOnline() {
     });
 }
 
+console.groupCollapsed('First Load');
+console.time('Page load time');
 document.addEventListener('DOMContentLoaded', async () => {
     checkOnline();
     checkVersion();
@@ -600,7 +602,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModal();
 
     //iosPWASplash('/images/splashScreen.png', '#ffffff');
-    console.log('Base script loaded!');
+    console.timeEnd('Page load time');
+    console.groupEnd();
 });
 
 window.addEventListener("focus", () => {

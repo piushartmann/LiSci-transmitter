@@ -48,7 +48,7 @@
     <div class="profilePictureContainer setting">
       <label for="head" data-lang-content="settings pick_profile_picture_color">Pick Profile Picture Color</label>
       <% if (profilePic.type == "default") { %>
-      <p class="profilePicture clickable" id="profilePictureColorPreview" style="background-color: <%= profilePic.content%>;">
+      <p class="profilePicture clickable" id="profilePictureColorPreview" style="background-color: <%= profilePic.content %>;">
         <%= username.charAt(0).toUpperCase() %>
         <input type="color" id="profilePictureColorPicker" class="hiddenInput" value="<%= profilePic.content %>" />
       </p>

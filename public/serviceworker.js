@@ -2,7 +2,6 @@ const sitesToPreload = [
     "/",
     "/citations",
     "/games",
-    "/about",
     "/settings",
     "/create"
 ];
@@ -45,7 +44,7 @@ async function preloadSites() {
 
         const response = await cache.match(url);
         if (!response) {
-            console.warn('Failed to get depndencies of', url);
+            console.warn('Failed to get dependencies of', url);
             return;
         }
         const text = await response.text();

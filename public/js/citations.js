@@ -4,6 +4,18 @@ let endReached = false;
 let loadedCitations = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    let query = urlParams.get('q');
+
+    if (query) {
+        const filterAuthor = document.getElementById("filterAuthor");
+        filterAuthor.value = query;
+    }
+
+    loadCitations(1);
+
+    currentPage = 1;
+
     previousAuthors = await loadPreviousAuthors();
     addNewContext(true);
 
@@ -16,8 +28,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById('filterAuthor').select();
         }
     })
-
-    reloadContent();
 });
 
 function textAreaOnInput(textarea) {
@@ -27,7 +37,7 @@ function textAreaOnInput(textarea) {
 }
 
 function addNewContext(first = false) {
-    const citationBox = document.getElementById("newCitationBox");
+    const newCitationBox = document.getElementById("newCitationBox");
     const baseStructure = document.getElementById("baseStructure");
 
     const sentence = document.createElement("div");
@@ -45,22 +55,8 @@ function addNewContext(first = false) {
         sentence.appendChild(deleteButton);
     }
 
-    citationBox.appendChild(sentence);
+    newCitationBox.appendChild(sentence);
     loadLanguage(true);
-}
-
-window.onload = function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    let query = urlParams.get('q');
-
-    if (query) {
-        const filterAuthor = document.getElementById("filterAuthor");
-        filterAuthor.value = query;
-    }
-
-    loadCitations(1);
-
-    currentPage = 1;
 }
 
 function utf8ToBase64(str) {
@@ -138,7 +134,7 @@ const reloadContent = async () => {
         const bodyHeight = window.getComputedStyle(body).height;
         body.style.height = bodyHeight;
         citationBox.innerHTML = "";
-        citationBox.replaceChildren(...citations);
+        citationBox.append(...citations);
         body.style.height = "auto";
         endReached = false;
     }, true);
