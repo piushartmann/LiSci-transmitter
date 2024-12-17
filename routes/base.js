@@ -105,6 +105,10 @@ module.exports = (db) => {
         return await renderView(req, res, 'chat');
     });
 
+    router.get('/test', async (req, res) => {
+        return await renderView(req, res, 'test');
+    });
+
     router.get('/about', async (req, res) => {
         return await renderView(req, res, 'about');
     });

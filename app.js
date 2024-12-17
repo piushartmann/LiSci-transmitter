@@ -12,6 +12,7 @@ const ws = require('express-ws')(app);
 const MongoConnector = require('./server/MongoConnector').MongoConnector;
 const versioning = require('./server/versioning');
 const subdomains = require('./server/subdomainManager');
+const RateLimit = require('express-rate-limit');
 
 //set up subdomains
 app.use(subdomains);
@@ -77,6 +78,13 @@ app.set('views', views);
 
 //set up versioning
 app.use(versioning(views, publicDirs));
+
+//setup rate limiting
+var limiter = RateLimit({
+  windowMs: 1000 * 5, // 5 seconds
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 //set up static files
 app.use(express.static(path.join(__dirname, 'public'), {

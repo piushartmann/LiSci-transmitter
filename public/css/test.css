@@ -1,0 +1,13 @@
+video {
+    border: black 1px solid;
+    display: none;
+}
+
+#capture {
+    border: red 1px solid;
+    background-color: white;
+}
+
+#canvas {
+    display: none;
+}
