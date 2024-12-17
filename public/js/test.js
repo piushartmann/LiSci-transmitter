@@ -2,17 +2,13 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const video = document.getElementById('video');
 
+let stream;
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const captureDiv = document.getElementById('capture');
 
-    const captureButton = document.getElementById('captureButton');
-
-    captureButton.onclick = () => {
-        const stream = getStream(captureDiv);
-        video.srcObject = stream;
-        video.play();
-    }
+    getStream(captureDiv);
 
     setInterval(async () => {
         const counter = document.getElementById('counter');
@@ -48,8 +44,8 @@ document.addEventListener('focus', async () => {
 });
 
 async function getImageFromDiv(div) {
-    const width = div.clientWidth;
-    const height = div.clientHeight;
+    const width = video.clientWidth;
+    const height = video.clientHeight;
     const pngDataUrl = await domtoimage.toPng(div, { width, height });
     const img = new Image(width, height);
     img.src = pngDataUrl;
@@ -57,20 +53,66 @@ async function getImageFromDiv(div) {
     return img;
 }
 
-function getStream(div, fps = 10) {
+function reziseCanvas(div) {
 
-    canvas.style.width = div.clientWidth + "px";
-    canvas.style.height = div.clientHeight + "px";
+    if (canvas.style.width != div.clientWidth + "px" || canvas.style.height != div.clientHeight + "px" || canvas.width != div.clientWidth || canvas.height != div.clientHeight) {
+        canvas.style.width = div.clientWidth + "px";
+        canvas.style.height = div.clientHeight + "px";
+        canvas.width = div.clientWidth;
+        canvas.height = div.clientHeight;
+        video.width = div.clientWidth;
+        video.height = div.clientHeight;
+        video.style.width = div.clientWidth + "px";
+        video.style.height = div.clientHeight + "px";
+    }
+}
 
-    canvas.width = div.clientWidth;
-    canvas.height = div.clientHeight;
 
-    const stream = canvas.captureStream();
+async function getStream(div) {
+    // Capture the canvas stream at 30 FPS
+    const stream = canvas.captureStream(30);
 
-    // Run getImageFromDiv every frame
+    // Assign stream to the video element
+    video.srcObject = stream;
+    video.muted = true; // Mute to prevent audio feedback
+
+    // Update canvas regularly
+    setInterval(() => {
+        reziseCanvas(div);
+        getImageFromDiv(div);
+    }, 1000 / 30);
+
+    video.play();
+
+    return stream;
+}
+
+async function startWebRTCStream(div) {
+    reziseCanvas(div);
+
+    const stream = canvas.captureStream(30); // 30 FPS
+
+    // Continuously render the div to the canvas
     setInterval(async () => {
         await getImageFromDiv(div);
-    }, 1000 / fps); //set fps
+        reziseCanvas(div);
+    }, 1000 / 30);
+
+    // Create a WebRTC PeerConnection
+    const peerConnection = new RTCPeerConnection();
+
+    // Add canvas stream to the connection
+    stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+
+    // Generate SDP offer
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+
+    // Mock receiving the SDP answer (normally requires a signaling server)
+    // Simulating a loopback for local testing
+    peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+
+    console.log('WebRTC stream started.');
 
     return stream;
 }

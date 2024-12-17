@@ -5,8 +5,9 @@
   <%- include("./partials/baseHead.ejs") %>
 
   <title data-lang-content="name">Test</title>
+  <script src="/js/other/ffmpeg.min.js"></script>
   <script src="/js/test.js" defer></script>
-  <script src="https://rawgit.com/tsayen/dom-to-image/master/src/dom-to-image.js"></script>
+  <script src="/js/other/dom-to-image.js"></script>
   <link rel="stylesheet" href="/css/test.css">
 </head>
 
@@ -20,7 +21,7 @@
     <img src="/images/logo.png" crossorigin="anonymous" style="width: 50%;"></img>
   </div>
 
-  <video id="video" autoplay playsinline x-webkit-airplay="allow" webkit-playsinline="true" controls></video>
+  <video id="video" playsinline x-webkit-airplay="allow" controls></video>
 
   <button id="captureButton">Capture</button>
 
