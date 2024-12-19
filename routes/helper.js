@@ -20,8 +20,6 @@ module.exports = (db) => {
         const ip = ips.split(",")[0];
 
         const isInSchool = ip == config.schoolIP;
-
-        console.log(ip, config.schoolIP, isInSchool)
     
         return res.render(view, {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {}, isInSchool,
