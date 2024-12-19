@@ -197,7 +197,8 @@ module.exports = (db, s3Client, push) => {
     });
 
     router.get('/getIP', async (req, res) => {
-        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+        const ips = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+        const ip = ips.split(",")[0]
 
         return res.status(200).send(ip);
     });
