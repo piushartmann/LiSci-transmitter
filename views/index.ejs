@@ -16,6 +16,9 @@
   <%- prank %>
 
   <h1 data-lang-content="posts hello" data-lang-arguments='{"username": "<%= typeof username !=='undefined' ? username : 'World' %>"}'>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
+  <% if (isInSchool) { %>
+   <p>Du bist in der Schule</p>
+  <% } %>
   <label for="onlyNews" data-lang-content="posts only_show_news">Nur Zeitungen anzeigen</label>
   <input type="checkbox" id="onlyNews" name="onlyNews">
 

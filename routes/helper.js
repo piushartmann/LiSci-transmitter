@@ -16,10 +16,12 @@ module.exports = (db) => {
         const permissions = await db.getUserPermissions(req.session.userID) || [];
         const preferences = await db.getPreferences(req.session.userID) || {};
         const profilePic = await db.getPreference(req.session.userID, 'profilePic');
-        const ips = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-        const ip = ips.split(",")[0]
+        const ips = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        const ip = ips.split(",")[0];
 
         const isInSchool = ip == config.schoolIP;
+
+        console.log(ip, config.schoolIP, isInSchool)
     
         return res.render(view, {
             loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {}, isInSchool,
