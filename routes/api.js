@@ -196,6 +196,12 @@ module.exports = (db, s3Client, push) => {
         return res.status(200).send("Success");
     });
 
+    router.get('/getIP', async (req, res) => {
+        const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+
+        return res.status(200).send(ip);
+    });
+
     router.post('/createCitation', async (req, res) => {
         const user = await checkAPIKey(req);
         if (!user) return res.status(401).send("Invalid API key or insufficient permissions")
