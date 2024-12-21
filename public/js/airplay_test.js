@@ -8,7 +8,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const captureDiv = document.getElementById('capture');
 
-    getStream(captureDiv);
+    document.getElementById('captureButton').addEventListener('click', async () => {
+        await getStream(captureDiv);
+    });
 
     setInterval(async () => {
         const counter = document.getElementById('counter');
@@ -69,50 +71,65 @@ function reziseCanvas(div) {
 
 
 async function getStream(div) {
-    // Capture the canvas stream at 30 FPS
     const stream = canvas.captureStream(30);
+    const isSupported = MediaRecorder.isTypeSupported('video/webm;codecs=vp9');
+    const mimeType = isSupported ? 'video/webm;codecs=vp9' : 'video/mp4;codecs=avc1';
+    const recorder = new MediaRecorder(stream, { mimeType });
+    const mediaSource = new MediaSource();
 
-    // Assign stream to the video element
-    video.srcObject = stream;
-    video.muted = true; // Mute to prevent audio feedback
 
-    // Update canvas regularly
+    // Set up the video to use MediaSource
+    video.src = URL.createObjectURL(mediaSource);
+    video.play();
+
+
+    let sourceBuffer;
+    let queue = []; // To queue buffers if sourceBuffer is not ready
+    let sourceOpen = false;
+
+    mediaSource.addEventListener('sourceopen', () => {
+        mediaSource.duration = 99999;
+        sourceBuffer = mediaSource.addSourceBuffer(mimeType);
+        sourceBuffer.duration = 99999;
+        sourceBuffer.mode = 'sequence';
+        sourceBuffer.changeType('video/webm; codecs="vp9"');
+        sourceOpen = true;
+
+        // If we had queued up any data before the source opened:
+        while (queue.length > 0) {
+            appendBuffer(sourceBuffer, queue.shift());
+        }
+    });
+
+    function appendBuffer(sb, buffer) {
+        if (sb.updating) {
+            sb.addEventListener('updateend', function handler() {
+                sb.removeEventListener('updateend', handler);
+                appendBuffer(sb, buffer);
+            });
+        } else {
+            sb.appendBuffer(buffer);
+        }
+    }
+
+    recorder.ondataavailable = async (e) => {
+        if (e.data.size > 0) {
+            const arrayBuffer = await e.data.arrayBuffer();
+            if (sourceOpen && !sourceBuffer.updating) {
+                // Append directly if ready
+                appendBuffer(sourceBuffer, arrayBuffer);
+            } else {
+                // Queue if SourceBuffer isn't ready yet
+                queue.push(arrayBuffer);
+            }
+        }
+    };
+
+    recorder.start(500); // Get a data chunk every second
+
+    // Update the canvas regularly
     setInterval(() => {
         reziseCanvas(div);
         getImageFromDiv(div);
-    }, 1000 / 30);
-
-    video.play();
-
-    return stream;
-}
-
-async function startWebRTCStream(div) {
-    reziseCanvas(div);
-
-    const stream = canvas.captureStream(30); // 30 FPS
-
-    // Continuously render the div to the canvas
-    setInterval(async () => {
-        await getImageFromDiv(div);
-        reziseCanvas(div);
-    }, 1000 / 30);
-
-    // Create a WebRTC PeerConnection
-    const peerConnection = new RTCPeerConnection();
-
-    // Add canvas stream to the connection
-    stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
-
-    // Generate SDP offer
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-
-    // Mock receiving the SDP answer (normally requires a signaling server)
-    // Simulating a loopback for local testing
-    peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-
-    console.log('WebRTC stream started.');
-
-    return stream;
+    }, 1000 / 10);
 }

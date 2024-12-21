@@ -101,14 +101,16 @@ module.exports = (db) => {
 
     router.get('/chat', async (req, res) => {
         if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
         return await renderView(req, res, 'chat');
     });
 
-    router.get('/test', async (req, res) => {
+    router.get('/airplay_test', async (req, res) => {
         res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
         res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-        return await renderView(req, res, 'test');
+        return await renderView(req, res, 'airplay_test');
     });
 
     router.get('/about', async (req, res) => {

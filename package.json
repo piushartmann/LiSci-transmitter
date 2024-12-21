@@ -28,7 +28,7 @@
   "scripts": {
     "start": "node app.js",
     "build:digitalocean": "sh ./build.sh",
-    "test": "jest --detectOpenHandles"
+    "test": "jest"
   },
   "devDependencies": {
     "jest": "^29.7.0",

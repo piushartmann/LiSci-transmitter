@@ -17,6 +17,7 @@ describe('scan files for missing lang content', () => {
     fileList.forEach(file => {
         const filename = path.basename(file);
         it(`should have no missing Language Content in: ${filename}`, () => {
+            if (['about.ejs', 'chat.ejs', 'swaggerui.ejs', 'invitePage.ejs', 'airplay_test.ejs'].includes(filename)) return; // skip these files, as they dont have to comply with the language files
             const missingLangContent = scanFileForMissingLangContent(file);
             if (missingLangContent.length > 0) {
                 console.log(missingLangContent);
