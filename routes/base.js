@@ -117,5 +117,13 @@ module.exports = (db) => {
         return await renderView(req, res, 'about');
     });
 
+    router.get('/homework', async (req, res) => {
+        if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
+        
+        return await renderView(req, res, 'homework');
+    });
+
     return router;
 }

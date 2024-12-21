@@ -10,6 +10,7 @@ let newsRequest = loadPosts(page, "news");
 let posts = [];
 let news = [];
 
+//line number of reloadContent refered to in documentation; change if necessary currently: 14
 const reloadContent = async () => {
     const onlyNewsFilter = document.getElementById("onlyNews").checked;
 

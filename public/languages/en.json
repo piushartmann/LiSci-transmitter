@@ -1,5 +1,6 @@
 {
     "name": "Life Science Transmitter",
+    "you_are_in_school": "You are in school",
     "landing": {
         "description": "Welcome to the Life Science Transmitter, your go-to platform for all things related to life sciences."
     },

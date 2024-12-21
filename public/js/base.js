@@ -1,3 +1,14 @@
+/**
+ * Creates a button element with optional icon, label, and short label.
+ *
+ * @param {string} icon - The URL of the icon image to be displayed on the button.
+ * @param {string} fallback - The fallback text to be displayed if no language content is provided.
+ * @param {Function} onclick - The function to be called when the button is clicked.
+ * @param {string} [languageContent] - The text content to be displayed on the button, if provided.
+ * @param {string} [languageContentShort] - The short text content to be displayed on the button, if provided.
+ * @param {boolean} [counter=false] - A flag indicating whether the button is a counter button.
+ * @returns {HTMLButtonElement} The created button element.
+ */
 function buildButton(icon, fallback, onclick, languageContent, languageContentShort, counter = false) {
 
     let button = document.createElement("button");
@@ -50,6 +61,16 @@ function buildButton(icon, fallback, onclick, languageContent, languageContentSh
     return button;
 }
 
+/**
+ * Builds a profile picture element for a user.
+ *
+ * @param {Object} profilePic - The profile picture information.
+ * @param {string} profilePic.type - The type of profile picture ("default" or "custom").
+ * @param {string} profilePic.content - The content of the profile picture. For "default", it's a color. For "custom", it's the image path.
+ * @param {string} username - The username of the user.
+ * @param {boolean} [short=false] - Whether to use the short version (without the username text).
+ * @returns {HTMLDivElement} The constructed profile picture element.
+ */
 function buildProfilePic(profilePic, username, short = false) {
     let authorDiv = document.createElement("div");
     if (profilePic.type === "default") {
@@ -103,55 +124,58 @@ function buildProfilePic(profilePic, username, short = false) {
     return authorDiv;
 }
 
-function buildLikeButton(route, id, liked, likes, loggedIn) {
+/**
+ * Builds a like button element with the specified properties and functionality.
+ *
+ * @param {string} route - The API route to send the like/unlike request.
+ * @param {string} id - The identifier of the item to be liked/unliked.
+ * @param {boolean} liked - Indicates whether the item is already liked by the user.
+ * @param {number} likes - The current number of likes for the item.
+ * @param {boolean} loggedIn - Indicates whether the user is logged in.
+ * @returns {HTMLElement} The constructed like button element.
+ */
+function buildLikeButton(route, id, liked, likes) {
 
     let likeIcon;
 
     let likeLabel = resolveLanguageContent("interaction likes") || "Likes";
 
-    if (loggedIn) {
-        likeIcon = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
-    }
-    else {
-        likeIcon = "/icons/like-locked.svg";
-    }
+    likeIcon = liked ? "/icons/like-filled.svg" : "/icons/like-unfilled.svg";
 
     let likeButton = buildButton(likeIcon, `${likes} ${likeLabel}`, () => { }, `${likes} ${likeLabel}`, `${likes}`, true);
     likeButton.classList.add("online-only");
 
-    if (loggedIn) {
-        likeButton.onclick = async () => {
-            if (!liked) {
-                await fetch(route, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ id: id }),
-                });
-                likeButton.label.textContent = `${likes + 1} ${likeLabel}`;
-                likeButton.short.textContent = likes + 1;
-                likes++;
-                likeButton.icon.src = "/icons/like-filled.svg";
-                liked = true;
-            }
-            else {
-                await fetch(route, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ id: id }),
-                });
-                likeButton.label.textContent = `${likes - 1} ${likeLabel}`;
-                likeButton.short.textContent = likes - 1;
-                likes--;
-                likeButton.icon.src = "/icons/like-unfilled.svg";
-                liked = false;
-            }
-            if (likeButton.refreshTarget) {
-                updateCache(likeButton.refreshTarget, "reloadContent");
-            }
+    likeButton.onclick = async () => {
+        if (!liked) {
+            await fetch(route, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: id }),
+            });
+            likeButton.label.textContent = `${likes + 1} ${likeLabel}`;
+            likeButton.short.textContent = likes + 1;
+            likes++;
+            likeButton.icon.src = "/icons/like-filled.svg";
+            liked = true;
+        }
+        else {
+            await fetch(route, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ id: id }),
+            });
+            likeButton.label.textContent = `${likes - 1} ${likeLabel}`;
+            likeButton.short.textContent = likes - 1;
+            likes--;
+            likeButton.icon.src = "/icons/like-unfilled.svg";
+            liked = false;
+        }
+        if (likeButton.refreshTarget) {
+            updateCache(likeButton.refreshTarget, "reloadContent");
         }
     }
     return likeButton;
@@ -328,7 +352,10 @@ function openModal(content, id = "modal") {
     modal.style.display = 'block';
     return modal;
 }
-
+/**
+ * Call this whenever you add some html with a language key to the DOM.
+ * @param {boolean} update - Whether to update the language file if it is already loaded. Should almost always be false.
+ */
 function loadLanguage(update = false) {
     const language = (localStorage.getItem('language') || navigator.language || navigator.userLanguage).split('-')[0];
     if (localStorage.getItem('language') !== language || localStorage.getItem('languageFile') == null) {

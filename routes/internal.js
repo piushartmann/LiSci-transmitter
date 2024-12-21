@@ -55,12 +55,13 @@ module.exports = (db, s3Client) => {
     });
 
     //include all internal routes
-    router.use('/', require('./internal/interactions')(db, s3Client));
-    router.use('/', require('./internal/citations')(db, s3Client));
-    router.use('/', require('./internal/posts')(db, s3Client));
+    router.use('/', require('./internal/interactions')(db));
+    router.use('/', require('./internal/citations')(db));
+    router.use('/', require('./internal/posts')(db));
     router.use('/', require('./internal/uploads')(db, s3Client));
-    router.use('/', require('./internal/users')(db, s3Client));
-    router.use('/settings', require('./internal/settings')(db, s3Client));
+    router.use('/', require('./internal/users')(db));
+    router.use('/settings', require('./internal/settings')(db));
+    router.use('/hw', require('./internal/homework')(db));
 
     return router;
 }

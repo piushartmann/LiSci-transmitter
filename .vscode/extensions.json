@@ -8,6 +8,7 @@
         "dbaeumer.vscode-eslint",
         "HTMLHint.vscode-htmlhint",
         "ecmel.vscode-html-css",
-        "PKief.material-icon-theme"
+        "PKief.material-icon-theme",
+        "Gruntfuggly.todo-tree"
     ],
 }

@@ -207,7 +207,7 @@ function buildCitation(citation) {
     let interactionButtons = document.createElement("div");
     interactionButtons.className = "interaction-buttons";
 
-    interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length, loggedIn));
+    interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length));
 
     if (citation.canEdit) {
         let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "interaction delete", "");

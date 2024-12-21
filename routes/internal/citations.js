@@ -5,13 +5,12 @@ const router = Router();
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
- * @param {multer} s3Client - The s3 client instance.
  * @returns {Router} The router instance.
  */
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-module.exports = (db, s3Client) => {
+module.exports = (db) => {
     const config = require('../../config.json');
     const citationsPageSize = config.citationsPageSize;
 

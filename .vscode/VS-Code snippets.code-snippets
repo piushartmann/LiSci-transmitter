@@ -47,4 +47,74 @@
 		],
 		"description": "insert data-lang-arguments attribute"
 	},
+	"newPage": {
+		"scope": "ejs,html",
+		"prefix": "newPage",
+		"body": [
+			"<!DOCTYPE html>",
+			"<html lang=\"de\">",
+			"<!-- TODO: Add ${TM_FILENAME_BASE}.title to en and de language files -->",
+			"<head>",
+			"  <%- include(\"./partials/baseHead.ejs\") %>",
+			"",
+			"",
+			"  <title data-lang-content=\"${TM_FILENAME_BASE} title\">${1:${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}}</title>",
+			"  <script src=\"/js/${TM_FILENAME_BASE}.js\"></script>",
+			"  <link rel=\"stylesheet\" href=\"/css/${TM_FILENAME_BASE}.css\">",
+			"</head>",
+			"",
+			"<body>",
+			"  <%- include('./partials/base.ejs') %>",
+			"",
+			"  <!-- TODO: Add ${TM_FILENAME_BASE} body content here -->",
+			"  $0",
+			"",
+			"</body>",
+			"",
+			"</html>"
+		],
+		"isFileTemplate": true,
+		"description": "Create a new page with the basic structure"
+	},
+	"newRouter": {
+		"scope": "javascript",
+		"prefix": "newRouter",
+		"body": [
+			"const { Router } = require('express');",
+			"const sanitizeHtml = require('sanitize-html');",
+			"const router = Router();",
+			"",
+			"/**",
+			" * @param {MongoConnector} db - The MongoDB connector instance.",
+			" * @returns {Router} The router instance.",
+			" */",
+			"",
+			"sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);",
+			"",
+			"// TODO: Add the ${TM_FILENAME_BASE} router to app.js or another router",
+			"module.exports = (db) => {",
+			"",
+			"// TODO: Add ${TM_FILENAME_BASE} routes here",
+			"$0",
+			"    return router;",
+			"};"
+		],
+		"isFileTemplate": true,
+		"description": "Create a new router with the basic structure"
+	},
+	"newRoute": {
+		"scope": "javascript",
+		"prefix": "newRoute, nr",
+		"body": [
+			"router.${1|get,post,put,delete|}('/${2:route}', async (req, res) => {",
+			"    try {",
+			"        $0",
+			"    } catch (error) {",
+			"        console.error(error);",
+			"        res.status(500).send('Internal Server Error');",
+			"    }",
+			"});"
+		],
+		"description": "Create a new route with the basic structure"
+	}
 }

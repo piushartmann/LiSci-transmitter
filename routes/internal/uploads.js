@@ -26,21 +26,20 @@ function generateRandomFilename() {
     return result;
 }
 
-const s3Client = new S3Client({
-    region: "fra1",
-    endpoint: "https://fra1.digitaloceanspaces.com",
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-    forcePathStyle: false,
-});
 
-
-module.exports = (db) => {
+module.exports = (db, s3Client) => {
 
     const config = require('../../config.json');
 
+    /**
+     * Uploads a file to an S3 bucket using multer and multerS3.
+     *
+     * @param {Object} req - The request object.
+     * @param {Object} res - The response object.
+     * @param {string} [directory=""] - The directory path within the S3 bucket where the file will be stored. e.g "images" or "posts".
+     * @param {string[]} [forceFormats=[]] - An array of allowed file formats. If provided, only files with these formats will be accepted.
+     * @returns {Promise<string>} - A promise that resolves with the S3 key of the uploaded file, or rejects with an error.
+     */
     function uploadFile(req, res, directory = "", forceFormats = []) {
         return new Promise((resolve, reject) => {
             const filename = generateRandomFilename();

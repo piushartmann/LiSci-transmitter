@@ -15,4 +15,8 @@
         "revealWithFocus": "none",
         "clearOnRun": "none"
     },
+    "todo-tree.filtering.excludeGlobs": [
+        "**/node_modules/*/**",
+        "**/.vscode/*/**",
+    ]
 }
