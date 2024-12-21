@@ -13,8 +13,16 @@ let news = [];
 const reloadContent = async () => {
     const onlyNewsFilter = document.getElementById("onlyNews").checked;
 
-    postsRequest = loadPosts(page, "all");
-    newsRequest = loadPosts(page, "news");
+    const postsRequest = await fetch(`internal/getPosts?page=${page}&filter=all`, {
+        headers: {
+            'cache-refresh': 'true'
+        }
+    });
+    const newsRequest = await fetch(`internal/getPosts?page=${page}&filter=news`, {
+        headers: {
+            'cache-refresh': 'true'
+        }
+    });
 
     const newsJson = await (await newsRequest).json();
     const postsJson = await (await postsRequest).json();

@@ -83,14 +83,21 @@
             "checkboxes": {
                 "news": "Zeitungen",
                 "posts": "Posts",
-                "citations": "Zitate (kommen bald)",
-                "comments": "Kommentare (kommen bald)"
+                "citations": "Zitate",
+                "comments": "Kommentare"
             }
         },
         "pick_profile_picture_color": "Profilbildfarbe auswählen",
+        "pick_profile_picture": "Profilbild auswählen",
         "api_key": "API Key",
         "language": "Sprache",
-        "enable": "Aktivieren"
+        "enable": "Aktivieren",
+        "pick_profile_picture_modal": {
+            "title": "Profilbild auswählen",
+            "click_to_add": "Klicke um ein Profilbild hinzuzufügen",
+            "scale": "Scale",
+            "reset": "Reset"
+        }
     },
     "admin_settings": {
         "title": "Admin Einstellungen",
@@ -151,6 +158,8 @@
         "pl": "Polnisch (ai)",
         "tlh-Latn": "Klingonisch (ai)",
         "elv": "Elbisch",
-        "dwa": "Zwergisch"
+        "dwa": "Zwergisch",
+        "nl": "Niederländisch",
+        "wurstwasser": "Wurstwasser"
     }
 }

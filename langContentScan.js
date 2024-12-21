@@ -3,6 +3,9 @@ const fs = require('fs');
 const jsdom = require("jsdom");
 const config = require('./config.json');
 
+
+const filterTags = ["script", "image", "style"]
+
 //get all ejs file
 function scanDirForEjsFiles(dir, fileList = []) {
     const files = fs.readdirSync(dir);
@@ -18,51 +21,60 @@ function scanDirForEjsFiles(dir, fileList = []) {
     return fileList;
 }
 
-const currentDir = __dirname;
-const ejsFiles = scanDirForEjsFiles(currentDir);
-filterTags = ["script", "image", "style"]
+function scanFileForMissingLangContent(file) {
+    missingLangContent = [];
 
-//scan ejs files for missing langContent on all text elements
-console.groupCollapsed("Scanning files for missing langContent");
-for (const file of ejsFiles) {
-    if (file.includes("about") || file.includes("chat")) continue;
+    if (file.includes("about") || file.includes("chat") || file.includes("swaggerui") || file.includes("invitePage")) return missingLangContent; //skip these files
+
+    //parse html file
     const data = fs.readFileSync(file, 'utf8');
     const parsedHtml = new jsdom.JSDOM(data).window.document;
     let elements = Array.from(parsedHtml.querySelectorAll('*'));
+
     let filteredElements = [];
+
+    const mainLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', `${config.languages.manuallyTranslated[0]}.json`)));
+
+    //filter out all elements that dont need a langContent tag
     for (const el of elements) {
-        if (filterTags.includes(el.tagName.toLowerCase())) continue;
-        if (el.children.length !== 0) continue;
-        if (el.textContent.trim().length <= 0) continue;
-        if (el.textContent === "×") continue;
-        if (el.getAttribute(`data-lang-content`) !== null || el.getAttribute(`data-lang-content-value`) !== null || el.getAttribute(`data-lang-content-placeholder`) !== null) continue;
+        if (filterTags.includes(el.tagName.toLowerCase())) continue; //filter out all tags defined in filterTags
+        if (el.textContent.includes("<%")) continue; //filter out ejs render things
+        if (el.children.length !== 0) continue; //filter out elements with children
+        if (el.textContent.trim().length <= 0) continue; //filter out empty elements
+        if (el.textContent === "×") continue; //filter out the close button
+        if (el.getAttribute(`data-lang-content`) !== null || el.getAttribute(`data-lang-content-value`) !== null || el.getAttribute(`data-lang-content-placeholder`) !== null) {
+            const content = el.getAttribute(`data-lang-content`) || el.getAttribute(`data-lang-content-value`) || el.getAttribute(`data-lang-content-placeholder`);
+            if (content === "") continue; //filter out empty langContent tags
+            if (content === "none") continue; //filter out langContent tags with value none
+
+            //check if content is a key in the language file
+            let languageFileJson = mainLanguageFile;
+            try {
+                content.split(" ").forEach(function (key) {
+                    languageFileJson = languageFileJson[key];
+                });
+                continue;
+            } catch (e) {
+                filteredElements.push(el);
+                continue;
+            }
+        };
         filteredElements.push(el);
     }
-    if (filteredElements.length === 0) continue;
-    console.groupCollapsed("Scanning file: " + file);
-    filteredElements.map(function (el, i) { console.log(el.innerHTML.trim()) });
-    console.groupEnd();
+
+    //extract content from filtered elements
+    if (filteredElements.length === 0) return missingLangContent;
+    filteredElements.map(function (el, i) {
+        missingLangContent.push(el.innerHTML.trim());
+    });
+
+    return missingLangContent;
 }
-console.groupEnd();
 
-//scan manually translated languages for missing keys
-const mainLanguage = config.languages.manuallyTranslated[0];
-const mainLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', `${mainLanguage}.json`)));
-const mainKeys = Object.keys(mainLanguageFile);
-
-const checkLanguages = config.languages.manuallyTranslated.slice(1);
-
-console.groupCollapsed("Scanning manually translated languages for deviating content");
-
-for (const lang of checkLanguages) {
+function scanLanguageFileForMissingKeys(lang, mainLanguageFile, mainKeys) {
+    //load language file
     const checkLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', `${lang}.json`)));
-    const checkKeys = Object.keys(checkLanguageFile);
-    const missingKeys = mainKeys.filter(key => !checkKeys.includes(key));
-    if (missingKeys.length > 0) {
-        console.groupCollapsed(`Missing keys in language: ${lang}`);
-        missingKeys.forEach(key => console.warn(`Missing keys in ${lang}: ${key}`));
-        console.groupEnd();
-    }
+    let missingKeys = [];
 
     function findMissingNestedKeys(mainObj, checkObj, parentKey = '') {
         let missingKeys = [];
@@ -77,9 +89,72 @@ for (const lang of checkLanguages) {
         return missingKeys;
     }
 
+    //check for missing keys in nested objects
     const nestedMissingKeys = findMissingNestedKeys(mainLanguageFile, checkLanguageFile);
     if (nestedMissingKeys.length > 0) {
-        nestedMissingKeys.forEach(key => console.log(`Missing keys in ${lang}: ${key}`));
+        nestedMissingKeys.forEach(function (key) {
+            missingKeys.push(key);
+        });
     }
+
+    return missingKeys;
 }
-console.groupEnd();
+
+function scan() {
+    const currentDir = __dirname;
+    const ejsFiles = scanDirForEjsFiles(currentDir);
+
+
+    let missingLangContent = {};
+
+    //scan ejs files for missing langContent on all text elements
+    console.groupCollapsed("Scanning files for missing langContent");
+    for (const file of ejsFiles) {
+        const missingLangContent = scanFileForMissingLangContent(file);
+        console.groupCollapsed(file);
+        missingLangContent.forEach(function (content) {
+            console.log(content);
+        });
+        console.groupEnd();
+    }
+
+    //scan manually translated languages for missing keys
+    const mainLanguage = config.languages.manuallyTranslated[0];
+    const mainLanguageFile = JSON.parse(fs.readFileSync(path.join(__dirname, 'public', 'languages', `${mainLanguage}.json`)));
+    const mainKeys = Object.keys(mainLanguageFile);
+
+    const checkLanguages = config.languages.manuallyTranslated.slice(1);
+
+    let missingKeys = {};
+
+    console.groupCollapsed("Scanning language files for missing keys");
+
+    for (const lang of checkLanguages) {
+        const missingKeysThisFile = scanLanguageFileForMissingKeys(lang, mainLanguageFile, mainKeys);
+        if (missingKeysThisFile.length > 0) {
+            console.groupCollapsed(lang);
+            missingKeysThisFile.forEach(function (key) {
+                console.log(key);
+            });
+            console.groupEnd();
+        }
+        missingKeys[lang] = missingKeysThisFile;
+    }
+
+    console.groupEnd();
+
+    return {
+        missingLangContent,
+        missingKeys
+    };
+}
+
+const isTest = process.env.NODE_ENV === 'test';
+
+if (!isTest) scan();
+
+module.exports = {
+    scanDirForEjsFiles,
+    scanFileForMissingLangContent,
+    scanLanguageFileForMissingKeys
+};

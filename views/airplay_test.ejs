@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <%- include("./partials/baseHead.ejs") %>
+
+  <title data-lang-content="name">Test</title>
+  <script src="/js/test.js" defer></script>
+  <script src="/js/other/dom-to-image.js"></script>
+  <link rel="stylesheet" href="/css/test.css">
+</head>
+
+<body>
+
+  <%- include('./partials/base.ejs') %>
+
+  <div id="capture">
+    <p>Das ist ein test</p>
+    <p id="counter">0</p>
+    <img src="/images/logo.png" crossorigin="anonymous" style="width: 50%;"></img>
+  </div>
+
+  <video id="video" playsinline x-webkit-airplay="allow" controls muted></video>
+
+  <button id="captureButton">Capture</button>
+
+  <button type="button" id="airplay"><i class="fa fa-apple fa-lg">Airplay</i></button>
+
+  <canvas id="canvas"></canvas>
+
+</body>
+
+</html>

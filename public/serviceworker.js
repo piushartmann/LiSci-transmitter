@@ -2,7 +2,6 @@ const sitesToPreload = [
     "/",
     "/citations",
     "/games",
-    "/about",
     "/settings",
     "/create"
 ];
@@ -45,7 +44,7 @@ async function preloadSites() {
 
         const response = await cache.match(url);
         if (!response) {
-            console.warn('Failed to get depndencies of', url);
+            console.warn('Failed to get dependencies of', url);
             return;
         }
         const text = await response.text();
@@ -109,10 +108,7 @@ self.addEventListener('message', async function (event) {
     else if (event.data.type === 'updateCache') {
         try {
             const url = new URL(event.data.url, self.location.origin);
-            await updateCache(url);
-            if (event.data.callbackType === 'reloadContent') {
-                SWreloadContent();
-            }
+            await updateCache(url, event.data.callbackType === 'reloadSite' ? SWreloadSite : SWreloadContent);
         } catch (error) {
             console.error('Invalid URL:', event.data.url);
         }
@@ -139,15 +135,21 @@ self.addEventListener('fetch', function (event) {
     const url = new URL(event.request.url);
 
     event.respondWith(
-        caches.match(url.pathname + url.search).then(function (response) {
+        caches.match(url.pathname + url.search).then(async function (response) {
             if (response) {
                 console.log('Page: ', url.pathname, ' served from cache');
                 reloadType = event.request.headers.get('reloadType') || sitesToPreload.includes(url.pathname + url.search) === true ? 'refreshSite' : 'refreshContent';
 
                 if (reloadType === 'refreshSite') {
+                    if (event.request.headers.get('cache-refresh') === 'true') {
+                        return response;
+                    }
                     updateCache(url, SWreloadSite);
                 }
                 else if (reloadType === 'refreshContent') {
+                    if (event.request.headers.get('cache-refresh') === 'true') {
+                        return response;
+                    }
                     updateCache(url, SWreloadContent);
                 }
                 return response;
@@ -162,27 +164,29 @@ self.addEventListener('fetch', function (event) {
 
 async function updateCache(url, callback) {
     try {
+        console.log('Updating cache of:', url.pathname + url.search);
         const fetchRequest = fetch(url)
         const cache = await caches.open('preload');
         const cacheMatch = await cache.match(url);
         const fetchResponse = await fetchRequest;
 
-        const matchEtag = cacheMatch ? cacheMatch.headers.get('etag') : null;
-        const fetchEtag = fetchResponse.headers.get('etag');
         await cache.put(url, fetchResponse.clone());
 
-        const isRequest = requestsToCache.includes(url.pathname + url.search);
-
-        const match = isRequest ?
-            cacheMatch && fetchResponse.data === cacheMatch.data :
-            matchEtag === fetchEtag;
-
-        if (!match) {
-            console.log('Cache of ', url.pathname + url.search, ' updated');
-            if (callback) {
-                callback();
+        if (cacheMatch) {
+            const cacheMatchText = await cacheMatch.text();
+            const fetchResponseText = await fetchResponse.clone().text();
+            if (cacheMatchText === fetchResponseText) {
+                console.log('Cache and fetch response are identical for:', url.pathname + url.search);
+                return;
             }
         }
+
+        console.log('Cache of ', url.pathname + url.search, ' updated');
+        if (typeof callback === 'function') {
+            console.log('Reloading Content because of: ', url.pathname + url.search);
+            callback();
+        }
+
     } catch (error) {
         console.error(error, 'on UpdateCache with url:', url);
     }

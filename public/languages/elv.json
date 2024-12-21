@@ -21,7 +21,8 @@
     "login_form": {
         "username": " Username",
         "password": " Password",
-        "cancel": " Cancel"
+        "cancel": " Cancel",
+        "invalid": " Username Or Password Is Invalid."
     },
     "comment_modal": {
         "title": " Comments",
@@ -51,6 +52,7 @@
         "title": " CitatiOns"
     },
     "posts": {
+        "hello": " Hello, {username}!",
         "file_view_fallback": " DateI AnzeIgen",
         "only_show_news": " Only show news"
     },
@@ -81,14 +83,21 @@
             "checkboxes": {
                 "news": " News",
                 "posts": " Posts",
-                "citations": " CitatiOns (coming seOn)",
-                "comments": " Comments (coming seOn)"
+                "citations": " CitatiOns",
+                "comments": " Comments"
             }
         },
-        "pick_profile_picture": " Pic profile picture color",
+        "pick_profile_picture_color": " Pic profile picture color",
+        "pick_profile_picture": " Pic profile picture",
         "api_key": " API Key",
         "language": " LanguAge",
-        "enable": " Enable"
+        "enable": " Enable",
+        "pick_profile_picture_modal": {
+            "title": " Pic profile picture",
+            "click_to_add": " Clic to Add Profile Picture",
+            "scale": " Scale",
+            "reset": " Reset"
+        }
     },
     "admin_settings": {
         "title": " Admin Settings",
@@ -144,11 +153,12 @@
         }
     },
     "languages": {
-        "german": " German",
-        "english": " English",
-        "polish": " Polski (aI)",
-        "klingon": " Klingon (aI)",
-        "elvish": " Elbish",
-        "dwarvish": " dwarvish"
+        "de": " German",
+        "en": " English",
+        "pl": " Polnish (aI)",
+        "tlh-Latn": " Klingon (aI)",
+        "elv": " Elvish",
+        "dwa": " Dwarvish",
+        "nl": " Dutch"
     }
 }

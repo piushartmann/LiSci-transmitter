@@ -13,7 +13,9 @@
             "tlh-Latn",
             "pl",
             "elv",
-            "dwa"
+            "dwa",
+            "nl",
+            "wurstwasser"
         ]
     },
     "permissions": [
@@ -25,5 +27,6 @@
         "games",
         "apiAccess"
     ],
-    "profilePictureResolution": 1024
+    "profilePictureResolution": 1024,
+    "schoolIP": "141.91.210.103"
 }

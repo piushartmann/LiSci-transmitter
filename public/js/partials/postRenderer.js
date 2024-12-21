@@ -79,7 +79,9 @@ function buildFooter(post) {
 
     let commentButton = buildButton(post.comments.length > 0 ? "/icons/comment-filled.svg" : "/icons/comment-unfilled.svg", `${post.comments.length} ${commentLabel}`, () => renderComments(post), `${post.comments.length} ${commentLabel}`, `${post.comments.length}`, true);
 
-    iteractionButtons.appendChild(buildLikeButton("/internal/likePost", post._id, post.liked, post.likes.length, loggedIn));
+    const likeButton = buildLikeButton("/internal/likePost", post._id, post.liked, post.likes.length, loggedIn);
+    likeButton.refreshTarget = "/internal/getPosts?page=1&filter=all";
+    iteractionButtons.appendChild(likeButton);
     iteractionButtons.appendChild(commentButton);
 
     footerDiv.appendChild(iteractionButtons);

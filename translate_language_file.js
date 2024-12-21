@@ -15,6 +15,9 @@ async function translate(text, fromLanguage, toLanguage) {
     else if (toLanguage === 'dwa'){
         return { translation: transcribeDwarvish(text) };
     }
+    else if (toLanguage === 'wurstwasser') {
+        return { translation: "wurstwasser"};
+    }
 
     const translation = await bingTranslate(text, fromLanguage, toLanguage);
     return translation;

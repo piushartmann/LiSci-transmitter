@@ -12,22 +12,13 @@ const openAI = require('../../server/openAI');
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-module.exports = (db, s3Client, push) => {
+module.exports = (db, s3Client) => {
     const config = require('../../config.json');
     const postsPageSize = config.postsPageSize;
 
     async function markPostsAsRead(userID, posts) {
         for (let i = 0; i < posts.length; i++) {
             await db.markPostAsRead(userID, posts[i]._id);
-        }
-    }
-
-    function pushNewPostNotification(post, username, news = false) {
-        if (news) {
-            push.sendToEveryone("newNews", 'Neue Zeitung', `Neue Zeitung: "${post.title}" von ${username}`);
-        }
-        else {
-            push.sendToEveryone("newPost", 'Neuer Post', `Neuer Post: "${post.title}" von ${username}`);
         }
     }
 
@@ -66,7 +57,7 @@ module.exports = (db, s3Client, push) => {
         res.status(200).send("Success");
         console.log("Created post with Title: " + title);
         summarizeSections(sanitizedSections, postID);
-        pushNewPostNotification(post, req.session.username, postType === "news");
+
         return;
     });
 
@@ -139,6 +130,7 @@ module.exports = (db, s3Client, push) => {
     router.get('/getPosts', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const isTeacher = !(permissions.includes("classmate"));
+        if (!req.query) return res.status(400).send("Missing parameters");
         let page = (req.query.page || 1) - 1;
 
         const filter = req.query.filter || {};

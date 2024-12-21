@@ -16,7 +16,7 @@ function generateRandomProfilePic() {
     return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
 }
 
-module.exports = (db, s3Client, push) => {
+module.exports = (db, s3Client) => {
 
     router.get('/', (req, res) => {
         res.send("This is the internal API, it is not meant to be accessed directly. On the /api route you can find the public API.");
@@ -56,8 +56,8 @@ module.exports = (db, s3Client, push) => {
 
     //include all internal routes
     router.use('/', require('./internal/interactions')(db, s3Client));
-    router.use('/', require('./internal/citations')(db, s3Client, push));
-    router.use('/', require('./internal/posts')(db, s3Client, push));
+    router.use('/', require('./internal/citations')(db, s3Client));
+    router.use('/', require('./internal/posts')(db, s3Client));
     router.use('/', require('./internal/uploads')(db, s3Client));
     router.use('/', require('./internal/users')(db, s3Client));
     router.use('/settings', require('./internal/settings')(db, s3Client));

@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "Orta.vscode-jest",
+        "hbenl.vscode-test-explorer",
+        "j69.ejs-beautify",
+        "DigitalBrainstem.javascript-ejs-support",
+        "leonzalion.vscode-ejs",
+        "dbaeumer.vscode-eslint",
+        "HTMLHint.vscode-htmlhint",
+        "ecmel.vscode-html-css",
+        "PKief.material-icon-theme"
+    ],
+}

@@ -1,0 +1,164 @@
+{
+    "name": "wurstwasser",
+    "landing": {
+        "description": "wurstwasser"
+    },
+    "header": {
+        "home": "wurstwasser",
+        "citations": "wurstwasser",
+        "games": "wurstwasser",
+        "about": "wurstwasser",
+        "create": "wurstwasser",
+        "settings": "wurstwasser",
+        "logout": "wurstwasser",
+        "login": "wurstwasser"
+    },
+    "not_logged_in": {
+        "title": "wurstwasser",
+        "description": "wurstwasser",
+        "login": "wurstwasser"
+    },
+    "login_form": {
+        "username": "wurstwasser",
+        "password": "wurstwasser",
+        "cancel": "wurstwasser",
+        "invalid": "wurstwasser"
+    },
+    "comment_modal": {
+        "title": "wurstwasser",
+        "new_comment": "wurstwasser",
+        "submit": "wurstwasser",
+        "comment_placeholder": "wurstwasser"
+    },
+    "interaction": {
+        "edit": "wurstwasser",
+        "delete": "wurstwasser",
+        "save": "wurstwasser",
+        "cancel": "wurstwasser",
+        "likes": "wurstwasser",
+        "comments": "wurstwasser"
+    },
+    "citations": {
+        "new": {
+            "title": "wurstwasser",
+            "sentence": {
+                "0": "wurstwasser",
+                "1": "wurstwasser",
+                "2": "wurstwasser",
+                "3": "wurstwasser"
+            },
+            "submit": "wurstwasser"
+        },
+        "title": "wurstwasser"
+    },
+    "posts": {
+        "hello": "wurstwasser",
+        "file_view_fallback": "wurstwasser",
+        "only_show_news": "wurstwasser"
+    },
+    "create": {
+        "post": {
+            "title": "wurstwasser",
+            "placeholder": "wurstwasser",
+            "teacher_can_see": "wurstwasser",
+            "is_news": "wurstwasser",
+            "submit": "wurstwasser",
+            "save": "wurstwasser"
+        },
+        "sections": {
+            "select_section": "wurstwasser",
+            "text": "wurstwasser",
+            "image": "wurstwasser",
+            "file": "wurstwasser",
+            "markdown": "wurstwasser"
+        },
+        "newPostTitle": "wurstwasser",
+        "updatePostTitle": "wurstwasser"
+    },
+    "settings": {
+        "title": "wurstwasser",
+        "push": {
+            "title": "wurstwasser",
+            "title_to_this_device": "wurstwasser",
+            "checkboxes": {
+                "news": "wurstwasser",
+                "posts": "wurstwasser",
+                "citations": "wurstwasser",
+                "comments": "wurstwasser"
+            }
+        },
+        "pick_profile_picture_color": "wurstwasser",
+        "pick_profile_picture": "wurstwasser",
+        "api_key": "wurstwasser",
+        "language": "wurstwasser",
+        "enable": "wurstwasser",
+        "pick_profile_picture_modal": {
+            "title": "wurstwasser",
+            "click_to_add": "wurstwasser",
+            "scale": "wurstwasser",
+            "reset": "wurstwasser"
+        }
+    },
+    "admin_settings": {
+        "title": "wurstwasser",
+        "create_user": {
+            "title": "wurstwasser",
+            "username": "wurstwasser",
+            "password": "wurstwasser",
+            "create": "wurstwasser"
+        },
+        "edit_user": {
+            "title": "wurstwasser",
+            "username": "wurstwasser"
+        }
+    },
+    "games": {
+        "request": {
+            "title": "wurstwasser",
+            "message": "wurstwasser",
+            "accept": "wurstwasser",
+            "decline": "wurstwasser"
+        },
+        "selector": {
+            "play_singleplayer": "wurstwasser",
+            "search_for_others": "wurstwasser",
+            "modal": {
+                "title": "wurstwasser",
+                "create_invite": "wurstwasser",
+                "copy_link": "wurstwasser"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": "wurstwasser",
+                "show_errors": "wurstwasser",
+                "prevent_errors": "wurstwasser"
+            }
+        },
+        "title": "wurstwasser",
+        "difficulties": {
+            "title": "wurstwasser"
+        }
+    },
+    "filter": {
+        "search": "wurstwasser",
+        "searchTerm": "wurstwasser",
+        "from": "wurstwasser",
+        "to": "wurstwasser",
+        "results": "wurstwasser",
+        "sort": {
+            "title": "wurstwasser",
+            "newest": "wurstwasser",
+            "oldest": "wurstwasser"
+        }
+    },
+    "languages": {
+        "de": "wurstwasser",
+        "en": "wurstwasser",
+        "pl": "wurstwasser",
+        "tlh-Latn": "wurstwasser",
+        "elv": "wurstwasser",
+        "dwa": "wurstwasser",
+        "nl": "wurstwasser"
+    }
+}

@@ -58,91 +58,70 @@ test('test renderView function', async () => {
     });
 });
 
-
-describe('base endpoints - logged in', () => {
-
-    beforeEach(() => {
-        mockDB.getUserPermissions.mockResolvedValue(['admin', 'classmate']);
-        mockDB.getPreferences.mockResolvedValue([]);
-        mockDB.getPreference.mockResolvedValue('profilePic.png');
-        mockDB.getPostNumber.mockResolvedValue(10);
-        mockDB.getNewsNumber.mockResolvedValue(10);
-        mockDB.getUserData.mockResolvedValue("apiKey");
-
-        const userSession = {
-            username: 'testUser',
-            userID: 'testUserID'
-        };
-        app.use((req, _, next) => {
-            req.session.username = userSession.username;
-            req.session.userID = userSession.userID;
-            next();
+describe('base endpoints - not logged in', () => {
+    
+        beforeEach(() => {
+            mockDB.getUserPermissions.mockResolvedValue([]);
+            mockDB.getPreferences.mockResolvedValue([]);
+            mockDB.getPreference.mockResolvedValue('profilePic.png');
+            mockDB.getPostNumber.mockResolvedValue(10);
+            mockDB.getNewsNumber.mockResolvedValue(10);
+            mockDB.getUserData.mockResolvedValue("apiKey");
+    
+            app.use('/', mockBase);
         });
-
-        app.set('view engine', 'ejs');
-
-        app.use('/', mockBase);
-    });
-
-    test('test / route', async () => {
-        await requestEndpoint("/")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'index',
-            expect.any(Object),
-            expect.any(Array)
-        )
-    });
-
-    test('test /create route', async () => {
-        await requestEndpoint("/create")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'create',
-            expect.any(Object),
-            expect.any(Array)
-        )
-    });
-
-    test('test /edit/:postID route', async () => {
-        await requestEndpoint("/edit/123")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'create',
-            expect.any(Object)
-        )
-    });
-
-    test('test /citations route', async () => {
-        await requestEndpoint("/citations")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'citations',
-            expect.any(Object),
-            expect.any(Array)
-        )
-    });
-
-    test('test /settings route', async () => {
-        await requestEndpoint("/settings")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'settings',
-            expect.any(Object)
-        )
-    });
-
-    test('test /about route', async () => {
-        await requestEndpoint("/about")
-        expect(mockRenderView).toHaveBeenCalledWith(
-            expect.any(Object),
-            expect.any(Object),
-            'about'
-        )
-    });
+    
+        test('test / route', async () => {
+            await requestEndpoint("/")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'landing'
+            )
+        });
+    
+        test('test /create route', async () => {
+            await requestEndpoint("/create")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /edit/:postID route', async () => {
+            await requestEndpoint("/edit/123")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /citations route', async () => {
+            await requestEndpoint("/citations")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /settings route', async () => {
+            await requestEndpoint("/settings")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'notLoggedIn'
+            )
+        });
+    
+        test('test /about route', async () => {
+            await requestEndpoint("/about")
+            expect(mockRenderView).toHaveBeenCalledWith(
+                expect.any(Object),
+                expect.any(Object),
+                'about'
+            )
+        });
 });

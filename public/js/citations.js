@@ -4,6 +4,18 @@ let endReached = false;
 let loadedCitations = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    let query = urlParams.get('q');
+
+    if (query) {
+        const filterAuthor = document.getElementById("filterAuthor");
+        filterAuthor.value = query;
+    }
+
+    loadCitations(1);
+
+    currentPage = 1;
+
     previousAuthors = await loadPreviousAuthors();
     addNewContext(true);
 
@@ -16,8 +28,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById('filterAuthor').select();
         }
     })
-
-    reloadContent();
 });
 
 function textAreaOnInput(textarea) {
@@ -27,7 +37,7 @@ function textAreaOnInput(textarea) {
 }
 
 function addNewContext(first = false) {
-    const citationBox = document.getElementById("newCitationBox");
+    const newCitationBox = document.getElementById("newCitationBox");
     const baseStructure = document.getElementById("baseStructure");
 
     const sentence = document.createElement("div");
@@ -45,22 +55,8 @@ function addNewContext(first = false) {
         sentence.appendChild(deleteButton);
     }
 
-    citationBox.appendChild(sentence);
+    newCitationBox.appendChild(sentence);
     loadLanguage(true);
-}
-
-window.onload = function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    let query = urlParams.get('q');
-
-    if (query) {
-        const filterAuthor = document.getElementById("filterAuthor");
-        filterAuthor.value = query;
-    }
-
-    loadCitations(1);
-
-    currentPage = 1;
 }
 
 function utf8ToBase64(str) {
@@ -72,14 +68,24 @@ function utf8ToBase64(str) {
     return btoa(binaryString);
 }
 
-async function loadCitations(page, callback) {
+async function loadCitations(page, callback, reloading = false) {
 
     let { filter, sortObj } = getFilterSettings();
 
     filterBase64 = utf8ToBase64(JSON.stringify(filter));
     sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
 
-    let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`);
+    let headers = {};
+    if (reloading) {
+        headers = {
+            'cache-refresh': 'true'
+        }
+    }
+
+    let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`, {
+        headers: headers
+    });
+
     response = await response.json()
     const citationData = response.citations;
 
@@ -128,10 +134,10 @@ const reloadContent = async () => {
         const bodyHeight = window.getComputedStyle(body).height;
         body.style.height = bodyHeight;
         citationBox.innerHTML = "";
-        citationBox.replaceChildren(...citations);
+        citationBox.append(...citations);
         body.style.height = "auto";
         endReached = false;
-    });
+    }, true);
 };
 
 async function loadPreviousAuthors() {

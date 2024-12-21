@@ -66,6 +66,8 @@ module.exports = (db) => {
         const postID = req.params.postID;
         const post = await db.getPost(postID);
 
+        if (!post) return res.status(404).send("Post not found");
+
         return await renderView(req, res, 'create', {
             isCreatePage: true, post: post, canCreateNews: (permissions.includes("admin") || permissions.includes("writer"))
         });
@@ -97,14 +99,18 @@ module.exports = (db) => {
         });
     });
 
-    router.get('/archive', async (req, res) => {
-        return res.send("Das Archiv kommt bald!");
-    });
-
     router.get('/chat', async (req, res) => {
         if (!req.session.userID) return await renderView(req, res, 'notLoggedIn');
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
 
         return await renderView(req, res, 'chat');
+    });
+
+    router.get('/airplay_test', async (req, res) => {
+        res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+        res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+        return await renderView(req, res, 'airplay_test');
     });
 
     router.get('/about', async (req, res) => {

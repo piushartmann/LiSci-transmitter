@@ -3,10 +3,8 @@ const crypto = require('crypto');
 const Schema = mongoose.Schema;
 const { ObjectId } = mongoose.Types;
 const { generateApiKey } = require('generate-api-key');
-const { title, off } = require('process');
-const { type } = require('os');
-const { query } = require('express');
 const config = require('../config.json');
+const pushLib = require('./pushNotifications.js');
 
 
 const likeSchema = new Schema({
@@ -90,6 +88,11 @@ const fileSchema = new Schema({
     valid_until: { type: Date, required: false }
 });
 
+const chatSchema = new Schema({
+    members: [{ type: ObjectId, ref: 'User', required: true }],
+    messages: [{ type: Object, required: true }]
+});
+
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
     hash.update(password);
@@ -97,10 +100,11 @@ function hashPassword(password) {
 }
 
 module.exports.MongoConnector = class MongoConnector {
-    constructor(database, url = "mongodb://localhost:27017") {
+    constructor(database, url = "mongodb://localhost:27017", webpush) {
         this.mongoose = mongoose;
         this.url = url;
         this.connectPromise = this.mongoose.connect(this.url, { dbName: database });
+        this.db = this.mongoose.connection;
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
@@ -109,11 +113,23 @@ module.exports.MongoConnector = class MongoConnector {
         this.Game = this.mongoose.model('Game', gameSchema);
         this.GameInvite = this.mongoose.model('GameInvite', gameInviteSchema);
         this.File = this.mongoose.model('File', fileSchema);
+
+        this.push = pushLib(this, webpush);
     }
 
     async createPost(userID, title, sections, permissions, type) {
         const filteredSections = sections.filter(section => section.content && section.content.trim() !== '');
         const post = new this.Post({ userID, title, sections: filteredSections, permissions, type });
+
+        const user = await this.User.findById(userID);
+        if (!user) return null;
+        if (type === "news") {
+            this.push.sendToEveryone("newsNotifications", 'Neue Zeitung', `Neue Zeitung: "${title}" von ${user.username}`);
+        }
+        else {
+            this.push.sendToEveryone("postNotifications", 'Neuer Post', `Neuer Post: "${title}" von ${user.username}`);
+        }
+
         return await post.save();
     }
 
@@ -177,7 +193,13 @@ module.exports.MongoConnector = class MongoConnector {
     async commentPost(postID, userID, content, permissions) {
         const comment = await this.Comment.create({ userID, content, permissions });
         const post = await this.Post.findById(postID);
+        if (!post) return null;
         post.comments.push(comment);
+
+        const user = await this.User.findById(userID);
+        if (!user) return null;
+
+        this.push.sendToEveryone("commentNotifications", 'Neuer Kommentar', `Neuer Kommentar von ${user.username} auf "${post.title}"`);
         return await post.save();
     }
 
@@ -271,12 +293,18 @@ module.exports.MongoConnector = class MongoConnector {
                     ];
                 }
                 else if (key === 'fromDate') {
-                    filterObject.timestamp = filterObject.timestamp || {};
-                    filterObject.timestamp.$gte = new Date(filter[key]);
+                    const fromDate = new Date(filter[key]);
+                    if (!isNaN(fromDate.getTime())) {
+                        filterObject.timestamp = filterObject.timestamp || {};
+                        filterObject.timestamp.$gte = fromDate;
+                    }
                 }
                 else if (key === 'toDate') {
-                    filterObject.timestamp = filterObject.timestamp || {};
-                    filterObject.timestamp.$lte = new Date(filter[key]);
+                    const toDate = new Date(filter[key]);
+                    if (!isNaN(toDate.getTime())) {
+                        filterObject.timestamp = filterObject.timestamp || {};
+                        filterObject.timestamp.$lte = toDate;
+                    }
                 }
                 else if (key === 'type') {
                     filterObject.type = filter[key];
@@ -384,19 +412,9 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async getPost(postID) {
-        const post = await this.Post.findById(postID)
-            .populate({
-                path: 'userID',
-                select: 'username',
-                populate: {
-                    path: 'preferences',
-                    match: { key: 'profilePic' },
-                    select: 'value'
-                }
-            })
-            .populate({
-                path: 'comments',
-                populate: {
+        try {
+            const post = await this.Post.findById(postID)
+                .populate({
                     path: 'userID',
                     select: 'username',
                     populate: {
@@ -404,38 +422,52 @@ module.exports.MongoConnector = class MongoConnector {
                         match: { key: 'profilePic' },
                         select: 'value'
                     }
-                }
-            })
-            .sort({ timestamp: -1 });
+                })
+                .populate({
+                    path: 'comments',
+                    populate: {
+                        path: 'userID',
+                        select: 'username',
+                        populate: {
+                            path: 'preferences',
+                            match: { key: 'profilePic' },
+                            select: 'value'
+                        }
+                    }
+                })
+                .sort({ timestamp: -1 });
 
-        let restructuredPost = this.restructureUser(post);
-        if (!restructuredPost) {
+            let restructuredPost = this.restructureUser(post);
+            if (!restructuredPost) {
+                return null;
+            }
+
+            function generateRandomProfilePic() {
+                return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
+            }
+
+            restructuredPost.comments = restructuredPost.comments.map(comment => {
+                if (comment.userID.profilePic) {
+                    return comment;
+                }
+                if (comment.userID.preferences && comment.userID.preferences.length > 0) {
+                    const profilePicPreference = comment.userID.preferences.find(pref => pref.key === 'profilePic');
+                    if (profilePicPreference) {
+                        comment.userID.profilePic = profilePicPreference.value;
+                    }
+                } else {
+                    const randomProfilePic = generateRandomProfilePic();
+                    comment.userID.profilePic = randomProfilePic;
+                    this.setPreference(comment.userID._id, 'profilePic', randomProfilePic);
+                }
+                delete comment.userID.preferences;
+                return comment;
+            });
+
+            return restructuredPost;
+        } catch (error) {
             return null;
         }
-
-        function generateRandomProfilePic() {
-            return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
-        }
-
-        restructuredPost.comments = restructuredPost.comments.map(comment => {
-            if (comment.userID.profilePic) {
-                return comment;
-            }
-            if (comment.userID.preferences && comment.userID.preferences.length > 0) {
-                const profilePicPreference = comment.userID.preferences.find(pref => pref.key === 'profilePic');
-                if (profilePicPreference) {
-                    comment.userID.profilePic = profilePicPreference.value;
-                }
-            } else {
-                const randomProfilePic = generateRandomProfilePic();
-                comment.userID.profilePic = randomProfilePic;
-                this.setPreference(comment.userID._id, 'profilePic', randomProfilePic);
-            }
-            delete comment.userID.preferences;
-            return comment;
-        });
-
-        return restructuredPost;
     }
 
 
@@ -472,11 +504,13 @@ module.exports.MongoConnector = class MongoConnector {
 
     async createCitation(userID, author, content) {
         const citation = new this.Citation({ userID, author, content });
+        this.push.sendToEveryone("citationNotifications", 'Neues Zitat', `${author}: ${content}`);
         return await citation.save();
     }
 
     async createCitationWithContext(userID, context, timestamp) {
         const citation = new this.Citation({ userID, context, timestamp: timestamp || Date.now() });
+        this.push.sendToEveryone("citationNotifications", 'Neues Zitat', `${context[0].author}: ${context[0].content}` + context.length > 1 ? "..." : "");
         return await citation.save();
     }
 
@@ -620,7 +654,10 @@ module.exports.MongoConnector = class MongoConnector {
         return user.pushSubscription;
     }
 
-    async getAllSubscriptions() {
+    async getAllSubscriptions(type) {
+        if (type == "urgent") return await this.User.find({ pushSubscription: { $exists: true } });
+        if (typeof type !== "undefined") return await this.User.find({ pushSubscription: { $exists: true }, preferences: { $elemMatch: { key: type, value: true } } });
+
         return await this.User.find({ pushSubscription: { $exists: true } });
     }
 
@@ -784,5 +821,16 @@ module.exports.MongoConnector = class MongoConnector {
 
     async deleteFileEntry(path) {
         return await this.File.findOneAndDelete({ path });
+    }
+
+    async clearCollections() {
+        const collections = await this.mongoose.connection.db.collections();
+        for (let collection of collections) {
+            await collection.deleteMany({});
+        }
+    }
+
+    async disconnect() {
+        await this.mongoose.connection.close();
     }
 };

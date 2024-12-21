@@ -1,0 +1,164 @@
+{
+    "name": "De Zender van de biowetenschappen",
+    "landing": {
+        "description": "Welkom bij de Life Science Transmitter, uw go-to-platform voor alles wat met life sciences te maken heeft."
+    },
+    "header": {
+        "home": "Thuis",
+        "citations": "Citaten",
+        "games": "Spellen",
+        "about": "Over",
+        "create": "Nieuw bericht",
+        "settings": "Instellingen",
+        "logout": "Uitloggen",
+        "login": "Inloggen"
+    },
+    "not_logged_in": {
+        "title": "U bent niet ingelogd",
+        "description": "Log in om verder te gaan.",
+        "login": "Log hier in:"
+    },
+    "login_form": {
+        "username": "Gebruikersnaam",
+        "password": "Wachtwoord",
+        "cancel": "Annuleren",
+        "invalid": "Gebruikersnaam of wachtwoord is ongeldig."
+    },
+    "comment_modal": {
+        "title": "Opmerkingen",
+        "new_comment": "Plaats een nieuwe reactie:",
+        "submit": "Commentaar",
+        "comment_placeholder": "Dat is het grappigste wat ik ooit heb gezien!"
+    },
+    "interaction": {
+        "edit": "Bewerken",
+        "delete": "Verwijderen",
+        "save": "Redden",
+        "cancel": "Annuleren",
+        "likes": "Houdt",
+        "comments": "Opmerkingen"
+    },
+    "citations": {
+        "new": {
+            "title": "Een nieuw citaat maken",
+            "sentence": {
+                "0": "Meneer Treetzen",
+                "1": "voornoemd",
+                "2": "Een grappig citaat",
+                "3": "."
+            },
+            "submit": "Opslaan"
+        },
+        "title": "Citaten"
+    },
+    "posts": {
+        "hello": "Hallo, {gebruikersnaam}!",
+        "file_view_fallback": "Bestand weergeven",
+        "only_show_news": "Alleen toon nieuws"
+    },
+    "create": {
+        "post": {
+            "title": "Titel",
+            "placeholder": "Het Life-Science Profiel is weer op avontuur",
+            "teacher_can_see": "Leraar kan dit bericht zien",
+            "is_news": "Dit is een nieuwsbericht",
+            "submit": "Opslaan",
+            "save": "Redden"
+        },
+        "sections": {
+            "select_section": "Selecteer Sectietype",
+            "text": "Sms",
+            "image": "Beeld",
+            "file": "Bestand",
+            "markdown": "Markdown"
+        },
+        "newPostTitle": "Nieuw bericht",
+        "updatePostTitle": "Update bericht"
+    },
+    "settings": {
+        "title": "Instellingen",
+        "push": {
+            "title": "Push-notificaties",
+            "title_to_this_device": "Pushmeldingen naar dit apparaat",
+            "checkboxes": {
+                "news": "Nieuws",
+                "posts": "Berichten",
+                "citations": "Citaten",
+                "comments": "Opmerkingen"
+            }
+        },
+        "pick_profile_picture_color": "Kies de kleur van de profielfoto",
+        "pick_profile_picture": "Kies profielfoto",
+        "api_key": "API-sleutel",
+        "language": "Taal",
+        "enable": "Inschakelen",
+        "pick_profile_picture_modal": {
+            "title": "Kies profielfoto",
+            "click_to_add": "Klik om profielfoto toe te voegen",
+            "scale": "Schub",
+            "reset": "Terugstellen"
+        }
+    },
+    "admin_settings": {
+        "title": "Admin-instellingen",
+        "create_user": {
+            "title": "Gebruiker maken",
+            "username": "Gebruikersnaam",
+            "password": "Wachtwoord",
+            "create": "Scheppen"
+        },
+        "edit_user": {
+            "title": "Gebruiker bewerken",
+            "username": "Gebruikersnaam"
+        }
+    },
+    "games": {
+        "request": {
+            "title": "Spel Aanvraag",
+            "message": "Wil je {game} spelen met {gebruikersnaam}?",
+            "accept": "Accepteren",
+            "decline": "Afnemen"
+        },
+        "selector": {
+            "play_singleplayer": "Singleplayer",
+            "search_for_others": "Zoeken naar andere spelers",
+            "modal": {
+                "title": "Selecteer Speler",
+                "create_invite": "Maak een nieuwe uitnodiging Link om met anonieme spelers te spelen",
+                "copy_link": "Kopieer link"
+            }
+        },
+        "sudoku": {
+            "modal": {
+                "title": "Instellingen",
+                "show_errors": "Fouten weergeven",
+                "prevent_errors": "Voorkom fouten"
+            }
+        },
+        "title": "Spellen",
+        "difficulties": {
+            "title": "Kies een moeilijkheidsgraad"
+        }
+    },
+    "filter": {
+        "search": "Zoeken",
+        "searchTerm": "Zoekterm",
+        "from": "Van",
+        "to": "Aan",
+        "results": "Resultaten",
+        "sort": {
+            "title": "Sorteren op",
+            "newest": "Nieuwste eerst",
+            "oldest": "Oudste eerst"
+        }
+    },
+    "languages": {
+        "de": "Duits",
+        "en": "Engels",
+        "pl": "Pools (ai)",
+        "tlh-Latn": "Klingon (ai)",
+        "elv": "Elfs",
+        "dwa": "Dwerg",
+        "nl": "Nederlands"
+    }
+}

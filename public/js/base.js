@@ -56,12 +56,12 @@ function buildProfilePic(profilePic, username, short = false) {
         authorDiv.className = "author-info";
 
         let authorName = document.createElement("p");
-        authorName.textContent = short ? "" : username;
+        authorName.textContent = username;
         authorName.style = "margin-left: 10px;";
         authorName.className = "author-name";
 
         let authorProfilePic = document.createElement("p");
-        authorProfilePic.className = "profilePicture author-profile-pic";
+        authorProfilePic.className = "profilePicture";
         authorProfilePic.style = `background-color: ${profilePic.content};`;
         authorProfilePic.textContent = username.charAt(0).toUpperCase();
 
@@ -81,13 +81,23 @@ function buildProfilePic(profilePic, username, short = false) {
         authorName.style = "margin-left: 10px;";
         authorName.className = "author-name";
 
+        let authorProfilePicName = document.createElement("span");
+        authorProfilePicName.textContent = username;
+        authorProfilePicName.className = "tooltip";
+
+        let authorProfilePicWrapper = document.createElement("div");
+        authorProfilePicWrapper.className = "profilePicture";
+
         let authorProfilePic = document.createElement("img");
         authorProfilePic.className = "profilePicture image";
         authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
         authorProfilePic.alt = username;
 
+        authorProfilePicWrapper.appendChild(authorProfilePic);
+        authorProfilePicWrapper.appendChild(authorProfilePicName);
+
         if (!short) authorDiv.appendChild(authorName);
-        authorDiv.appendChild(authorProfilePic);
+        authorDiv.appendChild(authorProfilePicWrapper);
     }
 
     return authorDiv;
@@ -139,7 +149,9 @@ function buildLikeButton(route, id, liked, likes, loggedIn) {
                 likeButton.icon.src = "/icons/like-unfilled.svg";
                 liked = false;
             }
-            updateCache(window.location.href, "updateContent");
+            if (likeButton.refreshTarget) {
+                updateCache(likeButton.refreshTarget, "reloadContent");
+            }
         }
     }
     return likeButton;
@@ -307,7 +319,7 @@ function hideModal() {
     modal.style.display = 'none';
 }
 
-function openModal(content, id="modal") {
+function openModal(content, id = "modal") {
     if (content === "" || !content) content = document.getElementById(id);
     const modal = document.getElementById('modal');
     const modalContent = document.querySelector('#modal .modal-content');
@@ -392,6 +404,8 @@ function applyLanguage(languageFile, redraw = false) {
         totalChanges += elements.length;
         elements.forEach(element => {
             const key = element.getAttribute(query);
+            if (key === "none") return;
+            if (key === "") return;
             const dirs = key.split(' ');
             let json = languageFile
             try {
@@ -507,7 +521,7 @@ function registerServiceWorker() {
                 console.error('Error checking Service Worker registrations:', error);
             });
 
-            navigator.serviceWorker.addEventListener('message', event => {
+            navigator.serviceWorker.addEventListener('message', async (event) => {
                 console.log('Service Worker message received:', event.data);
                 if (event.data.type === 'updateContent') {
                     console.log('Service Worker updating content');
@@ -572,6 +586,8 @@ function checkOnline() {
     });
 }
 
+console.groupCollapsed('First Load');
+console.time('Page load time');
 document.addEventListener('DOMContentLoaded', async () => {
     checkOnline();
     checkVersion();
@@ -586,7 +602,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModal();
 
     //iosPWASplash('/images/splashScreen.png', '#ffffff');
-    console.log('Base script loaded!');
+    console.timeEnd('Page load time');
+    console.groupEnd();
 });
 
 window.addEventListener("focus", () => {
