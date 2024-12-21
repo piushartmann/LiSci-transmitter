@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <%- include("./partials/baseHead.ejs") %>
 
@@ -12,62 +13,61 @@
 
 <body>
 
- <%- include('./partials/base.ejs') %>
-  <%- prank %>
+  <%- include('./partials/base.ejs') %>
 
-  <h1 data-lang-content="posts hello" data-lang-arguments='{"username": "<%= typeof username !=='undefined' ? username : 'World' %>"}'>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
-  <% if (isInSchool === true) { %>
-   <p>Du bist in der Schule</p>
-  <% } %>
-  <label for="onlyNews" data-lang-content="posts only_show_news">Nur Zeitungen anzeigen</label>
-  <input type="checkbox" id="onlyNews" name="onlyNews">
+  <div class="logo">
+    <a href="/">Life Science Transmitter</a>
+    <%- prank %>
 
-  <div id="postBox" class="postBox">
-    <!-- this is where the posts will be -->
-  </div>
+    <h1 data-lang-content="posts hello" data-lang-arguments='{"username": "<%= typeof username !=='undefined' ? username : 'World' %>"}'>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
+    <% if (isInSchool === true) { %>
+    <p>Du bist in der Schule</p>
+    <% } %>
+    <label for="onlyNews" data-lang-content="posts only_show_news">Nur Zeitungen anzeigen</label>
+    <input type="checkbox" id="onlyNews" name="onlyNews">
 
-  <div class="content">
-    <div class="section-devider">
-      <img src="/icons/ring-on-fire.svg" alt="section-devider">
+    <div class="content">
+      <div class="section-devider">
+        <img src="/icons/ring-on-fire.svg" alt="section-devider">
+      </div>
+
+      <div class="section">
+        <div class="frame-design important" id="news">
+          <p>News</p>
+        </div>
+        <div class="frame-design important" id="citations">
+          <p>Citations</p>
+        </div>
+      </div>
+
+      <div class="section-devider">
+        <img src="/icons/ring-on-fire.svg" alt="section-devider">
+      </div>
+
+      <div class="section">
+        <div class="frame-design" id="games">
+          <p>Spiele</p>
+        </div>
+        <div class="frame-design" id="community-posts">
+          <p>Community Posts</p>
+        </div>
+        <div class="frame-design" id="create-community-post">
+          <p>Post erstellen</p>
+        </div>
+        <div class="frame-design" id="chat">
+          <p>Chat</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="frame-design" id="logout">
+          <p>Logout</p>
+        </div>
+        <div class="frame-design" id="settings">
+          <p>Einstellungen</p>
+        </div>
+      </div>
     </div>
-
-    <div class="section">
-      <div class="frame-design important" id="news">
-        <p>News</p>
-      </div>
-      <div class="frame-design important" id="citations">
-        <p>Citations</p>
-      </div>
-    </div>
-
-    <div class="section-devider">
-      <img src="/icons/ring-on-fire.svg" alt="section-devider">
-    </div>
-
-    <div class="section">
-      <div class="frame-design" id="games">
-        <p>Spiele</p>
-      </div>
-      <div class="frame-design" id="community-posts">
-        <p>Community Posts</p>
-      </div>
-      <div class="frame-design" id="create-community-post">
-        <p>Post erstellen</p>
-      </div>
-      <div class="frame-design" id="chat">
-        <p>Chat</p>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="frame-design" id="logout">
-        <p>Logout</p>
-      </div>
-      <div class="frame-design" id="settings">
-        <p>Einstellungen</p>
-      </div>
-    </div>
-  </div>
 
 </body>
 
