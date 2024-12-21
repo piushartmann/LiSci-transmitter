@@ -27,5 +27,6 @@
         "games",
         "apiAccess"
     ],
-    "profilePictureResolution": 1024
+    "profilePictureResolution": 1024,
+    "schoolIP": "141.91.210.103"
 }
