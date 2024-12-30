@@ -153,6 +153,9 @@
             "oldest": "Älteste zuerst"
         }
     },
+    "homework": {
+        "title": "Hausaufgaben"
+    },
     "languages": {
         "de": "Deutsch",
         "en": "Englisch",

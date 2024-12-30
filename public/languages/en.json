@@ -153,6 +153,9 @@
             "oldest": "Oldest first"
         }
     },
+    "homework": {
+        "title": "Homework"
+    },
     "languages": {
         "de": "German",
         "en": "English",

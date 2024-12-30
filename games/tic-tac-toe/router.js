@@ -32,6 +32,7 @@ module.exports = (db) => {
         if (anonymous) {
             const inviteID = req.session.inviteID;
             connections.push({ userID: inviteID, ws: ws });
+            console.log("Adding anonymous user to game " + inviteID);
         } else {
             connections.push({ userID: req.session.userID, ws: ws });
         }
@@ -45,7 +46,8 @@ module.exports = (db) => {
                 let board = game.gameState;
                 let index = message.index;
 
-                if (!index) return;
+                // Check if the index is valid
+                if (index == undefined) return;
 
                 // Check if the game is over and the player is trying to make a move (shouldn't happen)
                 if (board[tttAI.STATUS_INDEX] !== tttAI.STATUS_ONGOING) return;

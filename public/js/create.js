@@ -249,7 +249,7 @@ function addFileSection(isRecontructed) {
         console.log(this.id);
         sections[this.id] = { type: 'file', content: this.querySelector('#value').files[0], id: this.id };
         const preview = document.getElementById(`preview-${uniqueId}`);
-        renderPDF(URL.createObjectURL(this.querySelector('#value').files[0]), preview, 2);
+        preview.textContent = this.querySelector('#value').files[0].name;
     });
     sections[section.id] = { type: 'file', content: section.querySelector('#value').files[0], id: this.id };
     section.appendChild(addSectionFooter(section));
@@ -419,7 +419,7 @@ function loadPost(post) {
                 sections[newSection.id].content = section.content;
                 sections[newSection.id].id = newSection.id;
                 const preview = document.getElementById(`preview-section-${newSection.id}`);
-                renderPDF('https://storage.liscitransmitter.live/' + section.content, preview, 2);
+                preview.textContent = section.content;
                 break;
         }
     });

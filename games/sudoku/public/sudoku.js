@@ -10,7 +10,7 @@ const gameHTML = `<div class="inner game">
 <div class="inner square bottom right"></div>
 </div>`
 
-let ws;
+let sudokuWS;
 let highlightedSquares = [];
 let board = [];
 let preventImpossibleValues = true;

@@ -1,12 +1,12 @@
 let invited = [];
 let invites = [];
-let users = [];
+let discoveredUsers = [];
 let discoverGame = null;
 
-function buildDiscoveryList(players) {
-    const playerConnections = document.getElementById('playerConnections');
+function buildDiscoveryList() {
+    const playerConnections = document.querySelector('#modal .modal-content #playerConnections');
     playerConnections.innerHTML = '';
-    players.forEach(player => {
+    discoveredUsers.forEach(player => {
         const playerElement = buildButton("icons/games/connect.svg", player.username, () => {
             if (invited.includes(player.userID)) {
                 playerElement.classList.remove('invited');
@@ -14,13 +14,9 @@ function buildDiscoveryList(players) {
                 uninvitePlayer(discoverGame, player.userID);
             }
             else {
-                if (invites.find(i => i.user === player.userID)) {
-                    acceptInvite(discoverGame, player.userID);
-                } else {
-                    playerElement.classList.add('invited');
-                    invited.push(player.userID);
-                    invitePlayer(discoverGame, player.userID);
-                }
+                playerElement.classList.add('invited');
+                invited.push(player.userID);
+                invitePlayer(discoverGame, player.userID);
             }
         });
 
@@ -28,12 +24,7 @@ function buildDiscoveryList(players) {
             playerElement.classList.add('invited');
         }
 
-        if (invites.find(i => i.user === player.userID)) {
-            playerElement.classList.add('invitedBy');
-        }
-
         playerElement.classList.add('player');
-        playerElement.type = 'button';
         playerElement.dataset.userid = player.userID;
         playerConnections.appendChild(playerElement);
     });
@@ -96,8 +87,8 @@ function invitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    if (gamesWS && gamesWS.readyState === WebSocket.OPEN) {
-        gamesWS.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
     }
     else {
         console.log("Websocket not open");
@@ -109,8 +100,8 @@ function uninvitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    if (gamesWS && gamesWS.readyState === WebSocket.OPEN) {
-        gamesWS.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
     }
     else {
         console.log("Websocket not open");
@@ -122,6 +113,8 @@ function discoverOtherPlayers(game) {
 
     const connectionModal = document.getElementById('multiplayerModal');
     openModal(connectionModal);
+
+    buildDiscoveryList();
 
     discoverGame = game;
 

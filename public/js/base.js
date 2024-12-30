@@ -229,44 +229,51 @@ function iosPWASplash(t, e = "white") {
         }
 }
 
-let gamesWS;
+let ws;
 function makeDiscoverable() {
-    gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
-    gamesWS.onopen = () => {
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/websocket`);
+    ws.onopen = () => {
         console.log('Connected to server');
     }
-    gamesWS.onmessage = (event) => {
+    ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'invite') {
-            console.log('Game invite received');
-            document.body.appendChild(buildGameRequest(gamesWS, data.game, data.user, data.username));
-            loadLanguage();
+        console.log(data);
+
+        switch (data.type) {
+            case 'invite':
+                console.log('Game invite received');
+                document.body.appendChild(buildGameRequest(ws, data.game, data.user, data.username));
+                loadLanguage();
+                break;
+            case 'uninvite':
+                console.log('Game uninvite received');
+                const gameRequests = Array.from(document.getElementsByClassName('game-request'));
+                for (let i = 0; i < gameRequests.length; i++) {
+                    gameRequests[i].remove();
+                }
+                break;
+            case 'accept':
+                console.log('Game accept received');
+                window.location.href = `/games/${data.game}/${data.gameID}`;
+                break;
+            case 'decline':
+                console.log('Game decline received');
+                if (typeof inviteDeclined === 'function') {
+                    inviteDeclined(data.user);
+                }
+                break;
+            case 'discover':
+                discoveredUsers = data.users;
+                if (typeof buildDiscoveryList === 'function') {
+                    if (document.getElementById('modal').style.display === 'block') {
+                        buildDiscoveryList(data.users, data.game);
+                    }
+                }
+                break;
         }
-        else if (data.type === 'uninvite') {
-            console.log('Game uninvite received');
-            const gameRequests = Array.from(document.getElementsByClassName('game-request'));
-            for (let i = 0; i < gameRequests.length; i++) {
-                gameRequests[i].remove();
-            }
-        }
-        else if (data.type === 'accept') {
-            console.log('Game accept received');
-            console.log(data);
-            window.location.href = `/games/${data.game}/${data.gameID}`;
-        }
-        else if (data.type === 'decline') {
-            console.log('Game decline received');
-            if (typeof inviteDeclined === 'function') {
-                inviteDeclined(data.user);
-            }
-        }
-        else if (data.type === 'discover') {
-            if (typeof buildDiscoveryList === 'function') {
-                buildDiscoveryList(data.users, data.game);
-            }
-        }
+
     }
-    gamesWS.onclose = () => {
+    ws.onclose = () => {
         console.log('Disconnected from server. Reconnecting in 5 seconds');
         setTimeout(() => {
             makeDiscoverable();
@@ -324,7 +331,7 @@ function makeDiscoverable() {
         return gameRequest;
     }
 
-    return gamesWS;
+    return ws;
 }
 
 function addPWABar() {
@@ -519,6 +526,15 @@ function setupModal() {
     }
 }
 
+function utf8ToBase64(str) {
+    const utf8Bytes = new TextEncoder().encode(str);
+    let binaryString = '';
+    for (let i = 0; i < utf8Bytes.length; i++) {
+        binaryString += String.fromCharCode(utf8Bytes[i]);
+    }
+    return btoa(binaryString);
+}
+
 function registerServiceWorker() {
     if (loggedIn === true) {
         if ('serviceWorker' in navigator) {
@@ -634,7 +650,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.addEventListener("focus", () => {
-    if (typeof gamesWS !== 'undefined' && gamesWS.readyState === WebSocket.CLOSED) {
+    if (typeof ws !== 'undefined' && ws.readyState === WebSocket.CLOSED) {
         if (loggedIn) makeDiscoverable();
     }
 });

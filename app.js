@@ -82,7 +82,7 @@ app.use(versioning(views, publicDirs));
 //setup rate limiting
 var limiter = RateLimit({
   windowMs: 1000 * 5, // 5 seconds
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 200, // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
 
@@ -136,12 +136,20 @@ webpush.setVapidDetails(
 
 //connect to db
 const db = new MongoConnector("transmitter", connectionString, webpush);
+
+//store connected users for websocket. This is a global variable and will be kept updated by the websocket route
+let connectedUsers = [];
+
+//run all subsequent code after connecting to the database
 db.connectPromise.then(() => {
     console.log("Connected to database");
+
+    //setup websocket
+    app.use('/websocket', require('./routes/websocket')(db, connectedUsers, gameConfig));
     
     //use routes
     app.use('/', require('./routes/base')(db));
-    app.use('/games', require('./routes/games')(db, s3Client, gameConfig));
+    app.use('/games', require('./routes/games')(db, gameConfig, connectedUsers));
     app.use('/internal', require('./routes/internal')(db, s3Client));
     app.use('/api', require('./routes/api')(db, s3Client, db.push));
 
@@ -151,6 +159,7 @@ db.connectPromise.then(() => {
     });
     
 }).catch((err) => {
+    //on error, log and exit
     console.error(err);
     process.exit(1);
 });

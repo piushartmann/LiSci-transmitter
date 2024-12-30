@@ -282,7 +282,6 @@ module.exports.MongoConnector = class MongoConnector {
     async getPosts(isTeacher, limit = 10, offset = 0, filter = {}) {
         const filterObject = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
         if (offset < 0) offset = 0;
-
         try {
             Object.keys(filter).forEach(key => {
                 if (key === 'text') {
@@ -359,10 +358,10 @@ module.exports.MongoConnector = class MongoConnector {
             query = query.limit(limit);
         }
 
-        const posts = await query;
-
         const totalPosts = await this.Post.countDocuments(filterObject);
 
+        const posts = await query;
+        
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
 

@@ -59,15 +59,6 @@ function addNewContext(first = false) {
     loadLanguage(true);
 }
 
-function utf8ToBase64(str) {
-    const utf8Bytes = new TextEncoder().encode(str);
-    let binaryString = '';
-    for (let i = 0; i < utf8Bytes.length; i++) {
-        binaryString += String.fromCharCode(utf8Bytes[i]);
-    }
-    return btoa(binaryString);
-}
-
 async function loadCitations(page, callback, reloading = false) {
 
     let { filter, sortObj } = getFilterSettings();
