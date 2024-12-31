@@ -270,6 +270,8 @@ function makeDiscoverable() {
                     }
                 }
                 break;
+            case 'reload':
+                window.location.reload();
         }
 
     }

@@ -1,0 +1,3 @@
+{
+    "ignore": ["*.test.js", "tests/*", "public/*", "views/*", "node_modules/*", "README.md", "package.json", "package-lock.json", "nodemon.json", "games/*", ".github/*", ".git/*", ".vscode/*", "LICENSE"]
+}

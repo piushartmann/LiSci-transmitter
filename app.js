@@ -17,7 +17,12 @@ const RateLimit = require('express-rate-limit');
 //set up subdomains
 app.use(subdomains);
 
-const oneDay = 24 * 3600 * 1000
+const oneDay = 24 * 3600 * 1000;
+
+let addReloadCallback = () => {};
+if (process.env.DATABASE_URL === undefined) {
+    addReloadCallback = require('./dev_browser_reload');
+}
 
 //set up environment variables
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -145,7 +150,7 @@ db.connectPromise.then(() => {
     console.log("Connected to database");
 
     //setup websocket
-    app.use('/websocket', require('./routes/websocket')(db, connectedUsers, gameConfig));
+    app.use('/websocket', require('./routes/websocket')(db, connectedUsers, gameConfig, addReloadCallback));
     
     //use routes
     app.use('/', require('./routes/base')(db));

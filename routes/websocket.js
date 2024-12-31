@@ -6,7 +6,7 @@ const router = Router();
  * @returns {Router} The router instance.
  */
 
-module.exports = (db, connectedUsers, gameConfigs) => {
+module.exports = (db, connectedUsers, gameConfigs, addReloadCallback) => {
 
     let invites = [];
 
@@ -121,6 +121,14 @@ module.exports = (db, connectedUsers, gameConfigs) => {
             sendMessage(user.ws, JSON.stringify({ "type": "discover", "users": connectedUsers.map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username) }));
         });
     }
+
+    function reload() {
+        connectedUsers.forEach(user => {
+            sendMessage(user.ws, JSON.stringify({ "type": "reload" }));
+        });
+    }
+
+    addReloadCallback(reload);
 
     return router;
 };
