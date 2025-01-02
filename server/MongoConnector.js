@@ -834,71 +834,193 @@ module.exports.MongoConnector = class MongoConnector {
         await this.mongoose.connection.close();
     }
 
-    async getMostCitationByUser() {
-        const citations = await this.Citation.aggregate([
+    async getMostCitationsByUser(timespan) {
+        let matchStage = {};
+        
+        if (timespan) {
+            const now = new Date();
+            switch(timespan) {
+                case 'day':
+                    matchStage = {
+                        timestamp: { 
+                            $gte: new Date(now.setHours(0,0,0,0))
+                        }
+                    };
+                    break;
+                case 'week':
+                    const lastWeek = new Date(now.setDate(now.getDate() - 7));
+                    matchStage = {
+                        timestamp: { $gte: lastWeek }
+                    };
+                    break;
+                case 'month':
+                    const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
+                    matchStage = {
+                        timestamp: { $gte: lastMonth }
+                    };
+                    break;
+            }
+        }
+
+        const pipeline = [];
+        if (Object.keys(matchStage).length > 0) {
+            pipeline.push({ $match: matchStage });
+        }
+
+        pipeline.push(
             { $group: { _id: "$userID", count: { $sum: 1 } } },
-            { $sort: { count: -1 } }, // sort by count in descending order to get most citations first
-            { $limit: 10 }, // limit output to 10
-            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } }, // extract username from id
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
             { $unwind: "$user" },
             { $project: { username: "$user.username", count: 1 } },
-            { $sort: { count: 1 } } // reverse sort order again for better display
-        ]);
+            { $sort: { count: 1 } }
+        );
 
+        const citations = await this.Citation.aggregate(pipeline);
         return citations;
     }
 
-    async getCitationsOverTime(username) {
-        // Helper function to get week number
-        function getWeekNumber(date) {
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    async getMostCitationsByCitiated(timespan) {
+        let matchStage = {};
+        
+        if (timespan) {
+            const now = new Date();
+            switch(timespan) {
+                case 'day':
+                    matchStage = {
+                        timestamp: { 
+                            $gte: new Date(now.setHours(0,0,0,0))
+                        }
+                    };
+                    break;
+                case 'week':
+                    const lastWeek = new Date(now.setDate(now.getDate() - 7));
+                    matchStage = {
+                        timestamp: { $gte: lastWeek }
+                    };
+                    break;
+                case 'month':
+                    const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
+                    matchStage = {
+                        timestamp: { $gte: lastMonth }
+                    };
+                    break;
+            }
         }
 
-        let pattern = [
-            { $group: { 
-                _id: { 
-                    week: { $week: "$timestamp" },
-                    year: { $year: "$timestamp" }
-                }, 
-                count: { $sum: 1 } 
-            }},
-            { $sort: { "_id.year": 1, "_id.week": 1 } }
-        ];
+        const pipeline = [];
+        if (Object.keys(matchStage).length > 0) {
+            pipeline.push({ $match: matchStage });
+        }
+
+        pipeline.push(
+            { $unwind: "$context" },
+            { $group: { _id: "$context.author", count: { $sum: 1 } } },
+            { $sort: { count: -1 } }, // sort by count in descending order to get most citations first
+            { $limit: 10 }, // limit output to 10
+            { $sort: { count: 1 } } // reverse sort order again for better display
+        );
+
+        const citations = await this.Citation.aggregate(pipeline);
+        return citations;
+    }
+
+    async getCitationsOverTime(username, timespan) {
+
+        let pattern = [];
+        const now = new Date();
+
+        switch(timespan) {
+            case 'day':
+                pattern.push({
+                    $group: {
+                        _id: {
+                            hour: { $hour: "$timestamp" },
+                            day: { $dayOfMonth: "$timestamp" },
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            case 'week':
+                pattern.push({
+                    $group: {
+                        _id: {
+                            day: { $dayOfMonth: "$timestamp" },
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            case 'month':
+                pattern.push({
+                    $group: {
+                        _id: {
+                            day: { $dayOfMonth: "$timestamp" },
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            default: // Empty timespan or any other value
+                pattern.push({
+                    $group: {
+                        _id: {
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+        }
 
         if (username) {
             const user = await this.User.findOne({ username });
             if (!user) return [];
-            pattern.unshift({ $match: { userID: user._id } });
+            pattern.unshift({ 
+                $match: timespan ? { 
+                    userID: user._id,
+                    timestamp: {
+                        $gte: timespan === 'day' ? new Date(now.getTime() - 24 * 60 * 60 * 1000) :
+                               timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
+                               timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
+                               new Date(0) // Get all citations if timespan is empty
+                    }
+                } : { userID: user._id } // No timestamp filter if timespan is empty
+            });
+        } else if (timespan) {
+            pattern.unshift({
+                $match: {
+                    timestamp: {
+                        $gte: timespan === 'day' ? new Date(now.getTime() - 24 * 60 * 60 * 1000) :
+                               timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
+                               timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
+                               new Date(0) // Get all citations if timespan is empty
+                    }
+                }
+            });
         }
+
+        pattern.push({ $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } });
 
         const citations = await this.Citation.aggregate(pattern);
 
-        const now = new Date();
-        const last52Weeks = Array.from({ length: 52 }, (_, i) => {
-            const date = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
-            return {
-                week: getWeekNumber(date),
-                year: date.getFullYear(),
-                timestamp: date.getTime()
-            };
-        }).reverse();
-
-        const citationsMap = citations.reduce((acc, citation) => {
-            const key = `${citation._id.year}-${citation._id.week}`;
-            acc[key] = citation.count;
-            return acc;
-        }, {});
-
-        const result = last52Weeks.map(({ week, year, timestamp }) => {
-            return {
-                _id: timestamp,
-                count: citationsMap[`${year}-${week}`] || 0
-            };
-        });
-
-        return result;
+        return citations.map(citation => ({
+            _id: new Date(
+                citation._id.year, 
+                citation._id.month - 1, 
+                citation._id.day || 1,
+                citation._id.hour || 0
+            ).getTime(),
+            count: citation.count
+        }));
     }
 };

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <%- include("./partials/baseHead.ejs") %>
   <title data-lang-content="charts title">Statistics</title>
@@ -12,10 +13,24 @@
 <body>
   <%- include('./partials/base.ejs') %>
 
-  <!-- TODO: Add charts body content here -->
-  <canvas id="allCitations"></canvas>
+  <select id="timespanSelector">
+    <option value="">All Time</option>
+    <option value="month">Last Month</option>
+    <option value="week">Last Week</option>
+    <option value="day">Last Day</option>
+  </select>
 
-  <canvas id="citationsOverTime"></canvas>
+  <div class="chartContainer">
+    <div class="chart">
+      <canvas id="allCitations"></canvas>
+    </div>
+    <div class="chart">
+      <canvas id="mostCited"></canvas>
+    </div>
+    <div class="chart">
+      <canvas id="citationsOverTime"></canvas>
+    </div>
+  </div>
 
 </body>
 

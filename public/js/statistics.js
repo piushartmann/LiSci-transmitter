@@ -1,9 +1,69 @@
+let timespan = "";
+
 document.addEventListener('DOMContentLoaded', async function () {
-    const allCitationsChart = document.getElementById('allCitations');
+    updateMostCited();
+    updateTotalCitations();
+    drawCitationsOverTimeChart("");
 
-    const mostCitations = await (await fetch('internal/statistics/mostCitations')).json()
+    const timespanSelector = document.getElementById('timespanSelector');
+    timespanSelector.addEventListener('change', async () => {
+        timespan = timespanSelector.value;
+        updateMostCited();
+        updateTotalCitations();
+        drawCitationsOverTimeChart("");
+    });
 
-    new Chart(allCitationsChart, {
+
+    window.addEventListener('resize', () => {
+        for (let id in Chart.instances) {
+            Chart.instances[id].resize();
+        }
+    });
+
+});
+
+const mostCitedChart = document.getElementById('mostCited');
+let mostCitedChartInstance = null;
+
+async function updateMostCited() {
+    if (mostCitedChartInstance) {
+        mostCitedChartInstance.destroy();
+    }
+
+    const mostCited = await (await fetch(`internal/statistics/mostCited?timespan=${timespan || ""}`)).json()
+
+    mostCitedChartInstance = new Chart(mostCitedChart, {
+        type: 'bar',
+        data: {
+            labels: mostCited.map(c => c._id),
+            datasets: [{
+                label: 'Number of Citations Received per User',
+                data: mostCited.map(c => c.count),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+        }
+    });
+}
+
+const allCitationsChart = document.getElementById('allCitations');
+let allCitationsChartInstance = null;
+
+async function updateTotalCitations() {
+
+    if (allCitationsChartInstance) {
+        allCitationsChartInstance.destroy();
+    }
+
+    const mostCitations = await (await fetch(`internal/statistics/mostCitations?timespan=${timespan || ""}`)).json()
+
+    allCitationsChartInstance = new Chart(allCitationsChart, {
         type: 'bar',
         data: {
             labels: mostCitations.map(c => c.username),
@@ -29,12 +89,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const username = mostCitations[index].username;
                     drawCitationsOverTimeChart(username);
                 }
-            }
+            },
         }
     });
 
-    drawCitationsOverTimeChart("");
-});
+}
 
 
 const citationsOverTimeChart = document.getElementById('citationsOverTime');
@@ -46,9 +105,7 @@ async function drawCitationsOverTimeChart(user) {
         citationsOverTimeChartInstance.destroy();
     }
 
-    const citationsByMonth = await (await fetch(`internal/statistics/citationsOverTime?user=${user}`)).json();
-
-    console.log(citationsByMonth);
+    const citationsByMonth = await (await fetch(`internal/statistics/citationsOverTime?user=${user}&timespan=${timespan || ""}`)).json();
 
     citationsOverTimeChartInstance = new Chart(citationsOverTimeChart, {
         type: 'line',
@@ -71,7 +128,7 @@ async function drawCitationsOverTimeChart(user) {
                         }
                     }
                 }
-            }
+            },
         }
     });
 }
