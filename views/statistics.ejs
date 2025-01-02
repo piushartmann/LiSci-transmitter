@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <%- include("./partials/baseHead.ejs") %>
+  <title data-lang-content="charts title">Statistics</title>
+  <script src="/js/statistics.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <link rel="stylesheet" href="/css/statistics.css">
+</head>
+
+<body>
+  <%- include('./partials/base.ejs') %>
+
+  <!-- TODO: Add charts body content here -->
+  <canvas id="allCitations"></canvas>
+
+  <canvas id="citationsOverTime"></canvas>
+
+</body>
+
+</html>

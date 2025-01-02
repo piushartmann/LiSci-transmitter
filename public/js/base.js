@@ -237,7 +237,6 @@ function makeDiscoverable() {
     }
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log(data);
 
         switch (data.type) {
             case 'invite':
@@ -631,8 +630,7 @@ function checkOnline() {
     });
 }
 
-console.groupCollapsed('First Load');
-console.time('Page load time');
+console.time('Base JS load time');
 document.addEventListener('DOMContentLoaded', async () => {
     checkOnline();
     checkVersion();
@@ -647,8 +645,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupModal();
 
     //iosPWASplash('/images/splashScreen.png', '#ffffff');
-    console.timeEnd('Page load time');
-    console.groupEnd();
+    console.timeEnd('Base JS load time');
 });
 
 window.addEventListener("focus", () => {

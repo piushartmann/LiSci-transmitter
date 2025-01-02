@@ -90,7 +90,7 @@ function buildFooter(post) {
         let buttonRow = document.createElement("div");
         buttonRow.className = "flex";
 
-        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`, "interaction edit");
+        let editButton = buildButton("/icons/edit.svg", "Edit", () => window.location.href = `/edit/${post._id}`, "interaction edit", "");
         editButton.classList.add("online-only");
 
         buttonRow.appendChild(editButton);
@@ -107,7 +107,8 @@ function buildFooter(post) {
                 console.log(`Post ${post._id} deleted`);
             }
             window.location.reload();
-        }, "interaction delete");
+        }, "interaction delete",
+    "");
         deleteButton.classList.add("online-only");
 
         buttonRow.appendChild(deleteButton);

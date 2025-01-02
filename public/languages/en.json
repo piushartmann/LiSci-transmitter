@@ -156,6 +156,9 @@
     "homework": {
         "title": "Homework"
     },
+    "charts": {
+        "title": "Charts"
+    },
     "languages": {
         "de": "German",
         "en": "English",

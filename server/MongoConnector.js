@@ -361,7 +361,7 @@ module.exports.MongoConnector = class MongoConnector {
         const totalPosts = await this.Post.countDocuments(filterObject);
 
         const posts = await query;
-        
+
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
 
@@ -370,6 +370,7 @@ module.exports.MongoConnector = class MongoConnector {
             }
 
             restructuredPost.comments = restructuredPost.comments.map(comment => {
+                if (!comment.userID || !comment.userID.username) return null;
                 if (comment.userID.profilePic) {
                     return comment;
                 }
@@ -831,5 +832,73 @@ module.exports.MongoConnector = class MongoConnector {
 
     async disconnect() {
         await this.mongoose.connection.close();
+    }
+
+    async getMostCitationByUser() {
+        const citations = await this.Citation.aggregate([
+            { $group: { _id: "$userID", count: { $sum: 1 } } },
+            { $sort: { count: -1 } }, // sort by count in descending order to get most citations first
+            { $limit: 10 }, // limit output to 10
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } }, // extract username from id
+            { $unwind: "$user" },
+            { $project: { username: "$user.username", count: 1 } },
+            { $sort: { count: 1 } } // reverse sort order again for better display
+        ]);
+
+        return citations;
+    }
+
+    async getCitationsOverTime(username) {
+        // Helper function to get week number
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        let pattern = [
+            { $group: { 
+                _id: { 
+                    week: { $week: "$timestamp" },
+                    year: { $year: "$timestamp" }
+                }, 
+                count: { $sum: 1 } 
+            }},
+            { $sort: { "_id.year": 1, "_id.week": 1 } }
+        ];
+
+        if (username) {
+            const user = await this.User.findOne({ username });
+            if (!user) return [];
+            pattern.unshift({ $match: { userID: user._id } });
+        }
+
+        const citations = await this.Citation.aggregate(pattern);
+
+        const now = new Date();
+        const last52Weeks = Array.from({ length: 52 }, (_, i) => {
+            const date = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+            return {
+                week: getWeekNumber(date),
+                year: date.getFullYear(),
+                timestamp: date.getTime()
+            };
+        }).reverse();
+
+        const citationsMap = citations.reduce((acc, citation) => {
+            const key = `${citation._id.year}-${citation._id.week}`;
+            acc[key] = citation.count;
+            return acc;
+        }, {});
+
+        const result = last52Weeks.map(({ week, year, timestamp }) => {
+            return {
+                _id: timestamp,
+                count: citationsMap[`${year}-${week}`] || 0
+            };
+        });
+
+        return result;
     }
 };
