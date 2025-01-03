@@ -10,7 +10,6 @@ const router = Router();
 
 module.exports = (db, gameConfigs, connectedUsers) => {
 
-    const { renderView } = require('./helper')(db);
 
     router.get('*', async (req, res, next) => {
         // always allow access to the invite page
@@ -43,9 +42,9 @@ module.exports = (db, gameConfigs, connectedUsers) => {
             "/js/games.js",
         ];
 
-        await renderView(req, res, 'games', {
+        res.render('games', {
             games: gameConfigs
-        }, prefetches);
+        });
     });
 
     router.get('/:game/newInviteLink', async (req, res) => {
@@ -77,7 +76,7 @@ module.exports = (db, gameConfigs, connectedUsers) => {
         gameConfig.routerInstance.get('/:gameID', async (req, res) => {
             const permissions = await db.getUserPermissions(req.session.userID);
 
-            return await renderView(req, res, 'game', {
+            return res.render('game', {
                 title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
             });
         });

@@ -10,19 +10,27 @@ const webpush = require('web-push')
 const app = express();
 const ws = require('express-ws')(app);
 const MongoConnector = require('./server/MongoConnector').MongoConnector;
-const versioning = require('./server/versioning');
+const rendering = require('./server/rendering');
 const subdomains = require('./server/subdomainManager');
 const RateLimit = require('express-rate-limit');
-const helper = require('./routes/helper');
 
 //set up subdomains
 app.use(subdomains);
 
 const oneDay = 24 * 3600 * 1000;
 
-let addReloadCallback = () => { };
-if (process.env.DATABASE_URL === undefined) {
+let addReloadCallback = () => {};
+let version;
+
+if (process.env.TERM_PROGRAM === "vscode") {
+    console.log("Running in dev mode");
     addReloadCallback = require('./dev_browser_reload');
+    version = Math.random().toString(36);
+} else {
+    console.log("Running in production mode");
+    version = require('child_process')
+        .execSync('git rev-parse HEAD')
+        .toString().trim();
 }
 
 //set up environment variables
@@ -30,11 +38,6 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
-
-//get version from git
-const version = require('child_process')
-    .execSync('git rev-parse HEAD')
-    .toString().trim();
 
 console.log(`Running version ${version}`);
 
@@ -54,9 +57,6 @@ gameConfigs.concat(moduleConfigs).forEach(config => {
 });
 
 app.set('views', views);
-
-//set up versioning
-app.use(versioning(views, publicDirs));
 
 //setup rate limiting
 var limiter = RateLimit({
@@ -121,6 +121,9 @@ let connectedUsers = [];
 
 //run all subsequent code after connecting to the database
 db.connectPromise.then(() => {
+    //set up custom renderer
+    app.use(rendering(db, views, publicDirs, moduleConfigs));
+
     console.log("Connected to database");
 
     //setup websocket

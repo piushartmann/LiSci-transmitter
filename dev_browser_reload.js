@@ -4,9 +4,13 @@ const fs = require('fs');
 
 // Convert paths to absolute paths and verify they exist
 const basePath = process.cwd();
-const directories = ['public', 'views', 'games'];
+let directories = ['public', 'views', 'games'];
+
+const moduleConfigs = require('./server/loadModules').moduleConfigs;
+directories = directories.map(dir => path.join(basePath, dir))
+directories.push(...moduleConfigs.map(config => config.publicDir));
+
 const watch = directories
-    .map(dir => path.join(basePath, dir))
     .filter(dir => {
         const exists = fs.existsSync(dir);
         return exists;

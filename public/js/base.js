@@ -593,17 +593,11 @@ function updateCache(url, callbackType) {
 }
 
 function checkVersion() {
+    console.log(envVariables)
     if (typeof version !== 'undefined' && localStorage.getItem('version') !== version.toString()) {
         localStorage.setItem('version', version.toString());
         cacheBust();
     }
-}
-
-function cacheBust() {
-    console.log('Busting cache');
-    caches.keys().then(function (names) {
-        for (let name of names) caches.delete(name);
-    });
 }
 
 function checkOnline() {
@@ -631,7 +625,9 @@ function checkOnline() {
 }
 
 console.time('Base JS load time');
+let envVariables;
 document.addEventListener('DOMContentLoaded', async () => {
+    envVariables = Object.fromEntries(performance.getEntriesByType("navigation")?.[0]?.serverTiming?.map?.(({name, description}) => ([name, description])) ?? [])
     checkOnline();
     checkVersion();
     loadLanguage();

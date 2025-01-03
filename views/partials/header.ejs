@@ -15,6 +15,12 @@
       <li><a href="/games" data-lang-content="header games"></a></li>
       <% } %>
 
+      <% for( let i = 0; i < modules.length; i++ ) { %>
+        <% if (modules[i].visible == true) { %>
+          <li><a href="/<%= modules[i].url %>" data-lang-content="<%= modules[i].url %>"><%= modules[i].name %></a></li>
+        <% } %>
+      <% } %>
+
       <li><a href="/about" data-lang-content="header about"></a></li>
     </ul>
   </nav>

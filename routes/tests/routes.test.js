@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const { MongoConnector } = require('../../server/MongoConnector');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const helperModule = require('../helper')
 const mockApp = express();
 const ws = require('express-ws')(mockApp);
 const request = require('supertest');

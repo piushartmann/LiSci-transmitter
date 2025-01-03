@@ -1,4 +1,5 @@
 {
+    "name": "Statistics",
     "access": ["classmate"],
-    "visible": true
+    "visible": false
 }

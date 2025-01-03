@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const router = Router();
-const helperModule = require('../../server/helper');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
@@ -10,11 +9,8 @@ const helperModule = require('../../server/helper');
 
 module.exports = (db) => {
 
-    const { renderView } = helperModule(db);
-
     router.get('/', async (req, res) => {
-        console.log("Statistics page");
-        return await renderView(req, res, 'statistics');
+        return res.render('statistics');
     });
 
     router.get('/internal/mostCitations', async (req, res) => {
