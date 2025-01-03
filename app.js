@@ -13,13 +13,14 @@ const MongoConnector = require('./server/MongoConnector').MongoConnector;
 const versioning = require('./server/versioning');
 const subdomains = require('./server/subdomainManager');
 const RateLimit = require('express-rate-limit');
+const helper = require('./routes/helper');
 
 //set up subdomains
 app.use(subdomains);
 
 const oneDay = 24 * 3600 * 1000;
 
-let addReloadCallback = () => {};
+let addReloadCallback = () => { };
 if (process.env.DATABASE_URL === undefined) {
     addReloadCallback = require('./dev_browser_reload');
 }
@@ -29,7 +30,6 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
-const gamesDirectory = path.join(__dirname, "games")
 
 //get version from git
 const version = require('child_process')
@@ -40,44 +40,18 @@ console.log(`Running version ${version}`);
 
 process.env.VERSION = version;
 
-//load game config from manifest files
-let gameConfig = [];
-
-const games = fs.readdirSync(gamesDirectory);
-games.forEach(function (file) {
-    const fileDir = path.join(gamesDirectory, file);
-    const stat = fs.statSync(fileDir);
-
-    if (stat.isDirectory()) {
-        const gameFiles = fs.readdirSync(fileDir);
-        gameFiles.forEach(function (gameFile) {
-            if (gameFile === "manifest.json") {
-                const manifest = JSON.parse(fs.readFileSync(path.join(fileDir, gameFile)));
-                //console.log(manifest);
-                if (!(manifest.enabled == false)) {
-                    gameConfig.push(manifest);
-                }
-            }
-        });
-    }
-});
-
-gameConfig.sort((a, b) => a.priority - b.priority)
-gameConfig.reverse()
-
-console.log("Loaded games:", gameConfig.map(config => "'" + config.name + "'").join(", "));
-
 //set up views
 app.set('view engine', 'ejs');
-let views = [path.join(__dirname, 'views'), path.join(__dirname, 'views', 'partials')]
-let publicDirs = [path.join(__dirname, 'public')];
-gameConfig.forEach(config => {
-    const publicDir = path.join(__dirname, 'games', config.url, (config.public || 'public'))
-    app.use("/" + config.url, express.static(publicDir));
+const { gameConfigs, moduleConfigs, publicDirs, views } = require('./server/loadModules');
 
-    publicDirs.push(publicDir);
-    views.push(path.join(__dirname, 'games', config.url, (config.views || 'views')));
-})
+gameConfigs.concat(moduleConfigs).forEach(config => {
+    const dir = config.publicDir;
+    app.use("/" + config.url, express.static(dir, {
+        setHeaders: function (res, path) {
+            res.setHeader("Cache-Control", "public, max-age=86400");
+        },
+    }));
+});
 
 app.set('views', views);
 
@@ -86,8 +60,8 @@ app.use(versioning(views, publicDirs));
 
 //setup rate limiting
 var limiter = RateLimit({
-  windowMs: 1000 * 5, // 5 seconds
-  max: 200, // limit each IP to 100 requests per windowMs
+    windowMs: 1000 * 5, // 5 seconds
+    max: 200, // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
 
@@ -150,19 +124,37 @@ db.connectPromise.then(() => {
     console.log("Connected to database");
 
     //setup websocket
-    app.use('/websocket', require('./routes/websocket')(db, connectedUsers, gameConfig, addReloadCallback));
-    
+    app.use('/websocket', require('./routes/websocket')(db, connectedUsers, gameConfigs, addReloadCallback));
+
     //use routes
     app.use('/', require('./routes/base')(db));
-    app.use('/games', require('./routes/games')(db, gameConfig, connectedUsers));
+    app.use('/games', require('./routes/games')(db, gameConfigs, connectedUsers));
     app.use('/internal', require('./routes/internal')(db, s3Client));
     app.use('/api', require('./routes/api')(db, s3Client, db.push));
+
+    moduleConfigs.forEach(config => {
+        routerInstance = require(config.router)(db);
+
+        const router = express.Router();
+
+        router.use(async (req, res, next) => {
+            if (!config.access || config.access.length === 0) return next();
+            const permissions = await db.getUserPermissions(req.session.userID);
+            const hasPermission = config.access.every(access => permissions.includes(access));
+            if (!hasPermission) return res.status(403).send("You do not have permission to access this module");
+            next();
+        });
+
+        router.use("/", routerInstance);
+
+        app.use("/" + config.url, router);
+    });
 
     //start server
     app.listen(port, () => {
         console.log(`Server is running on ${port}`);
     });
-    
+
 }).catch((err) => {
     //on error, log and exit
     console.error(err);

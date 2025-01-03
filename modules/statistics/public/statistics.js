@@ -30,7 +30,7 @@ async function updateMostCited() {
         mostCitedChartInstance.destroy();
     }
 
-    const mostCited = await (await fetch(`internal/statistics/mostCited?timespan=${timespan || ""}`)).json()
+    const mostCited = await (await fetch(`internal/mostCited?timespan=${timespan || ""}`)).json()
 
     mostCitedChartInstance = new Chart(mostCitedChart, {
         type: 'bar',
@@ -61,7 +61,7 @@ async function updateTotalCitations() {
         allCitationsChartInstance.destroy();
     }
 
-    const mostCitations = await (await fetch(`internal/statistics/mostCitations?timespan=${timespan || ""}`)).json()
+    const mostCitations = await (await fetch(`internal/mostCitations?timespan=${timespan || ""}`)).json()
 
     allCitationsChartInstance = new Chart(allCitationsChart, {
         type: 'bar',
@@ -105,7 +105,7 @@ async function drawCitationsOverTimeChart(user) {
         citationsOverTimeChartInstance.destroy();
     }
 
-    const citationsByMonth = await (await fetch(`internal/statistics/citationsOverTime?user=${user}&timespan=${timespan || ""}`)).json();
+    const citationsByMonth = await (await fetch(`internal/citationsOverTime?user=${user}&timespan=${timespan || ""}`)).json();
 
     citationsOverTimeChartInstance = new Chart(citationsOverTimeChart, {
         type: 'line',
