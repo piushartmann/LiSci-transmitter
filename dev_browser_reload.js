@@ -4,7 +4,7 @@ const fs = require('fs');
 
 // Convert paths to absolute paths and verify they exist
 const basePath = process.cwd();
-let directories = ['public', 'views', 'games'];
+let directories = ['public', 'views', 'games', 'modules'];
 
 const moduleConfigs = require('./server/loadModules').moduleConfigs;
 directories = directories.map(dir => path.join(basePath, dir))

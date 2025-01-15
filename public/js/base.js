@@ -593,7 +593,6 @@ function updateCache(url, callbackType) {
 }
 
 function checkVersion() {
-    console.log(envVariables)
     if (typeof version !== 'undefined' && localStorage.getItem('version') !== version.toString()) {
         localStorage.setItem('version', version.toString());
         cacheBust();

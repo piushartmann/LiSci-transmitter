@@ -43,6 +43,7 @@ gameConfigs.forEach(config => {
     views.push(path.join(root, 'games', config.url, (config.views || 'views')));
 })
 
+//load module config from manifest files
 let moduleConfigs = [];
 
 const modules = fs.readdirSync(path.join(root, 'modules'));
@@ -67,6 +68,7 @@ modules.forEach(function (file) {
 
 moduleConfigs.forEach(config => {
     const publicDir = path.join(root, 'modules', config.url, (config.public || 'public'))
+    publicDirs.push(publicDir);
 
     config.publicDir = publicDir;
     views.push(path.join(root, 'modules', config.url, (config.views || 'views')));

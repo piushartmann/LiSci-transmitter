@@ -17,7 +17,7 @@
 
       <% for( let i = 0; i < modules.length; i++ ) { %>
         <% if (modules[i].visible == true) { %>
-          <li><a href="/<%= modules[i].url %>" data-lang-content="<%= modules[i].url %>"><%= modules[i].name %></a></li>
+          <li><a href="/<%= modules[i].name %>" data-lang-content="<%= modules[i].name %>"><%= modules[i].name %></a></li>
         <% } %>
       <% } %>
 

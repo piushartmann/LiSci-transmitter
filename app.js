@@ -145,7 +145,7 @@ db.connectPromise.then(() => {
             if (!req.session.userID) return res.render('notLoggedIn');
             const permissions = await db.getUserPermissions(req.session.userID);
             const hasPermission = config.access.every(access => permissions.includes(access));
-            if (!hasPermission) return res.status(403).send("You do not have permission to access this module");
+            if (!hasPermission) return res.status(403).render('error', { code: 403, message: "You do not have permission to access this module" });
             next();
         });
 
