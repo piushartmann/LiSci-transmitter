@@ -7,14 +7,66 @@
 
 
   <title data-lang-content="homework title">Hausaufgaben</title>
-  <script src="/js/homework.js"></script>
+  <script src="/js/homework.js" defer></script>
   <link rel="stylesheet" href="/css/homework.css">
 </head>
 
 <body>
   <%- include('./partials/base.ejs') %>
 
-  <!-- TODO: Add homework body content here -->
+  <h3>Aufgabe eintragen</h3>
+  <div class="newTaskContainer">
+    <p>Im Kurs </p>
+    <div class="subject">
+      <textarea type="text" name="subject" class="online-only" placeholder="Chemie" oninput='textAreaOnInput(this)' required></textarea>
+    </div>
+    <p> bei Frau/Herrn </p>
+    <div class="teacher">
+      <textarea type="text" name="teacher" class="online-only" placeholder="Treetzen" oninput='textAreaOnInput(this)' required></textarea>
+    </div>
+    <p> ist die Aufgabe: </p>
+    <div class="content">
+      <textarea type="text" name="content" class="online-only" placeholder="überleben" oninput='textAreaOnInput(this)' required></textarea>
+    </div>
+  </div>
+
+  <button id="taskSubmit">Absenden</button>
+
+  <div class="calendar" id="calendar">
+        <!-- Calendar days will be dynamically generated -->
+  </div>
+
+  <div id="dayView">
+      <div class="dateDisplay">
+        <h1 id="dayView-Date">DD MM DD</h1>
+        <h1 id="dayView-dayCount">(in 5 Tagen)</h1>
+      </div>
+      <div class="taskCount">
+        <p class="count">5</p>
+        <p>Aufgaben sind an diesm Tag fällig.</p>
+      </div>
+  </div>
+  <div id="taskView">
+      <div id="taskElementPrefab" class="taskElement">
+        <div class="headder">
+          <p class="subject">Fach</p>
+          <p class="teacher">Lehrer</p>
+        </div>
+        <hr>
+        <p class="content">Die zu bearbeitende Aufgabe</p>
+        <div class="meta-info">
+          <div class="author-info">
+            <p class="author-name">Pius</p>
+            <div class="profilePicture">
+              <img class="profilePicture image" src="https://storage.liscitransmitter.live/profile-pictures/397w9ZcGyWt9LE6ERMyl.jpeg" alt="Pius">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="taskElement">test elem</div>
+      <div class="taskElement">test elem</div>
+      <div class="taskElement">test elem</div>
+  </div>
   
 
 </body>
