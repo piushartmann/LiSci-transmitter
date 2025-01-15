@@ -24,14 +24,6 @@ Ask me irl or <a href="mailto:admin@liscitransmitter.live">send an Email</a>
 
 Everything is accessible [here](https://liscitransmitter.live/about)
 
-### TODO
-
-- website redesign
-- Add more Sections:
-  - Tierlists
-  - Voting
-- add memes to posts
-
 ## Developer section
 
 - [API](#api)

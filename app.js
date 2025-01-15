@@ -142,6 +142,7 @@ db.connectPromise.then(() => {
 
         router.use(async (req, res, next) => {
             if (!config.access || config.access.length === 0) return next();
+            if (!req.session.userID) return res.render('notLoggedIn');
             const permissions = await db.getUserPermissions(req.session.userID);
             const hasPermission = config.access.every(access => permissions.includes(access));
             if (!hasPermission) return res.status(403).send("You do not have permission to access this module");
