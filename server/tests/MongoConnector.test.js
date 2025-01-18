@@ -5,26 +5,33 @@ const { MongoConnector } = require('../MongoConnector');
 let mongoServer;
 let mongoConnector;
 
-beforeAll(async () => {
+beforeEach(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
     mongoConnector = new MongoConnector('testdb', uri);
     mongoConnector.push = { sendToEveryone: jest.fn() };
+    
+    await mongoConnector.connectPromise;
 });
 
-afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+afterEach(async () => {
+    if (mongoConnector) {
+        await mongoConnector.mongoose.connection.dropDatabase();
+        await mongoConnector.mongoose.connection.close();
+    }
+    if (mongoServer) {
+        await mongoServer.stop();
+    }
 });
-
 
 describe('MongoConnector.getPosts', () => {
     let userID;
 
     beforeEach(async () => {
-        await mongoConnector.mongoose.connection.dropDatabase();
         const user = await mongoConnector.createUser('testuser', 'password', ['admin']);
         userID = user._id;
+
+        mongoConnector.setPreference = jest.fn();
     });
 
     it('should return posts with correct filters and sorting', async () => {
@@ -98,7 +105,6 @@ describe('MongoConnector.getCitations', () => {
     let userID;
 
     beforeEach(async () => {
-        await mongoConnector.mongoose.connection.dropDatabase();
         const user = await mongoConnector.createUser('testuser', 'password', ['admin']);
         userID = user._id;
     });

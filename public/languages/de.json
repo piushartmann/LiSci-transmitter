@@ -153,6 +153,12 @@
             "oldest": "Älteste zuerst"
         }
     },
+    "homework": {
+        "title": "Hausaufgaben"
+    },
+    "charts": {
+        "title": "Graphen"
+    },
     "languages": {
         "de": "Deutsch",
         "en": "Englisch",

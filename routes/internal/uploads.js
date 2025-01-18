@@ -183,7 +183,12 @@ module.exports = (db, s3Client) => {
                 return res.status(400).send("Invalid crop");
             }
 
-            image.extract({ width: extractWidth, height: extractHeight, left: extractLeft, top: extractTop }).resize(config.profilePictureResolution, config.profilePictureResolution).toBuffer().then(async (data) => {
+            image
+            .rotate()
+            .extract({ width: extractWidth, height: extractHeight, left: extractLeft, top: extractTop })
+            .resize(config.profilePictureResolution, config.profilePictureResolution)
+            .toBuffer()
+            .then(async (data) => {
                 //write the file to local disk on fs
                 console.log("Writing file to disk");
                 const filename = generateRandomFilename();
@@ -201,7 +206,7 @@ module.exports = (db, s3Client) => {
                 }));
                 registerFileInDB(req.session.userID, newFilename, s3Path, "profile-pictures");
                 const currentProfilePic = await db.getPreference(req.session.userID, 'profilePic');
-                if (currentProfilePic.type === "custom"){
+                if (currentProfilePic.type === "custom") {
                     console.log("Deleting old profile picture");
                     await deleteFile(currentProfilePic.content);
                 };
@@ -218,7 +223,7 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
         const currentProfilePic = await db.getPreference(req.session.userID, 'profilePic');
-        if (currentProfilePic.type === "custom"){
+        if (currentProfilePic.type === "custom") {
             console.log("Deleting old profile picture");
             await deleteFile(currentProfilePic.content);
         };

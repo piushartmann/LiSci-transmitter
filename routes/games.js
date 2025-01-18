@@ -5,15 +5,11 @@ const router = Router();
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
- * @param {multer} s3Client - The s3 client instance.
  * @returns {Router} The router instance.
 */
 
-module.exports = (db, s3Client, gameConfigs) => {
+module.exports = (db, gameConfigs, connectedUsers) => {
 
-    let discoverUsers = [];
-    let invites = [];
-    const { renderView } = require('./helper')(db);
 
     router.get('*', async (req, res, next) => {
         // always allow access to the invite page
@@ -22,7 +18,7 @@ module.exports = (db, s3Client, gameConfigs) => {
         if (req.session.inviteID && req.session.inviteGameID) {
             const invite = await db.getInvite(req.session.inviteID);
             if (invite) {
-                if (req.path.endsWith(req.session.inviteGameID) || (req.path.endsWith(req.session.inviteGameID)+"/.websocket")) {
+                if (req.path.endsWith(req.session.inviteGameID) || (req.path.endsWith(req.session.inviteGameID) + "/.websocket")) {
                     return next();
                 }
             }
@@ -42,15 +38,15 @@ module.exports = (db, s3Client, gameConfigs) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
         const prefetches = [
-    "/css/games.css",
-    "/js/games.js",
-    ];
-    
-    await renderView(req, res, 'games', {
-        games: gameConfigs
-    }, prefetches);
+            "/css/games.css",
+            "/js/games.js",
+        ];
+
+        res.render('games', {
+            games: gameConfigs
+        });
     });
-    
+
     router.get('/:game/newInviteLink', async (req, res) => {
         const gameURL = req.params.game;
         const gameConfig = gameConfigs.find(g => g.url === gameURL);
@@ -62,101 +58,6 @@ module.exports = (db, s3Client, gameConfigs) => {
 
         return res.status(200).send(JSON.stringify({ invite: inviteLink }));
     });
-
-    router.ws('/discover', async (ws, req) => {
-        if (!req.session.userID) return ws.close();
-        const user = await db.getUser(req.session.username);
-        if (!user) return ws.close();
-
-        discoverUsers.push({ "user": user, "ws": ws });
-
-        sendDiscoveryUpdate();
-
-        ws.on('message', async (msg) => {
-            const message = JSON.parse(msg);
-
-            if (message.type === "invite") {
-                const player = discoverUsers.find(u => u.user.id === message.user);
-
-                const invitation = { "game": message.game, "user": req.session.userID, "to": message.user };
-                invites.push(invitation);
-
-                if (!player) return;
-                player.ws.send(JSON.stringify({ "type": "invite", "user": req.session.userID, "game": message.game, "username": user.username }));
-            }
-            else if (message.type === "uninvite") {
-                const player = discoverUsers.find(u => u.user.id === message.user);
-
-                const invitation = { "game": message.game, "user": req.session.userID, "to": message.user };
-                invites = invites.filter(i => i !== invitation);
-
-                if (!player) return;
-                player.ws.send(JSON.stringify({ "type": "uninvite", "user": req.session.userID, "game": message.game }));
-            }
-
-            else if (message.type === "accept") {
-
-                const invitation = { "game": message.game, "user": message.user, "to": req.session.userID };
-                invites = invites.filter(i => i !== invitation);
-
-                if (!invites.find(i => i.user === message.user && i.to === req.session.userID)) return;
-
-                const game = await startGame(message.game, [req.session.userID, message.user]);
-
-                console.log("Game: " + game)
-
-                const otherPlayer = discoverUsers.find(u => u.user.id === message.user);
-                if (!otherPlayer) return;
-                otherPlayer.ws.send(JSON.stringify({ "type": "accept", "game": message.game, "gameID": game }));
-
-                const player = discoverUsers.find(u => u.user.id === req.session.userID);
-                if (!player) return;
-                player.ws.send(JSON.stringify({ "type": "accept", "game": message.game, "gameID": game }));
-            }
-            else if (message.type === "decline") {
-
-                const invitation = { "game": message.game, "user": message.user, "to": req.session.userID };
-                invites = invites.filter(i => i !== invitation);
-
-                if (!invites.find(i => i.user === message.user && i.to === req.session.userID)) return;
-
-                const otherPlayer = discoverUsers.find(u => u.user.id === message.user);
-                if (!otherPlayer) return;
-                otherPlayer.ws.send(JSON.stringify({ "type": "decline", "user": req.session.userID }));
-            }
-        });
-
-        ws.on('close', () => {
-            discoverUsers = discoverUsers.filter(u => u.ws !== ws);
-            const userInvites = invites.filter(i => i.user === req.session.userID || i.to === req.session.userID);
-            userInvites.forEach(invitation => {
-                const player = discoverUsers.find(u => u.user.id === (invitation.user === req.session.userID ? invitation.to : invitation.user));
-                if (player) {
-                    player.ws.send(JSON.stringify({ "type": "uninvite", "user": req.session.userID, "game": invitation.game }));
-                }
-            });
-            invites = invites.filter(i => i.user !== req.session.userID && i.to !== req.session.userID);
-            sendDiscoveryUpdate();
-        });
-    });
-
-    function sendDiscoveryUpdate() {
-        discoverUsers.forEach(user => {
-            user.ws.send(JSON.stringify({ "type": "discover", "users": discoverUsers.map(u => ({ "username": u.user.username, "userID": u.user.id })).filter(u => u.username !== user.user.username) }));
-        });
-    }
-
-    async function startGame(game, players) {
-        console.log("Starting Game")
-        for (const config of gameConfigs) {
-            if (config.url == game) {
-                console.log("Starting Game: " + config.name)
-                const gameID = await config.logicInstance.newGame(db, players);
-                return gameID.toString();
-            }
-        }
-        return null;
-    }
 
     gameConfigs.forEach(game => {
         try {
@@ -175,9 +76,9 @@ module.exports = (db, s3Client, gameConfigs) => {
         gameConfig.routerInstance.get('/:gameID', async (req, res) => {
             const permissions = await db.getUserPermissions(req.session.userID);
 
-            return await renderView(req, res, 'game', {
-            title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
-        });
+            return res.render('game', {
+                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
+            });
         });
 
         gameConfig.routerInstance.post('/startGame', async (req, res) => {
@@ -216,7 +117,7 @@ module.exports = (db, s3Client, gameConfigs) => {
     });
 
     //include invite routes
-    router.use('/invite', require('./invites')(db, gameConfigs, discoverUsers));
+    router.use('/invite', require('./invites')(db, gameConfigs, connectedUsers));
 
     return router;
 }

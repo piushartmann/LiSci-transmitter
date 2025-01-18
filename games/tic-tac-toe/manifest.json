@@ -1,7 +1,7 @@
 {
     "url": "tic-tac-toe",
     "name": "Ultimate Tic Tac Toe",
-    "description": "Spiele Ultimate Tit Tac Toe zu Zweit oder gegen die KI",
+    "description": "Spiele Ultimate Tic Tac Toe zu Zweit oder gegen die KI",
     "singleplayer": true,
     "multiplayer": true,
     "router": "router.js",

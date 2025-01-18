@@ -1,6 +1,6 @@
 let yourTurn = false;
 let gameID = null;
-let ws;
+let tttWS;
 
 const gameHTML = `<div class="inner game">
 <div class="inner square top left"></div>

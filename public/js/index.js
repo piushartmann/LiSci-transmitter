@@ -1,5 +1,8 @@
-async function loadPosts(page, filter) {
-    return await fetch(`internal/getPosts?page=${page}&filter=${filter}`);
+async function loadPosts(page, filter, headers = {}) {
+    if (filter == "all") {
+        return await fetch(`internal/getPosts?p=${page}`, { headers });
+    }
+    return await fetch(`internal/getPosts?p=${page}&f=${utf8ToBase64(JSON.stringify({"type": "news"}))}`, { headers });
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -14,12 +17,12 @@ let news = [];
 const reloadContent = async () => {
     const onlyNewsFilter = document.getElementById("onlyNews").checked;
 
-    const postsRequest = await fetch(`internal/getPosts?page=${page}&filter=all`, {
+    const postsRequest = loadPosts(page, "all", {
         headers: {
             'cache-refresh': 'true'
         }
     });
-    const newsRequest = await fetch(`internal/getPosts?page=${page}&filter=news`, {
+    const newsRequest = loadPosts(page, "news", {
         headers: {
             'cache-refresh': 'true'
         }

@@ -126,22 +126,32 @@ module.exports = (db) => {
         });
     }
 
+    function base64toUtf8(base64) {
+        return Buffer.from(base64, 'base64').toString('utf8');
+    }
+
     router.get('/getPosts', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const isTeacher = !(permissions.includes("classmate"));
         if (!req.query) return res.status(400).send("Missing parameters");
-        let page = (req.query.page || 1) - 1;
+        let page = (req.query.p || 1) - 1;
 
-        const filter = req.query.filter || {};
+        let filter = req.query.f;
 
-        const totalPosts = await db.getPostNumber(isTeacher, filter);
-
-        if (page * postsPageSize > totalPosts){
-            page = Math.ceil(totalPosts / postsPageSize) - 1;
+        try {
+            filter = filter ? JSON.parse(base64toUtf8(filter)) : {};
+        } catch (e) {
+            return res.status(400).send("Invalid filter parameter");
         }
 
+        Object.keys(filter).forEach(key => {
+            if (filter[key] === null || filter[key] === undefined || filter[key] === "") {
+                delete filter[key];
+            }
+        });
+
         const postData = await db.getPosts(isTeacher, postsPageSize, postsPageSize * page, filter);
-        const posts = postData.posts;
+        const { posts, totalPosts } = postData;
         let filteredPosts = [];
         posts.forEach(post => {
             let postObj = post;

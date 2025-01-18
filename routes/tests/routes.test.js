@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const { MongoConnector } = require('../../server/MongoConnector');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const helperModule = require('../helper')
 const mockApp = express();
 const ws = require('express-ws')(mockApp);
 const request = require('supertest');
@@ -55,7 +54,7 @@ describe('Base Endpoints - logged in', () => {
         let gameConfig = [];
         //use routes
         mockApp.use('/', require('../base')(db));
-        mockApp.use('/games', require('../games')(db, s3Client, gameConfig));
+        mockApp.use('/games', require('../games')(db, gameConfig, []));
         mockApp.use('/internal', require('../internal')(db, s3Client));
         mockApp.use('/api', require('../api')(db, s3Client));
 

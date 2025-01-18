@@ -287,7 +287,6 @@ module.exports.MongoConnector = class MongoConnector {
     async getPosts(isTeacher, limit = 10, offset = 0, filter = {}) {
         const filterObject = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
         if (offset < 0) offset = 0;
-
         try {
             Object.keys(filter).forEach(key => {
                 if (key === 'text') {
@@ -364,9 +363,9 @@ module.exports.MongoConnector = class MongoConnector {
             query = query.limit(limit);
         }
 
-        const posts = await query;
-
         const totalPosts = await this.Post.countDocuments(filterObject);
+
+        const posts = await query;
 
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
@@ -376,6 +375,7 @@ module.exports.MongoConnector = class MongoConnector {
             }
 
             restructuredPost.comments = restructuredPost.comments.map(comment => {
+                if (!comment.userID || !comment.userID.username) return null;
                 if (comment.userID.profilePic) {
                     return comment;
                 }
@@ -837,5 +837,195 @@ module.exports.MongoConnector = class MongoConnector {
 
     async disconnect() {
         await this.mongoose.connection.close();
+    }
+
+    async getMostCitationsByUser(timespan) {
+        let matchStage = {};
+        
+        if (timespan) {
+            const now = new Date();
+            switch(timespan) {
+                case 'day':
+                    matchStage = {
+                        timestamp: { 
+                            $gte: new Date(now.setHours(0,0,0,0))
+                        }
+                    };
+                    break;
+                case 'week':
+                    const lastWeek = new Date(now.setDate(now.getDate() - 7));
+                    matchStage = {
+                        timestamp: { $gte: lastWeek }
+                    };
+                    break;
+                case 'month':
+                    const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
+                    matchStage = {
+                        timestamp: { $gte: lastMonth }
+                    };
+                    break;
+            }
+        }
+
+        const pipeline = [];
+        if (Object.keys(matchStage).length > 0) {
+            pipeline.push({ $match: matchStage });
+        }
+
+        pipeline.push(
+            { $group: { _id: "$userID", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 },
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+            { $unwind: "$user" },
+            { $project: { username: "$user.username", count: 1 } },
+            { $sort: { count: 1 } }
+        );
+
+        const citations = await this.Citation.aggregate(pipeline);
+        return citations;
+    }
+
+    async getMostCitationsByCitiated(timespan) {
+        let matchStage = {};
+        
+        if (timespan) {
+            const now = new Date();
+            switch(timespan) {
+                case 'day':
+                    matchStage = {
+                        timestamp: { 
+                            $gte: new Date(now.setHours(0,0,0,0))
+                        }
+                    };
+                    break;
+                case 'week':
+                    const lastWeek = new Date(now.setDate(now.getDate() - 7));
+                    matchStage = {
+                        timestamp: { $gte: lastWeek }
+                    };
+                    break;
+                case 'month':
+                    const lastMonth = new Date(now.setMonth(now.getMonth() - 1));
+                    matchStage = {
+                        timestamp: { $gte: lastMonth }
+                    };
+                    break;
+            }
+        }
+
+        const pipeline = [];
+        if (Object.keys(matchStage).length > 0) {
+            pipeline.push({ $match: matchStage });
+        }
+
+        pipeline.push(
+            { $unwind: "$context" },
+            { $group: { _id: "$context.author", count: { $sum: 1 } } },
+            { $sort: { count: -1 } }, // sort by count in descending order to get most citations first
+            { $limit: 10 }, // limit output to 10
+            { $sort: { count: 1 } } // reverse sort order again for better display
+        );
+
+        const citations = await this.Citation.aggregate(pipeline);
+        return citations;
+    }
+
+    async getCitationsOverTime(username, timespan) {
+
+        let pattern = [];
+        const now = new Date();
+
+        switch(timespan) {
+            case 'day':
+                pattern.push({
+                    $group: {
+                        _id: {
+                            hour: { $hour: "$timestamp" },
+                            day: { $dayOfMonth: "$timestamp" },
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            case 'week':
+                pattern.push({
+                    $group: {
+                        _id: {
+                            day: { $dayOfMonth: "$timestamp" },
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            case 'month':
+                pattern.push({
+                    $group: {
+                        _id: {
+                            day: { $dayOfMonth: "$timestamp" },
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+            default: // Empty timespan or any other value
+                pattern.push({
+                    $group: {
+                        _id: {
+                            month: { $month: "$timestamp" },
+                            year: { $year: "$timestamp" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                });
+                break;
+        }
+
+        if (username) {
+            const user = await this.User.findOne({ username });
+            if (!user) return [];
+            pattern.unshift({ 
+                $match: timespan ? { 
+                    userID: user._id,
+                    timestamp: {
+                        $gte: timespan === 'day' ? new Date(now.getTime() - 24 * 60 * 60 * 1000) :
+                               timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
+                               timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
+                               new Date(0) // Get all citations if timespan is empty
+                    }
+                } : { userID: user._id } // No timestamp filter if timespan is empty
+            });
+        } else if (timespan) {
+            pattern.unshift({
+                $match: {
+                    timestamp: {
+                        $gte: timespan === 'day' ? new Date(now.getTime() - 24 * 60 * 60 * 1000) :
+                               timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
+                               timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
+                               new Date(0) // Get all citations if timespan is empty
+                    }
+                }
+            });
+        }
+
+        pattern.push({ $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } });
+
+        const citations = await this.Citation.aggregate(pattern);
+
+        return citations.map(citation => ({
+            _id: new Date(
+                citation._id.year, 
+                citation._id.month - 1, 
+                citation._id.day || 1,
+                citation._id.hour || 0
+            ).getTime(),
+            count: citation.count
+        }));
     }
 };
