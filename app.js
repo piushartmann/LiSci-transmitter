@@ -19,7 +19,7 @@ app.use(subdomains);
 
 const oneDay = 24 * 3600 * 1000;
 
-let addReloadCallback = () => {};
+let addReloadCallback = () => { };
 let version;
 
 if (process.env.TERM_PROGRAM === "vscode") {
@@ -127,7 +127,9 @@ db.connectPromise.then(() => {
     console.log("Connected to database");
 
     //setup websocket
-    app.use('/websocket', require('./routes/websocket')(db, connectedUsers, gameConfigs, addReloadCallback));
+    const { router: wsRouter, functions } = require('./routes/websocket')(db, connectedUsers, gameConfigs, addReloadCallback);
+    app.use('/websocket', wsRouter);
+    db.ws = functions;
 
     //use routes
     app.use('/', require('./routes/base')(db));
