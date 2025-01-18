@@ -10,28 +10,15 @@
   <title data-lang-content="homework title">Hausaufgaben</title>
   <script src="homework.js" defer></script>
   <link rel="stylesheet" href="homework.css">
+  <script src="/js/partials/autocomplete.js"></script>
+  <link rel="stylesheet" href="/css/autocomplete.css">
 </head>
 
 <body>
   <%- include('./partials/base.ejs') %>
 
-  <h3>Aufgabe eintragen</h3>
-  <div class="newTaskContainer">
-    <p>Im Kurs </p>
-    <div class="subject">
-      <textarea type="text" name="subject" class="online-only" placeholder="Chemie" oninput='textAreaOnInput(this)' required></textarea>
-    </div>
-    <p> bei Frau/Herrn </p>
-    <div class="teacher">
-      <textarea type="text" name="teacher" class="online-only" placeholder="Treetzen" oninput='textAreaOnInput(this)' required></textarea>
-    </div>
-    <p> ist die Aufgabe: </p>
-    <div class="content">
-      <textarea type="text" name="content" class="online-only" placeholder="überleben" oninput='textAreaOnInput(this)' required></textarea>
-    </div>
-  </div>
 
-  <button id="taskSubmit">Absenden</button>
+  <button type="button" id="taskSubmit" onclick="openCreateTask()">Create Task</button>
 
   <div class="calendar" id="calendar">
     <!-- Calendar days will be dynamically generated -->
@@ -67,6 +54,12 @@
     <div class="taskElement">test elem</div>
     <div class="taskElement">test elem</div>
     <div class="taskElement">test elem</div>
+  </div>
+
+  <div class="modal" id="taskModal">
+    <span class="close">&times;</span>
+    <h1>Eine Aufgabe eintragen</h1>
+    <div class="timetable"></div>
   </div>
 
 

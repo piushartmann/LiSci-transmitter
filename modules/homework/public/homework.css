@@ -8,7 +8,7 @@
     margin: 0 auto;
 }
 
-.day {
+.calendar .day {
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 15px;
@@ -18,23 +18,23 @@
     transition: filter 0.3s;
 }
 
-.day-weekend {
+.calendar .day-weekend {
     background-color: #a6b4ba;
 }
 
-.day-today {
+.calendar .day-today {
     background-color: #6fe37d;
 }
 
-.day-pastDay {
+.calendar .day-pastDay {
     background-color: #d7d7d9;
 }
 
-.day:hover {
+.calendar .day:hover {
     filter: brightness(0.9);
 }
 
-.day-header {
+.calendar .day-header {
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -80,6 +80,7 @@
 }
 
 #taskSubmit {
+    display: block;
     padding: 10px 20px;
     background-color: #000;
     color: #fff;
@@ -87,6 +88,21 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 1em;
+    width: 150px;
+    margin-top: 5px;
+    margin-left: auto;
+}
+
+#subject,
+#teacher,
+#content {
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    resize: none;
+    height: 40px;
+    overflow: hidden;
     width: 100%;
 }
 
@@ -153,12 +169,43 @@
     display: flex;
 }
 
+
+#modal .timetable {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+#modal .timetable .lesson:hover {
+    background-color: #e9e9e9;
+}
+
+#modal .timetable .day {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    border: black 1px solid;
+}
+
+#modal .timetable .time {
+    display: flex;
+    flex-direction: row;
+}
+
+#modal .timetable .lesson {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #d4d4d4;
+    padding: 5px;
+    min-width: 100px;
+}
+
 @media (max-width: 768px) {
-    .day {
+    .calendar .day {
         padding: 5px;
     }
 
-    .day-number {
+    .calendar .day-number {
         display: none;
     }
 }
