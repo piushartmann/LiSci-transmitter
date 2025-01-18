@@ -17,8 +17,13 @@
     flex-direction: column;
 }
 
+.autocomplete-items.inline {
+    position: relative;
+}
+
 .autocomplete-items div {
     padding: 10px;
+    z-index: 99999;
     cursor: pointer;
     background-color: #fff;
     border-bottom: 1px solid #d4d4d4;

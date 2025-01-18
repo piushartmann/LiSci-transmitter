@@ -93,6 +93,11 @@ const chatSchema = new Schema({
     messages: [{ type: Object, required: true }]
 });
 
+const homeworkSchema = new Schema({
+    userID: { type: ObjectId, ref: 'User', required: true },
+    subject: { type: String, required: true },
+});
+
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
     hash.update(password);

@@ -647,3 +647,9 @@ function toggleVisibility(id, setVis = null) {
         element.style.display = setVis ? element.style.display = '' : element.style.display = 'none'
     }
 }
+
+function textAreaOnInput(textarea, multiline = false) {
+    if(!multiline) textarea.value = textarea.value.replace(/[\n]/g, "");
+    textarea.style.height = "";
+    textarea.style.height = textarea.scrollHeight + "px";
+}

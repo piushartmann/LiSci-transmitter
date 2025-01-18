@@ -28,5 +28,10 @@
         "apiAccess"
     ],
     "profilePictureResolution": 1024,
-    "schoolIP": "141.91.210.103"
+    "schoolIP": "141.91.210.103",
+    "untis": {
+        "schoolID": "hh5810",
+        "url": "ikarus.webuntis.com",
+        "className": "12.3"
+    }
 }
