@@ -110,6 +110,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.url = url;
         this.connectPromise = this.mongoose.connect(this.url, { dbName: database });
         this.db = this.mongoose.connection;
+        this.ws = null;
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
@@ -135,7 +136,9 @@ module.exports.MongoConnector = class MongoConnector {
             this.push.sendToEveryone("postNotifications", 'Neuer Post', `Neuer Post: "${title}" von ${user.username}`);
         }
 
-        return await post.save();
+        
+        await post.save();
+        return post;
     }
 
     async deletePost(postID) {
@@ -148,7 +151,9 @@ module.exports.MongoConnector = class MongoConnector {
         post.sections = sections;
         post.permissions = permissions;
         post.type = type;
-        return await post.save();
+        await post.save();
+        
+        return post;
     }
 
     async addSummaryToSection(postID, sectionIndex, summary) {
@@ -176,6 +181,7 @@ module.exports.MongoConnector = class MongoConnector {
         post.likes.push({ userID, date: Date.now() });
         await post.save();
 
+        
         return { success: true, message: 'Post liked successfully!' };
     }
 
@@ -186,12 +192,14 @@ module.exports.MongoConnector = class MongoConnector {
         if (hasLiked) {
             citation.likes = citation.likes.filter(like => !like.userID.equals(userID));
             await citation.save();
+            
             return { success: true, message: 'Like removed successfully!' };
         }
 
         citation.likes.push({ userID, date: Date.now() });
         await citation.save();
 
+        
         return { success: true, message: 'Citation liked successfully!' };
     }
 
@@ -203,9 +211,11 @@ module.exports.MongoConnector = class MongoConnector {
 
         const user = await this.User.findById(userID);
         if (!user) return null;
-
+        
         this.push.sendToEveryone("commentNotifications", 'Neuer Kommentar', `Neuer Kommentar von ${user.username} auf "${post.title}"`);
-        return await post.save();
+        
+        await post.save();
+        return post;
     }
 
     async getComment(commentID) {
@@ -213,12 +223,14 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async deleteComment(commentID) {
+        
         return await this.Comment.findByIdAndDelete(commentID);
     }
 
     async updateComment(commentID, content) {
         const comment = await this.Comment.findById(commentID);
         comment.content = content;
+        
         return await comment.save();
     }
 
@@ -287,6 +299,18 @@ module.exports.MongoConnector = class MongoConnector {
     async getPosts(isTeacher, limit = 10, offset = 0, filter = {}) {
         const filterObject = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
         if (offset < 0) offset = 0;
+
+        const pipeline = [
+            { $lookup: { from: 'comments', localField: 'comments', foreignField: '_id', as: 'comments' } },
+            { $lookup: { from: 'users', localField: 'userID', foreignField: '_id', as: 'userID', pipeline: [{ $project: { preferences: 1, username: 1 } }] } },
+            { $unwind: '$userID' },
+            { $skip: offset },
+            { $limit: limit },
+            { $addFields: { likeCount: { $size: '$likes' } } },
+            { $project: { _id: 1, userID: 1, title: 1, sections: 1, permissions: 1, timestamp: 1, comments: 1, likes: 1 } }
+        ]
+
+
         try {
             Object.keys(filter).forEach(key => {
                 if (key === 'text') {
@@ -334,38 +358,12 @@ module.exports.MongoConnector = class MongoConnector {
             }
         });
 
-        let query = this.Post.find(filterObject)
-            .populate({
-                path: 'userID',
-                select: 'username',
-                populate: {
-                    path: 'preferences',
-                    match: { key: 'profilePic' },
-                    select: 'value'
-                }
-            })
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'userID',
-                    select: 'username',
-                    populate: {
-                        path: 'preferences',
-                        match: { key: 'profilePic' },
-                        select: 'value'
-                    }
-                }
-            })
-            .sort(sortObject)
-            .skip(offset);
+        pipeline.unshift({ $sort: sortObject });
+        pipeline.unshift({ $match: filterObject });
 
-        if (limit !== -1) {
-            query = query.limit(limit);
-        }
+        const posts = await this.Post.aggregate(pipeline);
 
         const totalPosts = await this.Post.countDocuments(filterObject);
-
-        const posts = await query;
 
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
@@ -509,14 +507,18 @@ module.exports.MongoConnector = class MongoConnector {
 
     async createCitation(userID, author, content) {
         const citation = new this.Citation({ userID, author, content });
+        await citation.save();
         this.push.sendToEveryone("citationNotifications", 'Neues Zitat', `${author}: ${content}`);
-        return await citation.save();
+        
+        return citation;
     }
 
     async createCitationWithContext(userID, context, timestamp) {
         const citation = new this.Citation({ userID, context, timestamp: timestamp || Date.now() });
+        await citation.save();
         this.push.sendToEveryone("citationNotifications", 'Neues Zitat', `${context[0].author}: ${context[0].content}` + context.length > 1 ? "..." : "");
-        return await citation.save();
+        
+        return citation;
     }
 
     /**
@@ -539,8 +541,16 @@ module.exports.MongoConnector = class MongoConnector {
     * const citations = await db.getCitations(10, 0, { author: 'John Doe' }, { time: 'desc' });
      */
     async getCitations(limit = 10, offset = 0, filter = {}, sort = {}) {
-
         const filterObject = {};
+        let pipeline = [
+            { $lookup: { from: 'comments', localField: 'comments', foreignField: '_id', as: 'comments' } },
+            { $lookup: { from: 'users', localField: 'userID', foreignField: '_id', as: 'userID', pipeline: [{ $project: { preferences: 1, username: 1 } }] } },
+            { $unwind: '$userID' },
+            { $skip: offset },
+            { $limit: limit },
+            { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
+        ];
+
         try {
             Object.keys(filter).forEach(key => {
                 if (key === 'text') {
@@ -564,36 +574,20 @@ module.exports.MongoConnector = class MongoConnector {
             return { citations: [], totalCitations: -1 };
         }
 
-        const sortObject = { timestamp: -1 };
+        const sortObject = {};
         Object.keys(sort).forEach(key => {
             if (key === 'time') {
-                if (sort[key] === 'asc') {
-                    sortObject.timestamp = 1;
-                }
-                else if (sort[key] === 'desc') {
-                    sortObject.timestamp = -1;
-                }
-                else {
-                    console.log('Invalid sort value for time: ' + sort[key]);
-                    sortObject.timestamp = -1;
-                }
+                sortObject.timestamp = sort[key] === 'asc' ? 1 : -1;
+            }
+            else if (key === 'likes') {
+                sortObject.likes = sort[key] === 'asc' ? 1 : -1;
+                pipeline.unshift({ $addFields: { likeCount: { $size: '$likes' } } });
             }
         });
+        pipeline.unshift({ $sort: sortObject });
+        pipeline.unshift({ $match: filterObject });
 
-        const citations = await this.Citation.find(filterObject)
-            .populate({
-                path: 'userID',
-                select: 'username',
-                populate: {
-                    path: 'preferences',
-                    match: { key: 'profilePic' },
-                    select: 'value'
-                }
-            })
-            .sort(sortObject)
-            .skip(offset)
-            .populate('comments')
-            .limit(limit);
+        const citations = await this.Citation.aggregate(pipeline);
 
         const totalCitations = await this.Citation.countDocuments(filterObject);
 
@@ -611,22 +605,17 @@ module.exports.MongoConnector = class MongoConnector {
         function generateRandomProfilePic() {
             return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
         }
-        let restructuredObject = object.toObject();
-        if (restructuredObject.userID) {
-            if (restructuredObject.userID.preferences && restructuredObject.userID.preferences.length > 0) {
-                const profilePicPreference = restructuredObject.userID.preferences.find(pref => pref.key === 'profilePic');
-                if (profilePicPreference) {
-                    restructuredObject.userID.profilePic = profilePicPreference.value;
-                }
+        if (object.userID) {
+            const profilePicPreference = object.userID.preferences.find(pref => pref.key === 'profilePic');
+            if (profilePicPreference) {
+                object.userID.profilePic = profilePicPreference.value;
+                return object;
             }
-            else {
-                let randomProfilePic = generateRandomProfilePic();
-                restructuredObject.userID.profilePic = randomProfilePic;
-                this.setPreference(restructuredObject.userID._id, 'profilePic', randomProfilePic);
-            }
-            delete restructuredObject.userID.preferences;
         }
-        return restructuredObject;
+        object.userID.profilePic = generateRandomProfilePic();
+        this.setPreference(object.userID._id, 'profilePic', object.userID.profilePic);
+
+        return object;
     }
 
     async getCitation(citationID) {
@@ -635,14 +624,18 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     async deleteCitation(citationID) {
-        return await this.Citation.findByIdAndDelete(citationID);
+        const citation = await this.Citation.findByIdAndDelete(citationID);
+        
+        return citation;
     }
 
     async updateCitation(citationID, context) {
         try {
             const citation = await this.Citation.findById(citationID);
             citation.context = context;
-            return await citation.save();
+            await citation.save();
+            
+            return citation;
         } catch (error) {
             return null;
         }
@@ -841,14 +834,14 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getMostCitationsByUser(timespan) {
         let matchStage = {};
-        
+
         if (timespan) {
             const now = new Date();
-            switch(timespan) {
+            switch (timespan) {
                 case 'day':
                     matchStage = {
-                        timestamp: { 
-                            $gte: new Date(now.setHours(0,0,0,0))
+                        timestamp: {
+                            $gte: new Date(now.setHours(0, 0, 0, 0))
                         }
                     };
                     break;
@@ -888,14 +881,14 @@ module.exports.MongoConnector = class MongoConnector {
 
     async getMostCitationsByCitiated(timespan) {
         let matchStage = {};
-        
+
         if (timespan) {
             const now = new Date();
-            switch(timespan) {
+            switch (timespan) {
                 case 'day':
                     matchStage = {
-                        timestamp: { 
-                            $gte: new Date(now.setHours(0,0,0,0))
+                        timestamp: {
+                            $gte: new Date(now.setHours(0, 0, 0, 0))
                         }
                     };
                     break;
@@ -936,7 +929,7 @@ module.exports.MongoConnector = class MongoConnector {
         let pattern = [];
         const now = new Date();
 
-        switch(timespan) {
+        switch (timespan) {
             case 'day':
                 pattern.push({
                     $group: {
@@ -990,14 +983,14 @@ module.exports.MongoConnector = class MongoConnector {
         if (username) {
             const user = await this.User.findOne({ username });
             if (!user) return [];
-            pattern.unshift({ 
-                $match: timespan ? { 
+            pattern.unshift({
+                $match: timespan ? {
                     userID: user._id,
                     timestamp: {
                         $gte: timespan === 'day' ? new Date(now.getTime() - 24 * 60 * 60 * 1000) :
-                               timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
-                               timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
-                               new Date(0) // Get all citations if timespan is empty
+                            timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
+                                timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
+                                    new Date(0) // Get all citations if timespan is empty
                     }
                 } : { userID: user._id } // No timestamp filter if timespan is empty
             });
@@ -1006,9 +999,9 @@ module.exports.MongoConnector = class MongoConnector {
                 $match: {
                     timestamp: {
                         $gte: timespan === 'day' ? new Date(now.getTime() - 24 * 60 * 60 * 1000) :
-                               timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
-                               timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
-                               new Date(0) // Get all citations if timespan is empty
+                            timespan === 'week' ? new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) :
+                                timespan === 'month' ? new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) :
+                                    new Date(0) // Get all citations if timespan is empty
                     }
                 }
             });
@@ -1020,8 +1013,8 @@ module.exports.MongoConnector = class MongoConnector {
 
         return citations.map(citation => ({
             _id: new Date(
-                citation._id.year, 
-                citation._id.month - 1, 
+                citation._id.year,
+                citation._id.month - 1,
                 citation._id.day || 1,
                 citation._id.hour || 0
             ).getTime(),

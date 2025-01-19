@@ -145,7 +145,7 @@ function buildCitation(citation) {
     let authorDiv = document.createElement("div");
     let contextDiv = document.createElement("div");
     let metaDiv = document.createElement("div");
-    if (citation.context.length > 1) {
+    if (citation.context && citation.context.length > 1) {
         contextDiv = document.createElement("div");
         contextDiv.className = "context";
         citation.context.forEach(contextItem => {
@@ -214,7 +214,7 @@ function buildCitation(citation) {
 
     metaDiv.appendChild(dateDiv);
     metaDiv.appendChild(userDiv);
-    if (citation.context.length > 1) {
+    if (citation.context && citation.context.length > 1) {
         citationContainer.appendChild(contextDiv);
     }
     citationContainer.appendChild(sectionDiv);
@@ -462,10 +462,12 @@ function getFilterSettings() {
 
     sort.forEach(sortElement => {
         if (sortElement.id === "sortDate") {
-            sortObj.time = sortElement.value;
+            const [key, value] = sortElement.value.split("-")
+            console.log(key, value);
+            sortObj[key] = value;
         }
     });
-
+    console.log(sortObj);
     return { filter, sortObj };
 }
 

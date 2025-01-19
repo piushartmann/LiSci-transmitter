@@ -122,13 +122,35 @@ module.exports = (db, connectedUsers, gameConfigs, addReloadCallback) => {
         });
     }
 
-    function reload() {
+    function sendToEveryone(message) {
         connectedUsers.forEach(user => {
-            sendMessage(user.ws, JSON.stringify({ "type": "reload" }));
+            sendMessage(user.ws, message);
         });
+    }
+
+    function sendToUserID(userID, message) {
+        const user = connectedUsers.find(u => u.user.id === userID);
+        if (user) sendMessage(user.ws, message);
+    }
+
+    function sendToUser(username, message) {
+        const user = connectedUsers.find(u => u.user.username === username);
+        if (user) sendMessage(user.ws, message);
+    }
+
+    function reload() {
+        sendToEveryone(JSON.stringify({ "type": "reload" }));
     }
 
     addReloadCallback(reload);
 
-    return router;
+    // Add the functions to the router object
+    const functions = {};
+    functions.sendToEveryone = sendToEveryone;
+    functions.sendToUserID = sendToUserID;
+    functions.sendToUser = sendToUser
+    functions.reloadContent = () => sendToEveryone(JSON.stringify({ "type": "reloadContent" }));
+    functions.reload = reload;
+
+    return {router, functions};
 };

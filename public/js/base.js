@@ -271,6 +271,11 @@ function makeDiscoverable() {
                 break;
             case 'reload':
                 window.location.reload();
+            case 'reloadContent':
+                if (typeof reloadContent === 'function') {
+                    reloadContent();
+                }
+                break;
         }
 
     }
