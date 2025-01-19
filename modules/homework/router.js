@@ -10,7 +10,12 @@ const router = Router();
 module.exports = (db) => {
 
     router.get('/', async (req, res) => {
-        return res.render('homework');
+        const untisClasses = await db.getPreference(req.session.userID, 'untisClasses');
+        console.log(untisClasses);
+
+        return res.render('homework', {
+            untisClasses: untisClasses
+        });
     });
 
     return router;
