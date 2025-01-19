@@ -79,10 +79,11 @@ module.exports = (db) => {
         if (!req.session.userID) return res.render('notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);
         const pushEnabled = typeof await db.getSubscription(req.session.userID) != "undefined";
+        const untisClasses = await db.getPreference(req.session.userID, 'untisClasses');
 
         return res.render('settings', {
             isSettingsPage: true, apiKey: await db.getUserData(req.session.userID, 'apiKey'), isAdmin: permissions.includes("admin"), enabledPush: pushEnabled, possiblePermissions: config.permissions,
-            languages: config.languages.manuallyTranslated.concat(config.languages.aiTranslated)
+            languages: config.languages.manuallyTranslated.concat(config.languages.aiTranslated), untisClasses: untisClasses
         });
     });
 

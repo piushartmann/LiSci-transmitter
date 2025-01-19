@@ -65,46 +65,10 @@ function loadDayView(day) {
 
 function openCreateTask() {
   openModal('', 'taskModal');
-  fetch('/homework/internal/getTimetable').then(res => res.json()).then(uniqueSubjects => {
-    buildTimeTable(uniqueSubjects);
-  });
-}
-
-function buildTimeTable(timetable) {
-  const table = document.querySelector('#modal .timetable');
-  const dates = [...new Set(timetable.map(lesson => lesson.start.split('T')[0]))];
-  console.log(dates);
-  table.innerHTML = '';
-
-  //makes all the seperate date elements
-  dates.forEach(date => {
-    const dateElement = document.createElement('div');
-    dateElement.classList.add('day');
-    dateElement.innerHTML = date;
-    table.appendChild(dateElement);
-
-    timeslotStarts = [...new Set(timetable.filter(lesson => lesson.start.split('T')[0] === date).map(lesson => lesson.start.split('T')[1]))];
-    timeslotEnds = [...new Set(timetable.filter(lesson => lesson.start.split('T')[0] === date).map(lesson => lesson.end.split('T')[1]))];
-    let startElements = timeslotStarts.map(timeslot => { return new Date(date + "T" + timeslot).toLocaleTimeString('de', { hour: '2-digit', minute: '2-digit' }) });
-    let endElements = timeslotEnds.map(timeslot => { return new Date(date + "T" + timeslot).toLocaleTimeString('de', { hour: '2-digit', minute: '2-digit' }) });
-
-    startElements.forEach((start, index) => {
-      const timeElement = document.createElement('div');
-      timeElement.classList.add('time');
-      dateElement.appendChild(timeElement);
-
-      const lessons = timetable.filter(lesson => lesson.start.split('T')[0] === date && lesson.start.split('T')[1] === timeslotStarts[index]);
-      lessons.forEach(lesson => {
-        const lessonElement = document.createElement('div');
-        lessonElement.classList.add('lesson');
-        lesson.subjects.length > 0 ? lessonElement.innerHTML = lesson.subjects[0].element.longName : lessonElement.innerHTML = lesson.lessonText;
-        timeElement.appendChild(lessonElement);
-      });
-    });
-  });
+  buildUntisTable(document.querySelector('#modal .timetable'), untisClasses);
 }
 
 const today = displayCalender();
 loadDayView(today);
 
-openCreateTask();
+openCreateTask(); //for testing

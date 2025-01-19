@@ -12,7 +12,11 @@ module.exports = (db) => {
     const timetable = require('../../server/untis/timetable.json');
 
     router.get('/', async (req, res) => {
-        return res.render('homework');
+        const untisClasses = await db.getPreference(req.session.userID, 'untisClasses');
+
+        return res.render('homework', {
+            untisClasses: untisClasses
+        });
     });
 
     router.get('/internal/getTimetable', async (req, res) => {
