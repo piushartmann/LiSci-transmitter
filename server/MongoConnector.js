@@ -365,8 +365,7 @@ module.exports.MongoConnector = class MongoConnector {
             }
         });
 
-        console.log(sortObject);
-        pipeline.unshift({ $sort: sortObject });
+        if (sortObject) pipeline.unshift({ $sort: sortObject });
         pipeline.unshift({ $match: filterObject });
 
         const posts = await this.Post.aggregate(pipeline);
@@ -563,17 +562,18 @@ module.exports.MongoConnector = class MongoConnector {
             return { citations: [], totalCitations: -1 };
         }
 
-        const sortObject = {};
-        Object.keys(sort).forEach(key => {
-            if (key === 'time') {
-                sortObject.timestamp = sort[key] === 'asc' ? 1 : -1;
-            }
-            else if (key === 'likes') {
-                sortObject.likes = sort[key] === 'asc' ? 1 : -1;
-                pipeline.unshift({ $addFields: { likeCount: { $size: '$likes' } } });
-            }
-        });
-        pipeline.unshift({ $sort: sortObject });
+        const sortObject = { timestamp: -1 };
+        key = Object.keys(sort)[0]
+        if (key === 'time') {
+            sortObject.timestamp = sort[key] === 'asc' ? 1 : -1;
+        }
+        else if (key === 'likes') {
+            sortObject.likes = sort[key] === 'asc' ? 1 : -1;
+            delete sortObject.timestamp;
+            pipeline.unshift({ $addFields: { likeCount: { $size: '$likes' } } });
+        }
+
+        if (sortObject != {}) pipeline.unshift({ $sort: sortObject });
         pipeline.unshift({ $match: filterObject });
 
         const citations = await this.Citation.aggregate(pipeline);
