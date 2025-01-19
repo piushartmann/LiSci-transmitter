@@ -365,6 +365,7 @@ module.exports.MongoConnector = class MongoConnector {
             }
         });
 
+        console.log(sortObject);
         pipeline.unshift({ $sort: sortObject });
         pipeline.unshift({ $match: filterObject });
 
