@@ -294,6 +294,18 @@ module.exports.MongoConnector = class MongoConnector {
     async getPosts(isTeacher, limit = 10, offset = 0, filter = {}) {
         const filterObject = isTeacher ? { permissions: { $ne: 'classmatesonly' } } : {};
         if (offset < 0) offset = 0;
+
+        const pipeline = [
+            { $lookup: { from: 'comments', localField: 'comments', foreignField: '_id', as: 'comments' } },
+            { $lookup: { from: 'users', localField: 'userID', foreignField: '_id', as: 'userID', pipeline: [{ $project: { preferences: 1, username: 1 } }] } },
+            { $unwind: '$userID' },
+            { $skip: offset },
+            { $limit: limit },
+            { $addFields: { likeCount: { $size: '$likes' } } },
+            { $project: { _id: 1, userID: 1, title: 1, sections: 1, permissions: 1, timestamp: 1, comments: 1, likes: 1 } }
+        ]
+
+
         try {
             Object.keys(filter).forEach(key => {
                 if (key === 'text') {
@@ -341,38 +353,12 @@ module.exports.MongoConnector = class MongoConnector {
             }
         });
 
-        let query = this.Post.find(filterObject)
-            .populate({
-                path: 'userID',
-                select: 'username',
-                populate: {
-                    path: 'preferences',
-                    match: { key: 'profilePic' },
-                    select: 'value'
-                }
-            })
-            .populate({
-                path: 'comments',
-                populate: {
-                    path: 'userID',
-                    select: 'username',
-                    populate: {
-                        path: 'preferences',
-                        match: { key: 'profilePic' },
-                        select: 'value'
-                    }
-                }
-            })
-            .sort(sortObject)
-            .skip(offset);
+        pipeline.unshift({ $sort: sortObject });
+        pipeline.unshift({ $match: filterObject });
 
-        if (limit !== -1) {
-            query = query.limit(limit);
-        }
+        const posts = await this.Post.aggregate(pipeline);
 
         const totalPosts = await this.Post.countDocuments(filterObject);
-
-        const posts = await query;
 
         let restructuredPosts = posts.map(post => {
             let restructuredPost = this.restructureUser(post);
@@ -557,7 +543,6 @@ module.exports.MongoConnector = class MongoConnector {
             { $unwind: '$userID' },
             { $skip: offset },
             { $limit: limit },
-            { $addFields: { likeCount: { $size: '$likes' } } },
             { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
         ];
 
