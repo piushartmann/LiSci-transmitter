@@ -563,7 +563,7 @@ module.exports.MongoConnector = class MongoConnector {
         }
 
         const sortObject = { timestamp: -1 };
-        key = Object.keys(sort)[0]
+        const key = Object.keys(sort).length > 0 ? Object.keys(sort)[0] : null;
         if (key === 'time') {
             sortObject.timestamp = sort[key] === 'asc' ? 1 : -1;
         }
