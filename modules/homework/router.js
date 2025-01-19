@@ -9,7 +9,7 @@ const router = Router();
 
 module.exports = (db) => {
     const config = require('../../config.json');
-    const timetable = require('../../server/untis/timetable.json');
+    const untis = require('../../server/untis'); 
 
     router.get('/', async (req, res) => {
         const untisClasses = await db.getPreference(req.session.userID, 'untisClasses');
@@ -19,7 +19,11 @@ module.exports = (db) => {
         });
     });
 
-    router.get('/internal/getTimetable', async (req, res) => {
+    router.post('/internal/getTimetable', async (req, res) => {
+        let { weekOffset } = req.body;
+        if (!weekOffset) weekOffset = 0;
+        if (typeof weekOffset !== "number") return res.status(400).send("Invalid parameters");
+        const timetable = await untis.getTimetable(weekOffset);
         return res.json(timetable);
     })
 

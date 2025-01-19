@@ -63,9 +63,38 @@ function loadDayView(day) {
 
 }
 
+let weekOffset = 0;
 function openCreateTask() {
   openModal('', 'taskModal');
-  buildUntisTable(document.querySelector('#modal .timetable'), untisClasses);
+  weekOffset = 0;
+  fetchUntisTable();
+}
+
+function untisPreviousWeek(){
+  weekOffset--;
+  fetchUntisTable();
+}
+
+function untisNextWeek(){
+  weekOffset++;
+  fetchUntisTable();
+}
+
+function thisWeek(){
+  weekOffset = 0;
+  fetchUntisTable();
+}
+
+function fetchUntisTable(){
+  fetch('/homework/internal/getTimetable', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({weekOffset: weekOffset})
+  }).then(res => res.json()).then(timetable => {
+    buildUntisTable(timetable, document.querySelector('#modal .timetable'), untisClasses);
+  });
 }
 
 const today = displayCalender();

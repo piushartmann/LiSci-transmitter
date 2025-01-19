@@ -1,3 +1,3 @@
 {
-    "ignore": ["*.test.js", "tests/*", "public/*", "!public/languages/*", "views/*", "node_modules/*", "README.md", "package.json", "package-lock.json", "nodemon.json", "games/*", ".github/*", ".git/*", ".vscode/*", "LICENSE", "!manifest.json", "!router.js"]
+    "ignore": ["*.test.js", "tests/*", "public/*", "!public/languages/*", "views/*", "node_modules/*", "README.md", "package.json", "package-lock.json", "nodemon.json", "games/*", ".github/*", ".git/*", ".vscode/*", "LICENSE", "!manifest.json", "!router.js", "timetable.json"]
 }
