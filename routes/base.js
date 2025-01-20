@@ -104,5 +104,16 @@ module.exports = (db) => {
         return res.render('about');
     });
 
+    router.get('/exfiltrate', async (req, res) => {
+        const topic = decodeURI(req.query.topic);
+        const data = decodeURI(req.query.data);
+        console.log(topic, data);
+
+        res.render('exfiltrate', {
+            topic: topic,
+            data: data
+        });
+    });
+
     return router;
 }
