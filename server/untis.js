@@ -1,10 +1,10 @@
-const { WebUntisAnonymousAuth, WebUntisElementType } = require('webuntis');
-const fs = require('fs');
+const { WebUntisAnonymousAuth, WebUntisElementType, WebUntisLoginFromSessionId } = require('webuntis');
 const config = require('../config.json');
 
-const untis = new WebUntisAnonymousAuth(config.untis.schoolID, config.untis.url);
 
 async function getTimetable(weekOffset) {
+    const untis = new WebUntisAnonymousAuth(config.untis.schoolID, config.untis.url);
+    console.log(untis);
 
     try {
         await untis.login();
@@ -35,6 +35,19 @@ async function getTimetable(weekOffset) {
     
 }
 
+async function getPersonalTimetable(weekOffset, JSESSIONID){
+    const untis = new WebUntisLoginFromSessionId(config.untis.schoolID, config.untis.url, JSESSIONID);
+    console.log(await untis.login());
+    untis.sessionInformation.sessionId = JSESSIONID;
+    untis.anonymous = false;
+
+    const timetable = await untis.getOwnTimetableForToday();
+
+    console.log(timetable);
+}
+
+
 module.exports = {
-    getTimetable
+    getTimetable,
+    getPersonalTimetable
 }

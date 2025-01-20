@@ -25,7 +25,7 @@ module.exports = (db) => {
         if (typeof weekOffset !== "number") return res.status(400).send("Invalid parameters");
         const timetable = await untis.getTimetable(weekOffset);
         return res.json(timetable);
-    })
+    });
 
     return router;
 };

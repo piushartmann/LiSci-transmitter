@@ -83,11 +83,11 @@ app.use(session({
     cookie: {
         maxAge: oneDay * 30,
         sameSite: true,
-        secure: false
+        secure: true
     },
     secure: true,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: MongoDBStore.create({
         mongoUrl: connectionString,
         dbName: 'transmitter',
