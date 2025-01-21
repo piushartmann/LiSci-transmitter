@@ -30,12 +30,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     })
 });
 
-function textAreaOnInput(textarea) {
-    textarea.value = textarea.value.replace(/[\n]/g, "");
-    textarea.style.height = "";
-    textarea.style.height = textarea.scrollHeight + "px";
-}
-
 function addNewContext(first = false) {
     const newCitationBox = document.getElementById("newCitationBox");
     const baseStructure = document.getElementById("baseStructure");

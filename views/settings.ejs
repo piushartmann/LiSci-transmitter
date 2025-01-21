@@ -97,6 +97,12 @@
       </select>
     </div>
 
+    <div class="WebUntisClasses settings">
+      <label for="WebUntisClasses" data-lang-content="settings untis_classes">Untis Classes</label>
+      <input type="text" value="<%= untisClasses %>" id="WebUntisClasses">
+      <button id="WebUntisClassesSubmit" class="online-only" data-lang-content="interaction save" type="button" onclick="setUntisClasses()">Save</button>
+    </div>
+
 
     <% if (isAdmin) { %>
     <%- include('./partials/adminSettings.ejs') %>

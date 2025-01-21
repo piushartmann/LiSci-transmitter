@@ -357,3 +357,20 @@ function resetProfilePicture() {
         console.error("Error resetting profile picture:", error);
     });
 }
+
+function setUntisClasses() {
+    const classesString = document.getElementById('WebUntisClasses').value;
+    const classes = classesString.split(',').map((className) => className.trim());
+    fetch('internal/settings/setUntisClasses', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ classes }),
+    }).then(() => {
+        console.log("Untis classes set");
+        window.location.reload();
+    }).catch((error) => {
+        console.error("Error setting Untis classes:", error);
+    });
+}
