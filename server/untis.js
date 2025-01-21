@@ -48,27 +48,8 @@ async function getPersonalTimetable(weekOffset, JSESSIONID) {
     console.log(timetable);
 }
 
-async function attachmentStorageUrl(messageId, username, password) {
-    const untis = new WebUntis("hh5810", "Pius.Hartmann", "Asg.9344", "ikarus.webuntis.com");
-    await untis.login();
-    const JSESSIONID = untis.sessionInformation.sessionId;
-    console.log(JSESSIONID);
-    const url = `https://storage.webuntis.com/WebUntis/api/rest/view/v1/messages/bde00e20-22bd-4d51-827b-df6adab76df5/attachmentstorageurl`
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Cookie': `JSESSIONID=${JSESSIONID}`
-        }
-    });
-    //const json = await response.json();
-    const blob = await response.blob();
-    const bloburl = URL.createObjectURL(blob);
-    return bloburl;
-}
-
 
 module.exports = {
     getTimetable,
-    getPersonalTimetable,
-    attachmentStorageUrl
+    getPersonalTimetable
 }
