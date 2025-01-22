@@ -1,5 +1,3 @@
-
-
 .timetable {
     display: flex;
     flex-wrap: nowrap;
@@ -9,7 +7,7 @@
 .timetable .day {
     display: flex;
     flex-direction: column;
-    width: 19%;
+    width: 20%;
     border: black 1px solid;
 }
 
@@ -29,7 +27,7 @@
     justify-content: center;
     transition: filter 0.3s;
     user-select: none;
-    gap: 5px; 
+    gap: 5px;
 }
 
 .timetable .lesson:hover {
@@ -48,6 +46,7 @@
 .timetable .lessonRoom,
 .timetable .lessonSubject {
     margin: 0;
+    font-size: max(min(2vw, 0.9em), 10px);
 }
 
 .lesson-ADDITIONAL,

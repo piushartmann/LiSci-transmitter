@@ -1,5 +1,5 @@
 {
     "name": "Homework",
     "access": ["classmate"],
-    "visible": false
+    "visible": true
 }

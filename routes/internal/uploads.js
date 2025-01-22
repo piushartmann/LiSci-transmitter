@@ -92,7 +92,7 @@ module.exports = (db, s3Client) => {
 
     function registerFileInDB(userID, filename, path, type) {
         db.createFileEntry(userID, filename, path, type).then(() => {
-            console.log("File entry created in database");
+            console.log(`File '${filename}' created in database`);
         }).catch((error) => {
             console.error("Error creating file entry in database:", error);
         });
@@ -127,7 +127,7 @@ module.exports = (db, s3Client) => {
             return res.status(500).send(error.message);
         }
         return res.status(200).send(filename);
-    })
+    });
 
     router.post('/uploadImage', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -141,7 +141,21 @@ module.exports = (db, s3Client) => {
             return res.status(500).send(error.message);
         }
         return res.status(200).send(filename);
-    })
+    });
+
+    router.post('/uploadHomework', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!permissions.includes("admin") && !permissions.includes("classmate")) return res.status(403).send("You cannot upload a Homework");
+
+        let filename;
+        try {
+            filename = await uploadFile(req, res, "homework");
+        } catch (error) {
+            return res.status(500).send(error.message);
+        }
+        return res.status(200).send(filename);
+    });
 
     router.post('/uploadProfilePicture', multer().single('file'), async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");

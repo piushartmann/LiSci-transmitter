@@ -58,12 +58,22 @@
     <div class="taskElement">test elem</div>
   </div>
 
-  <div class="modal" id="taskModal">
+  <div class="modal" id="selectorModal">
     <button type="button" onclick="untisPreviousWeek()"><</button>
     <button type="button" onclick="untisNextWeek()">></button>
     <button type="button" onclick="thisWeek()">Today</button>
-    <h1>Eine Aufgabe eintragen</h1>
+    <h1>Wähle die Stunde aus</h1>
     <div class="timetable"></div>
+  </div>
+
+  <div class="modal" id="taskModal">
+    <h1>Neue Aufgabe eintragen</h1>
+    <textarea type="text" name="title" id="title" class="online-only" placeholder="Überschrift" oninput="textAreaOnInput(this)" required></textarea>
+    <textarea type="text" name="content" id="content" class="online-only" placeholder="Aufgabenbeschreibung" oninput="textAreaOnInput(this, true)" required></textarea>
+    <div id="files">
+      <input id="file0" class="online-only file_upload" type="file" name="file" accept="*" multiple="">
+    </div>
+    <button type="button" name="Submit" onclick="submitTask()">Submit</button>
   </div>
 
 </body>

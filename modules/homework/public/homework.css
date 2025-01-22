@@ -169,6 +169,17 @@
     display: flex;
 }
 
+.modal #content {
+    min-height: 200px;
+}
+
+#files {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 @media (max-width: 768px) {
     .calendar .day {
         padding: 5px;

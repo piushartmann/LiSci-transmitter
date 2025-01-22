@@ -95,7 +95,17 @@ const chatSchema = new Schema({
 
 const homeworkSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true },
-    subject: { type: String, required: true },
+    lesson: {
+        lessonID: { type: Number, required: true },
+        longName: { type: String, required: true },
+        shortName: { type: String, required: true },
+        lessonStart: { type: Date, required: true },
+        teacher: { type: String, required: true },
+    },
+    title: { type: String, required: true },
+    content: { type: String, required: true },
+    files: [{ type: ObjectId, ref: 'File', required: false }],
+    timestamp: { type: Date, default: Date.now }
 });
 
 function hashPassword(password) {
@@ -119,6 +129,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.Game = this.mongoose.model('Game', gameSchema);
         this.GameInvite = this.mongoose.model('GameInvite', gameInviteSchema);
         this.File = this.mongoose.model('File', fileSchema);
+        this.Homework = this.mongoose.model('Homework', homeworkSchema);
 
         this.push = pushLib(this, webpush);
     }
@@ -1014,5 +1025,25 @@ module.exports.MongoConnector = class MongoConnector {
             ).getTime(),
             count: citation.count
         }));
+    }
+
+    async createHomework(userID, lesson, content, title, files) {
+        const lessonID = lesson.id;
+        const start = lesson.start;
+        const longname = lesson.subjects[0].element.longName;
+        const name = lesson.subjects[0].element.name;
+        const teacher = lesson.teachers[0].element.name;
+
+        const lessonElement = {
+            lessonID,
+            longName: longname,
+            shortName: name,
+            lessonStart: start,
+            teacher: teacher
+        }
+
+        const homework = new this.Homework({ userID, lesson: lessonElement, title, content, files });
+        await homework.save();
+        return homework;
     }
 };

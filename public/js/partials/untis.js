@@ -1,8 +1,15 @@
-function buildUntisTable(timetable, tableElement, filter) {
+function buildUntisTable(timetable, tableElement, filter, onClickCallback) {
   const dates = [...new Set(timetable.map(lesson => lesson.start.split('T')[0]))];
   tableElement.innerHTML = '';
 
-  const MiPaHour = 7;
+  const MiPaHour = 6;
+
+  //find the max number of timeslots in a day to later fill up the days with empty timeslots
+  let mostTimeslots = 0;
+  dates.forEach(date => {
+    let i = [...new Set(timetable.filter(lesson => lesson.start.split('T')[0] === date).map(lesson => lesson.start.split('T')[1]))]
+    if (i.length > mostTimeslots) mostTimeslots = i.length;
+  });
 
   dates.forEach(date => {
     const dateElement = document.createElement('div');
@@ -44,7 +51,7 @@ function buildUntisTable(timetable, tableElement, filter) {
         const lessonData = document.createElement('div');
         lessonData.classList.add('lessonData');
 
-        if (lesson.rooms.length > 1) {
+        if (lesson.rooms.length > 0) {
           const lessonRoom = document.createElement('p');
           lessonRoom.classList.add('lessonRoom');
           lessonRoom.classList.add('room-' + lesson.rooms[0].state);
@@ -52,7 +59,7 @@ function buildUntisTable(timetable, tableElement, filter) {
           lessonData.appendChild(lessonRoom);
         }
 
-        if (lesson.teachers.length > 1) {
+        if (lesson.teachers.length > 0) {
           const lessonTeacher = document.createElement('p');
           lessonTeacher.classList.add('lessonTeacher');
           lessonTeacher.classList.add('teacher-' + lesson.teachers[0].state);
@@ -61,8 +68,26 @@ function buildUntisTable(timetable, tableElement, filter) {
         }
 
         lessonElement.appendChild(lessonData);
+
+        timeElement.addEventListener('click', () => onClickCallback({
+          id: lesson.id,
+          name: lesson.subjects.length > 0 ? lesson.subjects[0].element.longName : lesson.lessonText,
+          room: lesson.rooms.length > 0 ? lesson.rooms[0].element.displayname : '',
+          teacher: lesson.teachers.length > 0 ? lesson.teachers[0].element.name : '',
+          time: time
+        }));
         timeElement.appendChild(lessonElement);
       });
     });
+
+    //fill up the timeslots with empty timeslots, so that all days have the same amount of timeslots
+    if (timeslotStarts.length < mostTimeslots) {
+      for (let i = timeslotStarts.length; i < mostTimeslots; i++) {
+        const timeElement = document.createElement('div');
+        timeElement.classList.add('time');
+        dateElement.appendChild(timeElement);
+      }
+    }
+
   });
 }

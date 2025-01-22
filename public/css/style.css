@@ -350,6 +350,17 @@ a {
     flex-direction: row;
 }
 
+textarea {
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    resize: none;
+    height: 40px;
+    overflow: hidden;
+    width: 100%;
+}
+
 /* Keyframes for fade-in animation */
 @keyframes fadeIn {
     0% {

@@ -64,40 +64,119 @@ function loadDayView(day) {
 }
 
 let weekOffset = 0;
+let selectedLesson = null;
 function openCreateTask() {
-  openModal('', 'taskModal');
+  selectedLesson = null;
+  openModal('', 'selectorModal');
   weekOffset = 0;
   fetchUntisTable();
 }
 
-function untisPreviousWeek(){
+function untisPreviousWeek() {
   weekOffset--;
   fetchUntisTable();
 }
 
-function untisNextWeek(){
+function untisNextWeek() {
   weekOffset++;
   fetchUntisTable();
 }
 
-function thisWeek(){
+function thisWeek() {
   weekOffset = 0;
   fetchUntisTable();
 }
 
-function fetchUntisTable(){
+function fetchUntisTable() {
   fetch('/homework/internal/getTimetable', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({weekOffset: weekOffset})
+    body: JSON.stringify({ weekOffset: weekOffset })
   }).then(res => res.json()).then(timetable => {
-    buildUntisTable(timetable, document.querySelector('#modal .timetable'), untisClasses);
+    buildUntisTable(timetable, document.querySelector('#modal .timetable'), untisClasses, onLessonClick);
   });
 }
 
+function onLessonClick(lesson) {
+  selectedLesson = lesson;
+  hideModal();
+  openModal('', 'taskModal');
+  addFileEventListerners();
+}
+
+function addFileEventListerners() {
+  document.querySelectorAll('#modal #files .file_upload').forEach(file => {
+    file.onchange = (event) => {
+      let newInput = document.createElement('input')
+      const index = Array.from(document.querySelectorAll('#modal #files .file_upload')).indexOf(file);
+      newInput = document.getElementById('files').appendChild(newInput);
+      newInput.id = 'file' + (index + 1);
+      newInput.classList.add('online-only');
+      newInput.classList.add('file_upload');
+      newInput.type = 'file';
+      newInput.name = 'file';
+      newInput.accept = '*';
+      newInput.multiple = true;
+      addFileEventListerners();
+    };
+  });
+}
+
+async function submitTask() {
+  if (!selectedLesson) {
+    return;
+  }
+
+  //get all files and upload them to the server
+  const files = Array.from(document.querySelectorAll('#modal #files .file_upload'));
+  let uploadedFiles = []
+  for (const file of files) {
+    if (file.files.length > 0) {
+      let formData = new FormData();
+      formData.append('upload', file.files[0]);
+
+      const res = await fetch('/internal/uploadHomework', {
+        method: 'POST',
+        body: formData,
+        enctype: 'multipart/form-data',
+      });
+      if (res.ok) {
+        const data = await res.text();
+        uploadedFiles.push(data);
+      }
+    }
+  }
+
+  console.log(uploadedFiles);
+
+  let data = {};
+  data.lesson = selectedLesson.id;
+  data.weekOffset = weekOffset;
+  data.title = document.querySelector('#modal #title').value;
+  data.content = document.querySelector('#modal #content').value;
+  data.files = uploadedFiles;
+
+  fetch('/homework/internal/createTask', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then((res) => {
+    if (res.status == 200) {
+      console.log("Task created");
+      hideModal();
+    }
+    else {
+      console.error("Error creating task:", res);
+    }
+  }).catch((error) => {
+    console.error("Error while creating task:", error);
+  });
+}
+
+
 const today = displayCalender();
 loadDayView(today);
-
-openCreateTask(); //for testing

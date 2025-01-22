@@ -4,7 +4,6 @@ const config = require('../config.json');
 
 async function getTimetable(weekOffset) {
     const untis = new WebUntisAnonymousAuth(config.untis.schoolID, config.untis.url);
-    console.log(untis);
 
     try {
         await untis.login();
