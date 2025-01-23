@@ -577,7 +577,7 @@ module.exports.MongoConnector = class MongoConnector {
 
         if (sortObject != {}) pipeline.push({ $sort: sortObject });
         pipeline.push({ $match: filterObject });
-        pipeline = pipline.concat([
+        pipeline = pipeline.concat([
             { $skip: offset },
             { $limit: limit },
             { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
