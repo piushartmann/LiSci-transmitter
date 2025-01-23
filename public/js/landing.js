@@ -13,7 +13,7 @@ async function login() {
     console.log(response.status);
 
     if (response.status === 200) {
-        window.location.href = '/';
+        //window.location.href = '/';
     } else {
         password.value = "";
         document.getElementById('login-form').classList.add('invalid');
