@@ -572,11 +572,11 @@ module.exports.MongoConnector = class MongoConnector {
         else if (key === 'likes') {
             sortObject.likes = sort[key] === 'asc' ? 1 : -1;
             delete sortObject.timestamp;
-            pipeline.append({ $addFields: { likeCount: { $size: '$likes' } } });
+            pipeline.push({ $addFields: { likeCount: { $size: '$likes' } } });
         }
 
-        if (sortObject != {}) pipeline.append({ $sort: sortObject });
-        pipeline.append({ $match: filterObject });
+        if (sortObject != {}) pipeline.push({ $sort: sortObject });
+        pipeline.push({ $match: filterObject });
         pipeline = pipline.concat([
             { $skip: offset },
             { $limit: limit },
