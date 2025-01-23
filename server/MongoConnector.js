@@ -570,7 +570,7 @@ module.exports.MongoConnector = class MongoConnector {
             sortObject.timestamp = sort[key] === 'asc' ? 1 : -1;
         }
         else if (key === 'likes') {
-            sortObject.likes = sort[key] === 'asc' ? 1 : -1;
+            sortObject.likeCount = sort[key] === 'asc' ? 1 : -1;
             delete sortObject.timestamp;
             pipeline.push({ $addFields: { likeCount: { $size: '$likes' } } });
         }
