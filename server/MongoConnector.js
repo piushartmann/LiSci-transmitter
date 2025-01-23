@@ -582,7 +582,8 @@ module.exports.MongoConnector = class MongoConnector {
             { $limit: limit },
             { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
                        ]);
-
+        
+        console.log(pipeline)
         const citations = await this.Citation.aggregate(pipeline);
 
         const totalCitations = await this.Citation.countDocuments(filterObject);
