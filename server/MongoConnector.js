@@ -539,9 +539,6 @@ module.exports.MongoConnector = class MongoConnector {
             { $lookup: { from: 'comments', localField: 'comments', foreignField: '_id', as: 'comments' } },
             { $lookup: { from: 'users', localField: 'userID', foreignField: '_id', as: 'userID', pipeline: [{ $project: { preferences: 1, username: 1 } }] } },
             { $unwind: '$userID' },
-            { $skip: offset },
-            { $limit: limit },
-            { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
         ];
 
         try {
@@ -575,11 +572,16 @@ module.exports.MongoConnector = class MongoConnector {
         else if (key === 'likes') {
             sortObject.likes = sort[key] === 'asc' ? 1 : -1;
             delete sortObject.timestamp;
-            pipeline.unshift({ $addFields: { likeCount: { $size: '$likes' } } });
+            pipeline.append({ $addFields: { likeCount: { $size: '$likes' } } });
         }
 
-        if (sortObject != {}) pipeline.unshift({ $sort: sortObject });
-        pipeline.unshift({ $match: filterObject });
+        if (sortObject != {}) pipeline.append({ $sort: sortObject });
+        pipeline.append({ $match: filterObject });
+        pipeline = pipline.concat([
+            { $skip: offset },
+            { $limit: limit },
+            { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
+                       ]
 
         const citations = await this.Citation.aggregate(pipeline);
 
