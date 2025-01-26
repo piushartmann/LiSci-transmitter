@@ -216,6 +216,10 @@ a {
     padding-top: 5vh;
 }
 
+.modal-template {
+    display: none;
+}
+
 .modal-content {
     background-color: var(--post-background-color);
     margin: 5px auto;

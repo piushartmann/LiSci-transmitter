@@ -63,15 +63,6 @@ function loadDayView(day) {
 
 }
 
-let weekOffset = 0;
-let selectedLesson = null;
-function openCreateTask() {
-  selectedLesson = null;
-  openModal('', 'selectorModal');
-  weekOffset = 0;
-  fetchUntisTable();
-}
-
 function untisPreviousWeek() {
   weekOffset--;
   fetchUntisTable();
@@ -87,7 +78,16 @@ function thisWeek() {
   fetchUntisTable();
 }
 
-function fetchUntisTable() {
+function onLessonClick(lesson) {
+  selectedLesson = lesson.id;
+  hideModal('timeTableModal');
+  const modal = getModal('taskModal');
+  modal.querySelector('#selector_other').innerHTML = "Andere (" + lesson.name+")";
+
+}
+
+function fetchUntisTable(modal) {
+  if (!modal) modal = getModal('timeTableModal');
   fetch('/homework/internal/getTimetable', {
     method: 'POST',
     headers: {
@@ -95,23 +95,23 @@ function fetchUntisTable() {
     },
     body: JSON.stringify({ weekOffset: weekOffset })
   }).then(res => res.json()).then(timetable => {
-    buildUntisTable(timetable, document.querySelector('#modal .timetable'), untisClasses, onLessonClick);
+    buildUntisTable(timetable, modal.querySelector('.timetable'), untisClasses, onLessonClick);
   });
 }
 
-function onLessonClick(lesson) {
-  selectedLesson = lesson;
-  hideModal();
-  openModal('', 'taskModal');
-  addFileEventListerners();
+function showUntisModal(){
+  weekOffset = 0;
+  const modal = openModal('timeTableModal');
+  fetchUntisTable(modal);
+  return modal;
 }
 
-function addFileEventListerners() {
-  document.querySelectorAll('#modal #files .file_upload').forEach(file => {
+function addFileEventListerners(modal) {
+  modal.querySelectorAll('#files .file_upload').forEach(file => {
     file.onchange = (event) => {
       let newInput = document.createElement('input')
-      const index = Array.from(document.querySelectorAll('#modal #files .file_upload')).indexOf(file);
-      newInput = document.getElementById('files').appendChild(newInput);
+      const index = Array.from(modal.querySelectorAll('#files .file_upload')).indexOf(file);
+      newInput = modal.querySelector('#files').appendChild(newInput);
       newInput.id = 'file' + (index + 1);
       newInput.classList.add('online-only');
       newInput.classList.add('file_upload');
@@ -119,9 +119,61 @@ function addFileEventListerners() {
       newInput.name = 'file';
       newInput.accept = '*';
       newInput.multiple = true;
-      addFileEventListerners();
+      addFileEventListerners(modal);
     };
   });
+}
+
+let weekOffset = 0;
+let selectedLesson = null;
+function openCreateTask() {
+  selectedLesson = null;
+  const taskModal = openModal('taskModal');
+  addFileEventListerners(taskModal);
+  const classSelector = taskModal.querySelector('#classSelector');
+
+  function makeLessonContent(lesson) {
+    return `${lesson.subjects[0].element.longName} bei ${lesson.teachers[0].element.name}`;
+  }
+
+  fetch('/homework/internal/getCloseLessons').then(res => res.json()).then(data => {
+    classSelector.innerHTML = '';
+    data.beforeLessons.forEach(lesson => {
+      let option = document.createElement('option');
+      option.value = lesson.id;
+      option.innerHTML = makeLessonContent(lesson);
+      classSelector.appendChild(option);
+    });
+    if (data.currentLesson) {
+      let lesson = document.createElement('option');
+      lesson.value = data.currentLesson.id;
+      lesson.innerHTML = makeLessonContent(data.currentLesson);
+      lesson.selected = true;
+      classSelector.appendChild(lesson);
+    }
+    data.afterLessons.forEach(lesson => {
+      let option = document.createElement('option');
+      option.value = lesson.id;
+      option.innerHTML = makeLessonContent(lesson);
+      classSelector.appendChild(option);
+    });
+    let other = document.createElement('option');
+    other.id = 'selector_other';
+    other.value = 'other';
+    other.innerHTML = 'Andere';
+    classSelector.appendChild(other);
+    selectedLesson = Number(classSelector.value);
+  });
+
+  classSelector.onchange = () => {
+    if (classSelector.value == 'other') {
+      timeTableModal = showUntisModal();
+      taskModal.querySelector('#other_select_button').style.display = 'block';
+    }else{
+      taskModal.querySelector('#other_select_button').style.display = 'none';
+      selectedLesson = Number(classSelector.value);
+    }
+  };
 }
 
 async function submitTask() {
@@ -180,3 +232,5 @@ async function submitTask() {
 
 const today = displayCalender();
 loadDayView(today);
+
+openCreateTask();

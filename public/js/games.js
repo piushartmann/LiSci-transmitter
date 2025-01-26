@@ -4,7 +4,7 @@ let discoveredUsers = [];
 let discoverGame = null;
 
 function buildDiscoveryList() {
-    const playerConnections = document.querySelector('#modal .modal-content #playerConnections');
+    const playerConnections = getModal('multiplayerModal').querySelector('.modal-content #playerConnections');
     playerConnections.innerHTML = '';
     discoveredUsers.forEach(player => {
         const playerElement = buildButton("icons/games/connect.svg", player.username, () => {
@@ -111,8 +111,7 @@ function uninvitePlayer(game, player) {
 function discoverOtherPlayers(game) {
     console.log("Discovering other players");
 
-    const connectionModal = document.getElementById('multiplayerModal');
-    openModal(connectionModal);
+    openModal('multiplayerModal');
 
     buildDiscoveryList();
 

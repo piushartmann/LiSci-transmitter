@@ -58,10 +58,10 @@
       <img class="profilePicture" src="https://storage.liscitransmitter.live/<%= profilePic.content %>">
       <% } %>
 
-      <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('', 'profilePictureModal')">Pick Profile Picture</button>
+      <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('profilePictureModal')">Pick Profile Picture</button>
     </div>
 
-    <div class="modal" id="profilePictureModal">
+    <div class="modal-template" id="profilePictureModal">
       <h1 id="title" data-lang-content="settings pick_profile_picture_modal title">Pick Profile Picture</h1>
 
       <div class="pickPicture">

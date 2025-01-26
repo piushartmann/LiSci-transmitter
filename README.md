@@ -110,7 +110,7 @@ Important functions in the [base.js](./public/js/base.js) file:
 - `buildProfilePic(profilePic, username, short = false)`: Generates a profile picture element with the user's name and picture and returns the html element that can be added to the DOM.
 - `buildLikeButton(route, id, liked, likes)`: Creates a like button that can toggle between liked and unliked states.
 - `hideModal()`: Hides the active modal element.
-- `openModal(content, id = "modal")`: Opens a modal with the specified content. OR if content is "" it will open the modal with the id.
+- `openModal("modal ID")`: Opens a modal with the specified id.
 - `loadLanguage(update = false)`: Call this whenever you add some html with a language key to the DOM.
 - `updateCache(url, callbackType)`: Sends a message to the service worker to update the cache for the specified URL. Call this whenever you change Content that is also changed on the Server. e.g. when liking a post. callbackType can be `reloadSite` or `reloadContent`. When calling `reloadContent` you need to specify a `reloadContent` function in your client side JS. That reloads the server loaded Content. e.g: [index.js](./public/js/index.js#L14)
 - `toggleVisibility(id, setVis = null)`: Toggles the visibility of an element by its ID. Optionally, you can set the visibility to a specific value.

@@ -1,6 +1,5 @@
 function renderComments(post) {
-    const commentModal = document.getElementById('commentModal');
-    commentModal.style.display = 'block';
+    const commentModal = openModal('commentModal', true)
 
     const commentButton = document.getElementById('commentButton');
     commentButton.onclick = () => submitComment(post);
@@ -27,7 +26,7 @@ function renderComments(post) {
 }
 
 function hideComments() {
-    const commentModal = document.getElementById('commentModal');
+    const commentModal = hideModal('commentModal');
     const commentContainer = document.getElementById('commentContainer');
     commentContainer.innerHTML = '';
     commentModal.style.display = 'none';

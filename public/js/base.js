@@ -264,7 +264,7 @@ function makeDiscoverable() {
             case 'discover':
                 discoveredUsers = data.users;
                 if (typeof buildDiscoveryList === 'function') {
-                    if (document.getElementById('modal').style.display === 'block') {
+                    if (getModal('multiplayerModal')) {
                         buildDiscoveryList(data.users, data.game);
                     }
                 }
@@ -351,20 +351,81 @@ function addPWABar() {
     });
 }
 
-function hideModal() {
-    const modal = document.getElementById('modal');
-    modal.style.display = 'none';
+function hideModal(id) {
+    if (id) {
+        const modal = document.getElementById(id + "-modal");
+        if (modal) modal.style.display = 'none';
+    }
+    else {
+        const modals = Array.from(document.getElementsByClassName('modal'));
+        for (let i = 0; i < modals.length; i++) {
+            modals[i].style.display = 'none';
+        }
+    }
 }
 
-function openModal(content, id = "modal") {
-    if (content === "" || !content) content = document.getElementById(id);
-    const modal = document.getElementById('modal');
-    const modalContent = document.querySelector('#modal .modal-content');
-    if (typeof content === 'object') content = content.innerHTML;
-    modalContent.innerHTML = content;
+function buildModal(id) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
     modal.style.display = 'block';
+    modal.id = id + "-modal";
+
+    const modalClose = document.createElement('span');
+    modalClose.id = 'modalClose';
+    modalClose.className = 'close';
+    modalClose.title = 'Close Modal';
+    modalClose.textContent = '×';
+
+    const modalContent = document.createElement('form');
+    modalContent.className = 'modal-content animate';
+
+    let content = document.getElementById(id);
+    modalContent.innerHTML = content.innerHTML;
+
+    modal.appendChild(modalClose);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    window.addEventListener("click", (event) => {
+        if (event.target == modal) {
+            hideModal(id);
+        }
+    });
+
+    window.addEventListener("touchstart", (event) => {
+        if (event.target == modal) {
+            hideModal(id);
+        }
+    }, { passive: true });
+
+    modalClose.addEventListener("click", () => {
+        hideModal(id);
+    });
+
     return modal;
 }
+
+function openModal(id, clear = true) {
+    let modal;
+    if (clear && document.getElementById(id + "-modal")) {
+        document.getElementById(id + "-modal").remove();
+    }
+    
+    if (document.getElementById(id + "-modal")){
+        
+        modal = document.getElementById(id + "-modal").style.display = 'block';
+    }
+    else {
+        modal = buildModal(id);
+    }
+
+    return modal;
+}
+
+function getModal(id) {
+    return document.getElementById(id + "-modal");
+}
+
 /**
  * Call this whenever you add some html with a language key to the DOM.
  * @param {boolean} update - Whether to update the language file if it is already loaded. Should almost always be false.
@@ -383,12 +444,14 @@ function loadLanguage(update = false) {
     }
 }
 
+let languageFile = null;
 function fetchLanguageFile(language, redraw = false) {
     //console.log('Loading language file for ' + language);
-    const languageFile = `/languages/${language}.json`;
-    fetch(languageFile)
+    const languageURL = `/languages/${language}.json`;
+    fetch(languageURL)
         .then(response => response.json())
         .then(data => {
+            languageFile = data;
             if (redraw && (localStorage.getItem('languageFile') != JSON.stringify(data))) {
                 console.log('Language file changed. Redrawing');
                 applyLanguage(data, true);
@@ -420,7 +483,7 @@ function fetchLanguageFile(language, redraw = false) {
             }
         })
         .catch(error => {
-            console.log('Could not load requested language file ' + languageFile);
+            console.log('Could not load requested language file ' + languageURL);
             console.error(error);
             console.log("Loading default language file");
             if (language !== 'de') {
@@ -508,29 +571,6 @@ function resolveLanguageContent(key) {
 
 const isInStandaloneMode = () =>
     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
-
-function setupModal() {
-    var modal = document.getElementById('modal');
-
-    if (modal) {
-
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                hideModal();
-            }
-        }
-
-        window.ontouchstart = function (event) {
-            if (event.target == modal) {
-                hideModal();
-            }
-        }
-
-        document.getElementById("modalClose").addEventListener("click", () => {
-            hideModal();
-        });
-    }
-}
 
 function utf8ToBase64(str) {
     const utf8Bytes = new TextEncoder().encode(str);
@@ -631,7 +671,7 @@ function checkOnline() {
 console.time('Base JS load time');
 let envVariables;
 document.addEventListener('DOMContentLoaded', async () => {
-    envVariables = Object.fromEntries(performance.getEntriesByType("navigation")?.[0]?.serverTiming?.map?.(({name, description}) => ([name, description])) ?? [])
+    envVariables = Object.fromEntries(performance.getEntriesByType("navigation")?.[0]?.serverTiming?.map?.(({ name, description }) => ([name, description])) ?? [])
     checkOnline();
     checkVersion();
     loadLanguage();
@@ -641,8 +681,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (loggedIn) makeDiscoverable();
     registerServiceWorker();
-
-    setupModal();
 
     //iosPWASplash('/images/splashScreen.png', '#ffffff');
     console.timeEnd('Base JS load time');
@@ -664,7 +702,7 @@ function toggleVisibility(id, setVis = null) {
 }
 
 function textAreaOnInput(textarea, multiline = false) {
-    if(!multiline) textarea.value = textarea.value.replace(/[\n]/g, "");
+    if (!multiline) textarea.value = textarea.value.replace(/[\n]/g, "");
     textarea.style.height = "";
     textarea.style.height = textarea.scrollHeight + "px";
 }

@@ -31,21 +31,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const newsPushCheckbox = document.getElementById('newsPushCheckbox');
-    newsPushCheckbox.addEventListener('change', () => {
-        changePushPreference('newsNotifications', newsPushCheckbox.checked);
-    });
-    const postsPushCheckbox = document.getElementById('postsPushCheckbox');
-    postsPushCheckbox.addEventListener('change', () => {
-        changePushPreference('postNotifications', postsPushCheckbox.checked);
-    });
-    const citationPushCheckbox = document.getElementById('citationsPushCheckbox');
-    citationPushCheckbox.addEventListener('change', () => {
-        changePushPreference('citationNotifications', citationPushCheckbox.checked);
-    });
-    const commentPushCheckbox = document.getElementById('commentsPushCheckbox');
-    commentPushCheckbox.addEventListener('change', () => {
-        changePushPreference('commentNotifications', commentPushCheckbox.checked);
-    });
+    if (newsPushCheckbox) {
+        newsPushCheckbox.addEventListener('change', () => {
+            changePushPreference('newsNotifications', newsPushCheckbox.checked);
+        });
+        const postsPushCheckbox = document.getElementById('postsPushCheckbox');
+        postsPushCheckbox.addEventListener('change', () => {
+            changePushPreference('postNotifications', postsPushCheckbox.checked);
+        });
+        const citationPushCheckbox = document.getElementById('citationsPushCheckbox');
+        citationPushCheckbox.addEventListener('change', () => {
+            changePushPreference('citationNotifications', citationPushCheckbox.checked);
+        });
+        const commentPushCheckbox = document.getElementById('commentsPushCheckbox');
+        commentPushCheckbox.addEventListener('change', () => {
+            changePushPreference('commentNotifications', commentPushCheckbox.checked);
+        });
+    }
 
     const languageSelect = document.getElementById('language');
     languageSelect.addEventListener('change', async () => {

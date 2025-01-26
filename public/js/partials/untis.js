@@ -1,3 +1,17 @@
+/**
+ * Builds a timetable table and appends it to the provided table element.
+ *
+ * @param {Array} timetable - An array of lesson objects, each containing details about the lesson.
+ * @param {HTMLElement} tableElement - The HTML element where the timetable will be appended.
+ * @param {Array} filter - An array of subject names to filter the lessons by.
+ * @param {Function} onClickCallback - A callback function to be called when a lesson is clicked.
+ * @param {Object} onClickCallback.lesson - The lesson object passed to the callback function.
+ * @param {string} onClickCallback.lesson.id - The ID of the lesson.
+ * @param {string} onClickCallback.lesson.name - The name of the lesson or event.
+ * @param {string} onClickCallback.lesson.room - The room where the lesson takes place.
+ * @param {string} onClickCallback.lesson.teacher - The name of the teacher for the lesson.
+ * @param {string} onClickCallback.lesson.time - The time when the lesson starts.
+ */
 function buildUntisTable(timetable, tableElement, filter, onClickCallback) {
   const dates = [...new Set(timetable.map(lesson => lesson.start.split('T')[0]))];
   tableElement.innerHTML = '';
@@ -69,13 +83,15 @@ function buildUntisTable(timetable, tableElement, filter, onClickCallback) {
 
         lessonElement.appendChild(lessonData);
 
-        timeElement.addEventListener('click', () => onClickCallback({
-          id: lesson.id,
-          name: lesson.subjects.length > 0 ? lesson.subjects[0].element.longName : lesson.lessonText,
-          room: lesson.rooms.length > 0 ? lesson.rooms[0].element.displayname : '',
-          teacher: lesson.teachers.length > 0 ? lesson.teachers[0].element.name : '',
-          time: time
-        }));
+        if (onClickCallback) {
+          timeElement.addEventListener('click', () => onClickCallback({
+            id: lesson.id,
+            name: lesson.subjects.length > 0 ? lesson.subjects[0].element.longName : lesson.lessonText,
+            room: lesson.rooms.length > 0 ? lesson.rooms[0].element.displayname : '',
+            teacher: lesson.teachers.length > 0 ? lesson.teachers[0].element.name : '',
+            time: time
+          }));
+        }
         timeElement.appendChild(lessonElement);
       });
     });

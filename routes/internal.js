@@ -61,7 +61,6 @@ module.exports = (db, s3Client) => {
     router.use('/', require('./internal/uploads')(db, s3Client));
     router.use('/', require('./internal/users')(db));
     router.use('/settings', require('./internal/settings')(db));
-    router.use('/hw', require('./internal/homework')(db));
     router.use('/statistics', require('./internal/statistics')(db));
 
     return router;

@@ -32,6 +32,9 @@
     "untis": {
         "schoolID": "hh5810",
         "url": "ikarus.webuntis.com",
-        "className": "12.3"
+        "className": "12.3",
+        "cacheTime": 300000,
+        "cacheLookAhead": 3,
+        "cacheLookBack": 1
     }
 }

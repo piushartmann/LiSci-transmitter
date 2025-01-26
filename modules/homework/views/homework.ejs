@@ -58,16 +58,26 @@
     <div class="taskElement">test elem</div>
   </div>
 
-  <div class="modal" id="selectorModal">
+  <div class="modal-template" id="timeTableModal">
     <button type="button" onclick="untisPreviousWeek()"><</button>
-    <button type="button" onclick="untisNextWeek()">></button>
-    <button type="button" onclick="thisWeek()">Today</button>
-    <h1>Wähle die Stunde aus</h1>
-    <div class="timetable"></div>
+        <button type="button" onclick="untisNextWeek()">></button>
+        <button type="button" onclick="thisWeek()">Today</button>
+        <h1>Wähle die Stunde aus</h1>
+        <div class="timetable"></div>
   </div>
 
-  <div class="modal" id="taskModal">
+  <div class="modal-template" id="taskModal">
     <h1>Neue Aufgabe eintragen</h1>
+    <select id="classSelector" class="online-only" required>
+      <option selected="selected">Loading...</option>
+    </select>
+    <button id="other_select_button" class="hidden" type="button" onclick="showUntisModal()">select</button>
+    <select id="untilSelector" class="online-only" required>
+      <option>Heute</option>
+      <option selected="selected">Nächste Stunde</option>
+      <option>Übernächste Stunde</option>
+      <option>Custom</option>
+    </select>
     <textarea type="text" name="title" id="title" class="online-only" placeholder="Überschrift" oninput="textAreaOnInput(this)" required></textarea>
     <textarea type="text" name="content" id="content" class="online-only" placeholder="Aufgabenbeschreibung" oninput="textAreaOnInput(this, true)" required></textarea>
     <div id="files">
