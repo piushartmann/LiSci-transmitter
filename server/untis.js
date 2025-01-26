@@ -1,5 +1,7 @@
 const { WebUntisAnonymousAuth, WebUntisElementType, WebUntisLoginFromSessionId, WebUntis } = require('webuntis');
 const config = require('../config.json');
+const fs = require('fs');
+const path = require('path');
 
 
 async function getTimetable(weekOffset) {
@@ -45,29 +47,8 @@ async function getPersonalTimetable(weekOffset, JSESSIONID) {
     console.log(timetable);
 }
 
-async function attachmentStorageUrl(messageId, username, password) {
-    const untis = new WebUntis("hh5810", "Pius.Hartmann", "Asg.9344", "ikarus.webuntis.com");
-    await untis.login();
-    const JSESSIONID = untis.sessionInformation.sessionId;
-    console.log(JSESSIONID);
-    const url = `https://storage.webuntis.com/untis-sts-prod/2272700/28a01719-e079-461e-9e1e-3d633c3c87d8?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250121T170003Z&X-Amz-SignedHeaders=host%3Bx-amz-server-side-encryption-customer-algorithm%3Bx-amz-server-side-encryption-customer-key%3Bx-amz-server-side-encryption-customer-key-md5&X-Amz-Credential=X17QCZ27OUXDS5TWGSK7%2F20250121%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=5ba3ad49882e11ced9fb06c35451ce7d0c3367e12aa16083640676a1174de0c7`
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            //'Cookie': `JSESSIONID=${JSESSIONID}`,
-            'x-amz-server-side-encryption-customer-algorithm': 'AES256',
-            'x-amz-server-side-encryption-customer-key': 'hxiZuLjx5fCgQbZqSjChqnyfioZdE82Lv1rpSsEhi10=',
-            'x-amz-server-side-encryption-customer-key-md5': 'AuLSh50OwceseFmNCdtZHQ=='
-        }
-    });
-    const json = await response.json();
-    return json;
-
-}
-
 
 module.exports = {
     getTimetable,
-    getPersonalTimetable,
-    attachmentStorageUrl
+    getPersonalTimetable
 }

