@@ -79,11 +79,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //use db to store session
 app.use(session({
     secret: 'transmitter secret',
-    httpOnly: true,
+    httpOnly: false,
     cookie: {
         maxAge: oneDay * 30,
         sameSite: true,
-        secure: true
+        secure: false
     },
     secure: true,
     resave: false,
