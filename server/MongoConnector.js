@@ -102,6 +102,10 @@ const homeworkSchema = new Schema({
         lessonStart: { type: Date, required: true },
         teacher: { type: String, required: true },
     },
+    until: {
+        untilID: { type: Number, required: true },
+        untilStart: { type: Date, required: true },
+    },
     title: { type: String, required: true },
     content: { type: String, required: true },
     files: [{ type: ObjectId, ref: 'File', required: false }],
@@ -592,8 +596,8 @@ module.exports.MongoConnector = class MongoConnector {
             { $skip: offset },
             { $limit: limit },
             { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
-                       ]);
-        
+        ]);
+
         const citations = await this.Citation.aggregate(pipeline);
 
         const totalCitations = await this.Citation.countDocuments(filterObject);
@@ -1029,7 +1033,7 @@ module.exports.MongoConnector = class MongoConnector {
         }));
     }
 
-    async createHomework(userID, lesson, content, title, files) {
+    async createHomework(userID, lesson, untilLesson, content, title, files) {
         const lessonID = lesson.id;
         const start = lesson.start;
         const longname = lesson.subjects[0].element.longName;
@@ -1041,11 +1045,37 @@ module.exports.MongoConnector = class MongoConnector {
             longName: longname,
             shortName: name,
             lessonStart: start,
-            teacher: teacher
+            teacher: teacher,
         }
 
-        const homework = new this.Homework({ userID, lesson: lessonElement, title, content, files });
+        const untilID = untilLesson.id;
+        const untilStart = untilLesson.start;
+        const untilElement = {
+            untilID,
+            untilStart,
+
+        }
+
+        const homework = new this.Homework({ userID, lesson: lessonElement, until: untilElement, title, content, files });
         await homework.save();
         return homework;
+    }
+
+    async getHomeworkForDay(date) {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date);
+        end.setHours(23, 59, 59, 999);
+
+        return await this.Homework.find({
+            'until.untilStart': {
+                $gte: start,
+                $lte: end
+            }
+        });
+    }
+
+    async getHomeworks(){
+        return await this.Homework.find();
     }
 };

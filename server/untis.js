@@ -34,7 +34,6 @@ async function fetchTimetable() {
             try {
                 const date = new Date(new Date().getTime() + (1000 * 60 * 60 * 24 * 7 * i));
                 const lessons = await untis.getTimetableForWeek(date, classId, WebUntisElementType.CLASS, formatId = 1);
-                console.log(date.toISOString());
                 timetable = timetable.concat(lessons);
             } catch (error) {
             }

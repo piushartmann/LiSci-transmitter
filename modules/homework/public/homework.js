@@ -95,7 +95,6 @@ function showUntisModal() {
   weekOffset = 0;
   const modal = openModal('timeTableModal');
   displayTimetable(modal);
-  console.trace();
   return modal;
 }
 
@@ -193,9 +192,9 @@ function appendOption(until, text, offset, selected = false) {
     const option = document.createElement('option')
     const date = new Date();
     let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      if (languageFile && languageFile.days) {
-        days = Object.values(languageFile.days);
-      }
+    if (languageFile && languageFile.days) {
+      days = Object.values(languageFile.days);
+    }
     option.appendChild(document.createTextNode(`${text} (${days[date.getDay()]} ${date.getDate()}.${(date.getMonth() + 1)})`));
     option.value = selectedLesson;
     option.selected = selected;
@@ -272,11 +271,12 @@ async function submitTask() {
 
   console.log(uploadedFiles);
 
+  const modal = getModal('taskModal');
   let data = {};
-  data.lesson = selectedLesson.id;
-  data.weekOffset = weekOffset;
-  data.title = document.querySelector('#modal #title').value;
-  data.content = document.querySelector('#modal #content').value;
+  data.lesson = Number(selectedLesson);
+  data.until = Number(modal.querySelector('#untilSelector').value);
+  data.title = modal.querySelector('#title').value;
+  data.content = modal.querySelector('#content').value;
   data.files = uploadedFiles;
 
   fetch('/homework/internal/createTask', {
@@ -298,8 +298,11 @@ async function submitTask() {
   });
 }
 
+function fetchHomeworks() {
+  fetch('/homework/internal/getHomeworks').then(res => res.json()).then(homeworks => {
+    console.log(homeworks);
+  });
+}
 
 const today = displayCalender();
 loadDayView(today);
-
-openCreateTask();

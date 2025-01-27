@@ -71,8 +71,8 @@ module.exports = (db) => {
     });
 
     router.post('/internal/createTask', async (req, res) => {
-        const { lesson, weekOffset, title, content, files } = req.body;
-        if (typeof lesson !== "number" || typeof title !== "string" || typeof content !== "string" || typeof weekOffset !== "number") return res.status(400).send("Invalid parameters");
+        const { lesson, until, title, content, files } = req.body;
+        if (typeof lesson !== "number" || typeof title !== "string" || typeof content !== "string" || typeof until !== "number") return res.status(400).send("Invalid parameters");
 
         if (typeof files !== "object") return res.status(400).send("files must be a list");
         files.forEach(file => {
@@ -80,14 +80,22 @@ module.exports = (db) => {
             if (!file.startsWith("https://liscitransmitter.live")) return res.status(400).send("files must originate from this server");
         });
 
-        const timetable = await untis.getTimetable(weekOffset);
-        const selectedLesson = timetable.find(l => l.id === Number(lesson));
+        const timetable = await untis.getTimetable(0, "all");
+        const selectedLesson = timetable.find(l => l.id === lesson);
         if (!selectedLesson) return res.status(400).send("Invalid lesson");
 
-        const homework = await db.createHomework(req.session.userID, selectedLesson, content, title, files);
+        const untilLesson = timetable.find(l => l.id === until);
+        if (!untilLesson) return res.status(400).send("Invalid until lesson");
+
+        const homework = await db.createHomework(req.session.userID, selectedLesson, untilLesson, content, title, files);
         if (!homework) return res.status(500).send("Internal server error");
         return res.status(200).send("Success");
     });
+
+    router.get('/internal/getHomeworks', async (req, res) => {
+        const homeworks = await db.getHomeworks();
+        return res.json(homeworks);
+    })
 
     return router;
 };
