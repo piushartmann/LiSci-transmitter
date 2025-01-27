@@ -1,3 +1,16 @@
+function showUntisTimetable(table, weekOffset = 0, onLessonClick = () => { }) {
+  fetch('/homework/internal/getTimetable', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ weekOffset: weekOffset })
+  }).then(res => res.json()).then(timetableData => {
+    buildUntisTable(timetableData, table, untisClasses, onLessonClick);
+  });
+}
+
+
 /**
  * Builds a timetable table and appends it to the provided table element.
  *

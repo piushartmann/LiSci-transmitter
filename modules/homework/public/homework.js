@@ -65,17 +65,17 @@ function loadDayView(day) {
 
 function untisPreviousWeek() {
   weekOffset--;
-  fetchUntisTable();
+  displayTimetable();
 }
 
 function untisNextWeek() {
   weekOffset++;
-  fetchUntisTable();
+  displayTimetable();
 }
 
 function thisWeek() {
   weekOffset = 0;
-  fetchUntisTable();
+  displayTimetable();
 }
 
 function onLessonClick(lesson) {
@@ -86,23 +86,15 @@ function onLessonClick(lesson) {
   onClassSelect(modal.querySelector('#classSelector'), modal, true);
 }
 
-function fetchUntisTable(modal) {
-  if (!modal) modal = getModal('timeTableModal');
-  fetch('/homework/internal/getTimetable', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ weekOffset: weekOffset })
-  }).then(res => res.json()).then(timetable => {
-    buildUntisTable(timetable, modal.querySelector('.timetable'), untisClasses, onLessonClick);
-  });
+function displayTimetable() {
+  const modal = getModal('timeTableModal');
+  showUntisTimetable(modal.querySelector('.timetable'), weekOffset, onLessonClick);
 }
 
 function showUntisModal() {
   weekOffset = 0;
   const modal = openModal('timeTableModal');
-  fetchUntisTable(modal);
+  displayTimetable(modal);
   console.trace();
   return modal;
 }
