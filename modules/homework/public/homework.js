@@ -82,8 +82,8 @@ function onLessonClick(lesson) {
   selectedLesson = lesson.id;
   hideModal('timeTableModal');
   const modal = getModal('taskModal');
-  modal.querySelector('#selector_other').innerHTML = "Andere (" + lesson.name+")";
-
+  modal.querySelector('#selector_other').innerHTML = "Andere (" + lesson.name + ")";
+  onClassSelect(modal.querySelector('#classSelector'), modal, true);
 }
 
 function fetchUntisTable(modal) {
@@ -99,10 +99,11 @@ function fetchUntisTable(modal) {
   });
 }
 
-function showUntisModal(){
+function showUntisModal() {
   weekOffset = 0;
   const modal = openModal('timeTableModal');
   fetchUntisTable(modal);
+  console.trace();
   return modal;
 }
 
@@ -162,18 +163,94 @@ function openCreateTask() {
     other.value = 'other';
     other.innerHTML = 'Andere';
     classSelector.appendChild(other);
-    selectedLesson = Number(classSelector.value);
+    onClassSelect(classSelector, taskModal, true);
   });
 
   classSelector.onchange = () => {
-    if (classSelector.value == 'other') {
-      timeTableModal = showUntisModal();
-      taskModal.querySelector('#other_select_button').style.display = 'block';
-    }else{
-      taskModal.querySelector('#other_select_button').style.display = 'none';
-      selectedLesson = Number(classSelector.value);
-    }
+    onClassSelect(classSelector, taskModal);
   };
+}
+
+function onClassSelect(classSelector, taskModal, first = false) {
+
+  if (classSelector.value == 'other') {
+    taskModal.querySelector('#other_select_button').style.display = 'block';
+  }
+  else {
+    taskModal.querySelector('#other_select_button').style.display = 'none';
+    selectedLesson = Number(classSelector.value);
+  }
+
+
+  if (selectedLesson == null) {
+    if (!first) timeTableModal = showUntisModal();
+  } else {
+    const until = taskModal.querySelector('#untilSelector');
+    until.innerHTML = '';
+    appendOption(until, 'Am selben Tag', 0);
+    appendOption(until, 'Nächsten Sitzung', 1, true);
+    appendOption(until, 'Übernächste Sitzung', 2);
+    until.disabled = false;
+  }
+}
+
+function appendOption(until, text, offset, selected = false) {
+  if (offset < 0) return;
+
+  if (offset == 0) {
+    const option = document.createElement('option')
+    const date = new Date();
+    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      if (languageFile && languageFile.days) {
+        days = Object.values(languageFile.days);
+      }
+    option.appendChild(document.createTextNode(`${text} (${days[date.getDay()]} ${date.getDate()}.${(date.getMonth() + 1)})`));
+    option.value = selectedLesson;
+    option.selected = selected;
+    until.appendChild(option);
+    return;
+  }
+
+  fetch('/homework/internal/getNextLesson', {
+    body: JSON.stringify({
+      id: selectedLesson,
+      offset: offset - 1
+    }),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(res => res.json()).then(lesson => {
+    if (lesson) {
+      const option = document.createElement('option')
+      const date = new Date(lesson.start);
+      let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      if (languageFile && languageFile.days) {
+        days = Object.values(languageFile.days);
+      }
+      option.appendChild(document.createTextNode(`${text} (${days[date.getDay()]} ${date.getDate()}.${(date.getMonth() + 1)})`));
+      option.value = lesson.id;
+      option.selected = selected;
+      until.appendChild(option);
+    }
+  });
+}
+
+async function populateNextLesson(offset) {
+  if (!selectedLesson) {
+    return;
+  }
+  const res = await fetch('/homework/internal/getNextLesson', {
+    body: JSON.stringify({
+      id: selectedLesson,
+      offset: offset
+    }),
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }).then(res => res.json())
+  return res;
 }
 
 async function submitTask() {

@@ -57,12 +57,17 @@ module.exports = (db) => {
 
     router.post('/internal/getNextLesson', async (req, res) => {
         const id = req.body.id;
-        if (typeof id !== "number") return res.status(400).send("Invalid parameters");
+        const offset = req.body.offset || 0;
+        if (typeof id !== "number" || typeof offset !== "number") return res.status(400).send("Invalid parameters");
         const timetable = await untis.getTimetable(0, "all");
         const selectedLesson = timetable.find(l => l.id === id);
         if (!selectedLesson) return res.status(400).send("Invalid lesson");
-        const nextLesson = timetable.find(l => l.subjects[0].element.displayname === selectedLesson.subjects[0].element.displayname && l.start.getTime() > selectedLesson.end.getTime());
-        return res.json(nextLesson);
+        const nextLesson = timetable.filter(l => {
+            if (!(l.subjects && l.subjects[0])) return false;
+            return l.subjects[0].element.displayname === selectedLesson.subjects[0].element.displayname && l.start.getTime() > selectedLesson.end.getTime();
+        });
+        const uniqueLessons = [...new Set(nextLesson.map(l => l.start.getDate()))].map(date => nextLesson.find(l => l.start.getDate() === date));
+        return res.json(uniqueLessons[offset]);
     });
 
     router.post('/internal/createTask', async (req, res) => {

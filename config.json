@@ -33,7 +33,7 @@
         "schoolID": "hh5810",
         "url": "ikarus.webuntis.com",
         "className": "12.3",
-        "cacheTime": 300000,
+        "cacheTime": 1800000,
         "cacheLookAhead": 3,
         "cacheLookBack": 1
     }

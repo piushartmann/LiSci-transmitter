@@ -72,11 +72,8 @@
       <option selected="selected">Loading...</option>
     </select>
     <button id="other_select_button" class="hidden" type="button" onclick="showUntisModal()">select</button>
-    <select id="untilSelector" class="online-only" required>
-      <option>Heute</option>
-      <option selected="selected">Nächste Stunde</option>
-      <option>Übernächste Stunde</option>
-      <option>Custom</option>
+    <select id="untilSelector" class="online-only" required disabled>
+      <option>Please select a Subject</option>
     </select>
     <textarea type="text" name="title" id="title" class="online-only" placeholder="Überschrift" oninput="textAreaOnInput(this)" required></textarea>
     <textarea type="text" name="content" id="content" class="online-only" placeholder="Aufgabenbeschreibung" oninput="textAreaOnInput(this, true)" required></textarea>
