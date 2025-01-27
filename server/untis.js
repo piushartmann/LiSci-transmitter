@@ -40,7 +40,7 @@ async function fetchTimetable() {
             }
         }
 
-        fs.writeFileSync(path.join(__dirname, 'timetable.json'), JSON.stringify(timetable, null, 2));
+        //fs.writeFileSync(path.join(__dirname, 'timetable.json'), JSON.stringify(timetable, null, 2));
         timetable.forEach(lesson => {
             const date = lesson.date.toString();
             let startTime = lesson.startTime.toString();
