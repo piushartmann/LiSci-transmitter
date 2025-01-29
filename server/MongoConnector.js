@@ -613,6 +613,7 @@ module.exports.MongoConnector = class MongoConnector {
         if (!object) {
             return null;
         }
+        console.log(object);
         function generateRandomProfilePic() {
             return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
         }
@@ -620,12 +621,15 @@ module.exports.MongoConnector = class MongoConnector {
             const profilePicPreference = object.userID.preferences.find(pref => pref.key === 'profilePic');
             if (profilePicPreference) {
                 object.userID.profilePic = profilePicPreference.value;
+                delete object.userID.preferences;
+
                 return object;
             }
         }
         object.userID.profilePic = generateRandomProfilePic();
         this.setPreference(object.userID._id, 'profilePic', object.userID.profilePic);
 
+        delete object.userID.preferences;
         return object;
     }
 
@@ -1075,7 +1079,20 @@ module.exports.MongoConnector = class MongoConnector {
         });
     }
 
-    async getHomeworks(){
-        return await this.Homework.find();
+    async getHomeworks() {
+        let homework = await this.Homework.find().populate({
+            path: 'userID',
+            select: 'username',
+            populate: {
+                path: 'preferences',
+                match: { key: 'profilePic' },
+                select: 'value'
+            }
+        })
+
+        homework = homework.map(hw => {
+            return this.restructureUser(hw);
+        });
+        return homework;
     }
 };

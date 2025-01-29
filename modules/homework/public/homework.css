@@ -9,6 +9,7 @@
 }
 
 .calendar .day {
+    position: relative;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 15px;
@@ -16,6 +17,18 @@
     cursor: pointer;
     background-color: #f9f9f9;
     transition: filter 0.3s;
+}
+
+.dayTaskCount {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    border-radius: 100%;
+    aspect-ratio: 1/1;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
 }
 
 .calendar .day-weekend {
@@ -144,7 +157,7 @@
     overflow: hidden;
 }
 
-.taskElement .headder {
+.taskElement .header {
     display: flex;
 }
 

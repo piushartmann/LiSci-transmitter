@@ -13,6 +13,14 @@ function displayCalender() {
     const day = new Date();
     day.setDate(today.getDate() - todayWeekdayIndex + i);
 
+    let taskCount = 0;
+    homeworks.forEach(homework => {
+      const until = new Date(homework.until.untilStart);
+      if (until.toDateString() == day.toDateString()) {
+        taskCount++;
+      }
+    });
+
     const dayElement = document.createElement('div');
     dayElement.classList.add('day');
 
@@ -30,6 +38,13 @@ function displayCalender() {
           <div class="day-header">${day.toLocaleDateString('de', { weekday: 'short' })}</div>
           <div class="day-number">${day.toLocaleDateString('de', { month: 'short', day: 'numeric' })}</div>
       `;
+
+    if (taskCount > 0) {
+      const taskCountElement = document.createElement('div');
+      taskCountElement.classList.add('dayTaskCount');
+      taskCountElement.innerHTML = taskCount;
+      dayElement.appendChild(taskCountElement);
+    }
 
     dayElement.onclick = () => loadDayView(day);
 
@@ -60,6 +75,19 @@ function loadDayView(day) {
   if (count < -1) {
     dayCount.innerHTML = `(vor ${count * -1} Tagen)`
   }
+
+  const taskView = document.getElementById('taskView');
+  taskView.innerHTML = '';
+  let taskCount = 0;
+  homeworks.forEach(homework => {
+    if (new Date(homework.until.untilStart).getDate() == day.getDate()) {
+      taskView.appendChild(buildTaskElement(homework));
+      taskCount++;
+    }
+  })
+
+  const dayTaskCount = document.getElementById('dayTaskCount');
+  dayTaskCount.innerHTML = taskCount;
 
 }
 
@@ -298,11 +326,52 @@ async function submitTask() {
   });
 }
 
-function fetchHomeworks() {
-  fetch('/homework/internal/getHomeworks').then(res => res.json()).then(homeworks => {
-    console.log(homeworks);
+let homeworks = [];
+async function fetchHomeworks() {
+  await fetch('/homework/internal/getHomeworks').then(res => res.json()).then(data => {
+    console.log(data);
+    homeworks = data;
+    const taskView = document.getElementById('taskView');
+    homeworks.forEach(homework => {
+      if (new Date(homework.until.untilStart).getDate() == new Date().getDate()) {
+        taskView.appendChild(buildTaskElement(homework));
+      }
+    })
   });
 }
 
-const today = displayCalender();
-loadDayView(today);
+function buildTaskElement(task) {
+  const taskElement = document.createElement('div');
+  taskElement.classList.add('taskElement');
+
+  const taskHeader = document.createElement('div');
+  taskHeader.classList.add('header');
+
+  const headerSubject = document.createElement('p');
+  headerSubject.classList.add('subject');
+  headerSubject.innerHTML = task.lesson.longName;
+
+  const headerTeacher = document.createElement('p');
+  headerTeacher.classList.add('teacher');
+  headerTeacher.innerHTML = task.lesson.teacher;
+
+  taskHeader.appendChild(headerSubject);
+  taskHeader.appendChild(headerTeacher);
+
+  taskElement.appendChild(taskHeader);
+
+  taskElement.appendChild(document.createElement('hr'));
+
+  const taskContent = document.createElement('div');
+  taskContent.classList.add('content');
+  taskContent.innerHTML = task.content;
+
+  taskElement.appendChild(taskContent);
+
+  return taskElement;
+}
+
+fetchHomeworks().then(() => {
+  const today = displayCalender();
+  loadDayView(today);
+})
