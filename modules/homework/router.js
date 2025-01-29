@@ -71,8 +71,8 @@ module.exports = (db) => {
     });
 
     router.post('/internal/createTask', async (req, res) => {
-        const { lesson, until, title, content, files } = req.body;
-        if (typeof lesson !== "number" || typeof title !== "string" || typeof content !== "string" || typeof until !== "number") return res.status(400).send("Invalid parameters");
+        const { lesson, until, content, files } = req.body;
+        if (typeof lesson !== "number" || typeof content !== "string" || typeof until !== "number") return res.status(400).send("Invalid parameters");
 
         if (typeof files !== "object") return res.status(400).send("files must be a list");
         files.forEach(file => {
@@ -87,7 +87,7 @@ module.exports = (db) => {
         const untilLesson = timetable.find(l => l.id === until);
         if (!untilLesson) return res.status(400).send("Invalid until lesson");
 
-        const homework = await db.createHomework(req.session.userID, selectedLesson, untilLesson, content, title, files);
+        const homework = await db.createHomework(req.session.userID, selectedLesson, untilLesson, content, files);
         if (!homework) return res.status(500).send("Internal server error");
         return res.status(200).send("Success");
     });

@@ -645,11 +645,6 @@ function checkVersion() {
 }
 
 function checkOnline() {
-    //dont go offline when testing on localhost
-    if (window.location.hostname == "localhost") {
-        return;
-    }
-
     if (navigator.onLine) {
         document.body.classList.remove('offline');
     } else {

@@ -159,10 +159,12 @@
 
 .taskElement .header {
     display: flex;
+    height: 30px
 }
 
 .taskElement .subject,
-.taskElement .teacher {
+.taskElement .teacher,
+.taskElement .title {
     font-size: 1.2em;
     font-weight: bold;
     justify-content: right;
@@ -191,6 +193,13 @@
     flex-direction: column;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.author-info {
+    position: absolute;
+    margin: 0;
+    top: 0px;
+    right: 0px;
 }
 
 @media (max-width: 768px) {

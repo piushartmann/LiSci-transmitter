@@ -56,9 +56,10 @@ async function fetchTimetable() {
         untis.logout();
 
         timetableCache = timetable;
+        return;
     } catch (error) {
-        console.error(error);
-        return [];
+        console.error(error.message);
+        return;
     }
 }
 
@@ -74,7 +75,11 @@ Date.prototype.getWeek = function () {
 
 async function getTimetable(offset, timeSpan = "week") {
     if (!timetableCache) {
-        await fetchTimetable();
+        await fetchTimetable()
+        if (!timetableCache){
+            console.error("Error while fetching timetable")
+            return [];
+        }
     }
     const now = Date.now();
     //const now = new Date("2025-01-22T09:00:00.000Z").getTime();

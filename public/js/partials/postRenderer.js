@@ -108,7 +108,7 @@ function buildFooter(post) {
             }
             window.location.reload();
         }, "interaction delete",
-    "");
+            "");
         deleteButton.classList.add("online-only");
 
         buttonRow.appendChild(deleteButton);

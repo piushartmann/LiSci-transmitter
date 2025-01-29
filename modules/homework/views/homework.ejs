@@ -20,7 +20,7 @@
   <%- include('./partials/base.ejs') %>
 
 
-  <button type="button" id="taskSubmit" onclick="openCreateTask()">Create Task</button>
+  <button type="button" class="online-only" id="taskSubmit" onclick="openCreateTask()">Create Task</button>
 
   <div class="calendar" id="calendar">
     <!-- Calendar days will be dynamically generated -->
@@ -75,7 +75,6 @@
     <select id="untilSelector" class="online-only" required disabled>
       <option>Please select a Subject</option>
     </select>
-    <textarea type="text" name="title" id="title" class="online-only" placeholder="Überschrift" oninput="textAreaOnInput(this)" required></textarea>
     <textarea type="text" name="content" id="content" class="online-only" placeholder="Aufgabenbeschreibung" oninput="textAreaOnInput(this, true)" required></textarea>
     <div id="files">
       <input id="file0" class="online-only file_upload" type="file" name="file" accept="*" multiple="">

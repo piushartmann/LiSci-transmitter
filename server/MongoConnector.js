@@ -106,7 +106,6 @@ const homeworkSchema = new Schema({
         untilID: { type: Number, required: true },
         untilStart: { type: Date, required: true },
     },
-    title: { type: String, required: true },
     content: { type: String, required: true },
     files: [{ type: ObjectId, ref: 'File', required: false }],
     timestamp: { type: Date, default: Date.now }
@@ -1046,7 +1045,7 @@ module.exports.MongoConnector = class MongoConnector {
         }));
     }
 
-    async createHomework(userID, lesson, untilLesson, content, title, files) {
+    async createHomework(userID, lesson, untilLesson, content, files) {
         const lessonID = lesson.id;
         const start = lesson.start;
         const longname = lesson.subjects[0].element.longName;
@@ -1069,7 +1068,7 @@ module.exports.MongoConnector = class MongoConnector {
 
         }
 
-        const homework = new this.Homework({ userID, lesson: lessonElement, until: untilElement, title, content, files });
+        const homework = new this.Homework({ userID, lesson: lessonElement, until: untilElement, content, files });
         await homework.save();
         return homework;
     }

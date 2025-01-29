@@ -85,6 +85,7 @@ function loadDayView(day) {
       taskCount++;
     }
   })
+  loadLanguage(true);
 
   const dayTaskCount = document.getElementById('dayTaskCount');
   dayTaskCount.innerHTML = taskCount;
@@ -293,6 +294,7 @@ async function submitTask() {
       if (res.ok) {
         const data = await res.text();
         uploadedFiles.push(data);
+        window.navigation.reload();
       }
     }
   }
@@ -303,7 +305,6 @@ async function submitTask() {
   let data = {};
   data.lesson = Number(selectedLesson);
   data.until = Number(modal.querySelector('#untilSelector').value);
-  data.title = modal.querySelector('#title').value;
   data.content = modal.querySelector('#content').value;
   data.files = uploadedFiles;
 
@@ -337,6 +338,7 @@ async function fetchHomeworks() {
         taskView.appendChild(buildTaskElement(homework));
       }
     })
+    loadLanguage(true);
   });
 }
 
@@ -347,16 +349,12 @@ function buildTaskElement(task) {
   const taskHeader = document.createElement('div');
   taskHeader.classList.add('header');
 
-  const headerSubject = document.createElement('p');
-  headerSubject.classList.add('subject');
-  headerSubject.innerHTML = task.lesson.longName;
+  const headerTitle = document.createElement('p');
+  headerTitle.classList.add('title')
+  headerTitle.innerHTML = `${task.lesson.longName} bei ${task.lesson.teacher}`;
 
-  const headerTeacher = document.createElement('p');
-  headerTeacher.classList.add('teacher');
-  headerTeacher.innerHTML = task.lesson.teacher;
 
-  taskHeader.appendChild(headerSubject);
-  taskHeader.appendChild(headerTeacher);
+  taskHeader.appendChild(headerTitle);
 
   const profilePic = buildProfilePic(task.userID.profilePic, task.userID.username);
   taskHeader.appendChild(profilePic);
@@ -371,10 +369,19 @@ function buildTaskElement(task) {
 
   taskElement.appendChild(taskContent);
 
+  const taskFooter = document.createElement('div')
+  taskFooter.appendChild(buildButton('/icons/delete.svg', "delete", () => {
+    console.log("Delete")
+  }, "interaction delete", ""))
+
+  //taskElement.appendChild(taskFooter)
+
   return taskElement;
 }
 
 fetchHomeworks().then(() => {
-  const today = displayCalender();
+  displayCalender();
+  const today = new Date();
+  today.setDate(today.getDate() - 1)
   loadDayView(today);
 })
