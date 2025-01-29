@@ -358,6 +358,9 @@ function buildTaskElement(task) {
   taskHeader.appendChild(headerSubject);
   taskHeader.appendChild(headerTeacher);
 
+  const profilePic = buildProfilePic(task.userID.profilePic, task.userID.username);
+  taskHeader.appendChild(profilePic);
+
   taskElement.appendChild(taskHeader);
 
   taskElement.appendChild(document.createElement('hr'));

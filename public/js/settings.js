@@ -102,10 +102,11 @@ async function enablePush() {
 }
 
 function onProfilePictureChange(element) {
+    const modal = getModal('profilePictureModal')
     console.log('profilePicture changed');
     const file = element.files[0];
     const localUrl = URL.createObjectURL(file);
-    const preview = document.getElementById('profilePicturePreview');
+    const preview = modal.querySelector('#profilePicturePreview');
     preview.src = localUrl;
     preview.classList.remove('hidden');
     preview.addEventListener('load', () => {
@@ -123,7 +124,7 @@ function onProfilePictureChange(element) {
         preview.dataset.originalTop = preview.offsetTop;
         preview.dataset.maxScale = Math.max(preview.naturalWidth / preview.clientWidth, preview.naturalHeight / preview.clientHeight) * 4;
         preview.dataset.scale = 1;
-        document.getElementById('scaleSlider').max = preview.dataset.maxScale;
+        modal.querySelector('#scaleSlider').max = preview.dataset.maxScale;
         scalePreview(preview, 1);
         computeBounds(element.parentElement, preview);
         if (debug === true) drawDebugRect();
@@ -138,8 +139,9 @@ function computeBounds(parent, preview, imgScale = 1) {
 }
 
 function onScaleChange(element) {
+    const modal = getModal('profilePictureModal')
     const scale = element.value;
-    const preview = document.getElementById('profilePicturePreview');
+    const preview = modal.querySelector('#profilePicturePreview');
     const parent = preview.parentElement.children[0];
     scalePreview(preview, scale);
     preview.dataset.scale = scale;
@@ -182,8 +184,10 @@ function scalePreview(preview, scale) {
  */
 
 function debugSetScale(scale) {
-    document.getElementById('scaleSlider').value = scale;
-    onScaleChange(document.getElementById('scaleSlider'));
+    const modal = getModal('profilePictureModal')
+    const scaleSlider = modal.querySelector('#scaleSlider')
+    scaleSlider.value = scale;
+    onScaleChange(scaleSlider);
 }
 
 function draggable(element, constraints = { top: null, left: null, right: null, bottom: null }) {
@@ -272,7 +276,8 @@ function draggable(element, constraints = { top: null, left: null, right: null, 
 }
 
 function getPositionOfPreviewWithoutScale() {
-    const preview = document.getElementById('profilePicturePreview');
+    const modal = getModal('profilePictureModal')
+    const preview = modal.querySelector('#profilePicturePreview');
     let relativeX = Math.abs(preview.dataset.originalLeft - preview.offsetLeft) / preview.dataset.originalWidth / preview.dataset.scale;
     let relativeY = Math.abs(preview.dataset.originalTop - preview.offsetTop) / preview.dataset.originalHeight / preview.dataset.scale;
     if (relativeX < 0) relativeX = 0;
@@ -321,6 +326,7 @@ function drawDebugRect() {
 
 function submitProfilePicture() {
     const { x, y, scale } = getPositionOfPreviewWithoutScale();
+    const modal = getModal('profilePictureModal')
 
     console.log(x, y, scale);
 
@@ -328,7 +334,7 @@ function submitProfilePicture() {
     formData.append('x', x);
     formData.append('y', y);
     formData.append('scale', scale);
-    formData.append('file', document.getElementById('profilePicture').files[0]);
+    formData.append('file', modal.querySelector('#profilePicture').files[0]);
 
     fetch('internal/uploadProfilePicture', {
         method: 'post',
@@ -342,7 +348,7 @@ function submitProfilePicture() {
 }
 
 function resetProfilePicture() {
-    const preview = document.getElementById('profilePicturePreview');
+    const preview = modal.querySelector('#profilePicturePreview');
     preview.classList.add('hidden');
     preview.src = '';
     preview.style.width = '';

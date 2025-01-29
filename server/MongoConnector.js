@@ -610,27 +610,36 @@ module.exports.MongoConnector = class MongoConnector {
     }
 
     restructureUser(object) {
-        if (!object) {
-            return null;
-        }
-        console.log(object);
-        function generateRandomProfilePic() {
-            return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
-        }
-        if (object.userID) {
-            const profilePicPreference = object.userID.preferences.find(pref => pref.key === 'profilePic');
-            if (profilePicPreference) {
-                object.userID.profilePic = profilePicPreference.value;
-                delete object.userID.preferences;
-
+        try {
+            if (!object) {
+                console.log('Object is null!');
+                return null;
+            }
+            if (object.userID.profilePic && !object.userID.preferences){
                 return object;
             }
+            function generateRandomProfilePic() {
+                console.log('Generating random profile pic');
+                return { "type": "default", "content": "#" + Math.floor(Math.random() * 16777215).toString(16) };
+            }
+            if (object.userID) {
+                const profilePicPreference = object.userID.preferences.find(pref => pref.key === 'profilePic');
+                if (profilePicPreference) {
+                    object.userID.profilePic = profilePicPreference.value;
+                    delete object.userID.preferences;
+    
+                    return object;
+                }
+            }
+            object.userID.profilePic = generateRandomProfilePic();
+            this.setPreference(object.userID._id, 'profilePic', object.userID.profilePic);
+    
+            delete object.userID.preferences;
+            return object;
         }
-        object.userID.profilePic = generateRandomProfilePic();
-        this.setPreference(object.userID._id, 'profilePic', object.userID.profilePic);
+        catch {
 
-        delete object.userID.preferences;
-        return object;
+        }
     }
 
     async getCitation(citationID) {
@@ -1065,19 +1074,6 @@ module.exports.MongoConnector = class MongoConnector {
         return homework;
     }
 
-    async getHomeworkForDay(date) {
-        const start = new Date(date);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(date);
-        end.setHours(23, 59, 59, 999);
-
-        return await this.Homework.find({
-            'until.untilStart': {
-                $gte: start,
-                $lte: end
-            }
-        });
-    }
 
     async getHomeworks() {
         let homework = await this.Homework.find().populate({
@@ -1088,11 +1084,11 @@ module.exports.MongoConnector = class MongoConnector {
                 match: { key: 'profilePic' },
                 select: 'value'
             }
-        })
+        }).lean()
 
-        homework = homework.map(hw => {
+        const restructuredHomework = homework.map(hw => {
             return this.restructureUser(hw);
         });
-        return homework;
+        return restructuredHomework;
     }
 };
