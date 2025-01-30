@@ -270,7 +270,8 @@ function makeDiscoverable() {
                 }
                 break;
             case 'reload':
-                window.location.reload();
+                console.log("Realod because of ws 'reload' message")
+                //window.location.reload();
             case 'reloadContent':
                 if (typeof reloadContent === 'function') {
                     reloadContent();
@@ -585,7 +586,7 @@ function registerServiceWorker() {
     if (loggedIn === true) {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
-                if (registrations.length === 0) {
+                if (registrations.length ==) {
                     navigator.serviceWorker.register('/serviceworker.js')
                         .then(() => {
                             console.log('Service Worker registered');
@@ -598,7 +599,8 @@ function registerServiceWorker() {
                         registration.update();
                         registration.onupdatefound = () => {
                             console.log('Service Worker updating');
-                            location.reload();
+                            console.log("Reloading because of Service worker update")
+                            //location.reload();
                             return;
                         };
                         if (loggedIn === true) {
@@ -618,8 +620,8 @@ function registerServiceWorker() {
                         reloadContent();
                     }
                     else {
-                        console.warn('No content reload function found');
-                        window.location.reload();
+                        console.warn('No content reload function found. Reloading whole page');
+                        //window.location.reload();
                     }
                 }
             });
