@@ -578,15 +578,17 @@ module.exports.MongoConnector = class MongoConnector {
             return { citations: [], totalCitations: -1 };
         }
 
-        const sortObject = { timestamp: -1 };
+        let sortObject = {};
         const key = Object.keys(sort).length > 0 ? Object.keys(sort)[0] : null;
         if (key === 'time') {
-            sortObject.timestamp = sort[key] === 'asc' ? 1 : -1;
+            sortObject = { timestamp: sort[key] === 'asc' ? 1 : -1 };
         }
         else if (key === 'likes') {
-            sortObject.likeCount = sort[key] === 'asc' ? 1 : -1;
-            delete sortObject.timestamp;
+            sortObject = { likeCount: sort[key] === 'asc' ? 1 : -1, timestamp: -1 };
             pipeline.push({ $addFields: { likeCount: { $size: '$likes' } } });
+        }
+        else {
+            sortObject = { timestamp: -1 };
         }
 
         if (sortObject != {}) pipeline.push({ $sort: sortObject });
