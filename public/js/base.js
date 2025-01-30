@@ -586,7 +586,7 @@ function registerServiceWorker() {
     if (loggedIn === true) {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(registrations => {
-                if (registrations.length ==) {
+                if (registrations.length === 0) {
                     navigator.serviceWorker.register('/serviceworker.js')
                         .then(() => {
                             console.log('Service Worker registered');
