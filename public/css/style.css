@@ -441,7 +441,7 @@ textarea {
     }
 
     .button .short-label {
-        display: block;
+        display: block !important;
     }
 
     .author-name {
