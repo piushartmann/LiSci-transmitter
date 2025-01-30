@@ -97,25 +97,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         prank();
     }
 
-
-    var modal = document.getElementById('commentModal');
-
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            hideComments();
-        }
-    }
-
-    window.ontouchstart = function (event) {
-        if (event.target == modal) {
-            hideComments();
-        }
-    }
-
-    document.getElementById("modalClose").addEventListener("click", () => {
-        hideComments();
-    });
-
     onlyNewsCheckbox.addEventListener("change", async () => {
         const page = urlParams.get('page') || 1;
         changePage(page, newsPages, postsPages, onlyNewsCheckbox.checked);

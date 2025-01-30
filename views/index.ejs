@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <%- include("./partials/baseHead.ejs") %>
 
@@ -12,12 +13,12 @@
 
 <body>
 
- <%- include('./partials/base.ejs') %>
+  <%- include('./partials/base.ejs') %>
   <%- prank %>
 
   <h1 data-lang-content="posts hello" data-lang-arguments='{"username": "<%= typeof username !=='undefined' ? username : 'World' %>"}'>Hello, <%= typeof username !=='undefined' ? username : 'World' %></h1>
   <% if (isInSchool === true) { %>
-   <p data-lang-content="you_are_in_school">Du bist in der Schule</p>
+  <p data-lang-content="you_are_in_school">Du bist in der Schule</p>
   <% } %>
   <label for="onlyNews" data-lang-content="posts only_show_news">Nur Zeitungen anzeigen</label>
   <input type="checkbox" id="onlyNews" name="onlyNews">
@@ -28,21 +29,17 @@
   <div id="pageSelector" class="pageSelector"></div>
 
   <div id="commentModal" class="modal-template">
-    <span id="modalClose" class="close" title="Close Modal">&times;</span>
 
-    <form class="modal-content animate">
+    <h1 id="title" data-lang-content="comment_modal title"></h1>
+    <div class="newCommentContainer">
+      <p for="commentTextarea" data-lang-content="comment_modal new_comment"></p>
+      <textarea id="commentTextarea" class="online-only" data-lang-content-placeholder="comment_modal comment_placeholder" name="comment" required></textarea>
+      <button type="button" id="commentButton" class="commentButton online-only" data-lang-content="comment_modal submit"></button>
+    </div>
+    <h2 id="commentTitle" data-lang-content="comment_modal title"></h2>
+    <div id="commentContainer" class="commentContainer">
+    </div>
 
-      <h1 id="title" data-lang-content="comment_modal title"></h1>
-      <div class="newCommentContainer">
-        <p for="commentTextarea" data-lang-content="comment_modal new_comment"></p>
-        <textarea id="commentTextarea" class="online-only" data-lang-content-placeholder="comment_modal comment_placeholder" name="comment" required></textarea>
-        <button type="button" id="commentButton" class="commentButton online-only" data-lang-content="comment_modal submit"></button>
-      </div>
-      <h2 id="commentTitle" data-lang-content="comment_modal title"></h2>
-      <div id="commentContainer" class="commentContainer">
-      </div>
-
-    </form>
   </div>
 
 </body>

@@ -101,10 +101,12 @@ async function enablePush() {
     }
 }
 
+let newProfilePictureFile = null;
 function onProfilePictureChange(element) {
     const modal = getModal('profilePictureModal')
     console.log('profilePicture changed');
     const file = element.files[0];
+    newProfilePictureFile = file;
     const localUrl = URL.createObjectURL(file);
     const preview = modal.querySelector('#profilePicturePreview');
     preview.src = localUrl;
@@ -287,14 +289,15 @@ function getPositionOfPreviewWithoutScale() {
 }
 
 function drawDebugRect() {
-    const preview = document.getElementById('profilePicturePreview');
+    const modal = getModal('profilePictureModal')
+    const preview = modal.querySelector('#profilePicturePreview');
 
     const x = preview.dataset.originalLeft - preview.offsetLeft / preview.dataset.scale;
     const y = preview.dataset.originalTop - preview.offsetTop / preview.dataset.scale;
     const scale = preview.dataset.scale;
 
-    if (document.getElementById('debugCanvas')) {
-        document.getElementById('debugCanvas').remove();
+    if (modal.querySelector('#debugCanvas')) {
+        modal.querySelector('#debugCanvas').remove();
     }
     const canvas = document.createElement('canvas');
     canvas.id = 'debugCanvas';
@@ -308,8 +311,8 @@ function drawDebugRect() {
     canvas.style.zIndex = 1000;
     document.body.appendChild(canvas);
 
-    if (document.getElementById('debugCanvas2')) {
-        document.getElementById('debugCanvas2').remove();
+    if (modal.querySelector('#debugCanvas2')) {
+        modal.querySelector('#debugCanvas2').remove();
     }
     const canvas2 = document.createElement('canvas');
     canvas2.id = 'debugCanvas2';
@@ -327,6 +330,10 @@ function drawDebugRect() {
 function submitProfilePicture() {
     const { x, y, scale } = getPositionOfPreviewWithoutScale();
     const modal = getModal('profilePictureModal')
+    if (newProfilePictureFile === null) {
+        console.error("No file selected");
+        return;
+    }
 
     console.log(x, y, scale);
 
@@ -334,7 +341,7 @@ function submitProfilePicture() {
     formData.append('x', x);
     formData.append('y', y);
     formData.append('scale', scale);
-    formData.append('file', modal.querySelector('#profilePicture').files[0]);
+    formData.append('file', newProfilePictureFile);
 
     fetch('internal/uploadProfilePicture', {
         method: 'post',
