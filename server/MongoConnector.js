@@ -616,7 +616,7 @@ module.exports.MongoConnector = class MongoConnector {
                 console.log('Object is null!');
                 return null;
             }
-            if (object.userID.profilePic && !object.userID.preferences){
+            if (object.userID.profilePic && !object.userID.preferences) {
                 return object;
             }
             function generateRandomProfilePic() {
@@ -628,13 +628,13 @@ module.exports.MongoConnector = class MongoConnector {
                 if (profilePicPreference) {
                     object.userID.profilePic = profilePicPreference.value;
                     delete object.userID.preferences;
-    
+
                     return object;
                 }
             }
             object.userID.profilePic = generateRandomProfilePic();
             this.setPreference(object.userID._id, 'profilePic', object.userID.profilePic);
-    
+
             delete object.userID.preferences;
             return object;
         }
@@ -1085,7 +1085,11 @@ module.exports.MongoConnector = class MongoConnector {
                 match: { key: 'profilePic' },
                 select: 'value'
             }
-        }).lean()
+        }).populate({
+            path: 'files',
+            select: 'filename path'
+        })
+            .lean()
 
         const restructuredHomework = homework.map(hw => {
             return this.restructureUser(hw);

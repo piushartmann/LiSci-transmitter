@@ -55,6 +55,13 @@ module.exports = (db) => {
         return res.json(response);
     });
 
+    function lessonIsCanceled(lesson) {
+        if (lesson.cellState === "CANCEL" || lesson.cellState === "FREE") return true;
+        if (lesson.rooms[0].element.displayname === "z.H.") return true;
+        if (lesson.teachers[0].state === "ABSENT" || lesson.teachers[0].element.name === "---") return true;
+        return false;
+    }
+
     router.post('/internal/getNextLesson', async (req, res) => {
         const id = req.body.id;
         const offset = req.body.offset || 0;
@@ -64,6 +71,7 @@ module.exports = (db) => {
         if (!selectedLesson) return res.status(400).send("Invalid lesson");
         const nextLesson = timetable.filter(l => {
             if (!(l.subjects && l.subjects[0])) return false;
+            if (lessonIsCanceled(l)) return false;
             return l.subjects[0].element.displayname === selectedLesson.subjects[0].element.displayname && l.start.getTime() > selectedLesson.end.getTime();
         });
         const uniqueLessons = [...new Set(nextLesson.map(l => l.start.getDate()))].map(date => nextLesson.find(l => l.start.getDate() === date));
@@ -77,7 +85,6 @@ module.exports = (db) => {
         if (typeof files !== "object") return res.status(400).send("files must be a list");
         files.forEach(file => {
             if (typeof file !== "string") return res.status(400).send("files must be a list of strings");
-            if (!file.startsWith("https://liscitransmitter.live")) return res.status(400).send("files must originate from this server");
         });
 
         const timetable = await untis.getTimetable(0, "all");

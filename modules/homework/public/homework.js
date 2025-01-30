@@ -108,7 +108,8 @@ function thisWeek() {
 }
 
 function onLessonClick(lesson) {
-  selectedLesson = lesson.id;
+  selectedLessonId = lesson.id;
+  selectedLesson = lesson;
   hideModal('timeTableModal');
   const modal = getModal('taskModal');
   modal.querySelector('#selector_other').innerHTML = "Andere (" + lesson.name + ")";
@@ -146,9 +147,11 @@ function addFileEventListerners(modal) {
 }
 
 let weekOffset = 0;
+let selectedLessonId = null;
 let selectedLesson = null;
+
 function openCreateTask() {
-  selectedLesson = null;
+  selectedLessonId = null;
   const taskModal = openModal('taskModal');
   addFileEventListerners(taskModal);
   const classSelector = taskModal.querySelector('#classSelector');
@@ -198,16 +201,16 @@ function onClassSelect(classSelector, taskModal, first = false) {
   }
   else {
     taskModal.querySelector('#other_select_button').style.display = 'none';
-    selectedLesson = Number(classSelector.value);
+    selectedLessonId = Number(classSelector.value);
   }
 
 
-  if (selectedLesson == null) {
+  if (selectedLessonId == null) {
     if (!first) timeTableModal = showUntisModal();
   } else {
     const until = taskModal.querySelector('#untilSelector');
     until.innerHTML = '';
-    appendOption(until, 'Am selben Tag', 0);
+    appendOption(until, 'Heute', 0);
     appendOption(until, 'Nächsten Sitzung', 1, true);
     appendOption(until, 'Übernächste Sitzung', 2);
     until.disabled = false;
@@ -220,12 +223,12 @@ function appendOption(until, text, offset, selected = false) {
   if (offset == 0) {
     const option = document.createElement('option')
     const date = new Date();
-    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']; //fallback days
     if (languageFile && languageFile.days) {
       days = Object.values(languageFile.days);
     }
     option.appendChild(document.createTextNode(`${text} (${days[date.getDay()]} ${date.getDate()}.${(date.getMonth() + 1)})`));
-    option.value = selectedLesson;
+    option.value = selectedLessonId;
     option.selected = selected;
     until.appendChild(option);
     return;
@@ -233,7 +236,7 @@ function appendOption(until, text, offset, selected = false) {
 
   fetch('/homework/internal/getNextLesson', {
     body: JSON.stringify({
-      id: selectedLesson,
+      id: selectedLessonId,
       offset: offset - 1
     }),
     method: 'POST',
@@ -257,12 +260,12 @@ function appendOption(until, text, offset, selected = false) {
 }
 
 async function populateNextLesson(offset) {
-  if (!selectedLesson) {
+  if (!selectedLessonId) {
     return;
   }
   const res = await fetch('/homework/internal/getNextLesson', {
     body: JSON.stringify({
-      id: selectedLesson,
+      id: selectedLessonId,
       offset: offset
     }),
     method: 'POST',
@@ -274,36 +277,40 @@ async function populateNextLesson(offset) {
 }
 
 async function submitTask() {
-  if (!selectedLesson) {
+  if (!selectedLessonId) {
     return;
   }
 
+  const modal = getModal('taskModal');
+
   //get all files and upload them to the server
-  const files = Array.from(document.querySelectorAll('#modal #files .file_upload'));
+  const files = Array.from(modal.querySelectorAll('#files .file_upload'));
   let uploadedFiles = []
   for (const file of files) {
     if (file.files.length > 0) {
       let formData = new FormData();
       formData.append('upload', file.files[0]);
 
-      const res = await fetch('/internal/uploadHomework', {
+      const res = await fetch('/internal/uploadHomework?filename=' + file.files[0].name, {
         method: 'POST',
         body: formData,
-        enctype: 'multipart/form-data',
+        enctype: 'multipart/form-data'
       });
       if (res.ok) {
         const data = await res.text();
         uploadedFiles.push(data);
-        window.navigation.reload();
+      }
+      else {
+        console.error("Error uploading file:", res);
+        return;
       }
     }
   }
 
   console.log(uploadedFiles);
 
-  const modal = getModal('taskModal');
   let data = {};
-  data.lesson = Number(selectedLesson);
+  data.lesson = Number(selectedLessonId);
   data.until = Number(modal.querySelector('#untilSelector').value);
   data.content = modal.querySelector('#content').value;
   data.files = uploadedFiles;
@@ -318,6 +325,7 @@ async function submitTask() {
     if (res.status == 200) {
       console.log("Task created");
       hideModal();
+      navigation.reload()
     }
     else {
       console.error("Error creating task:", res);
@@ -340,6 +348,16 @@ async function fetchHomeworks() {
     })
     loadLanguage(true);
   });
+}
+
+async function download(dataurl, fileName) {
+  const response = await fetch(dataurl);
+  const blob = await response.blob();
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+  link.click();
 }
 
 function buildTaskElement(task) {
@@ -369,6 +387,21 @@ function buildTaskElement(task) {
 
   taskElement.appendChild(taskContent);
 
+  if (task.files.length > 0) {
+    taskElement.appendChild(document.createElement('hr'));
+    
+    const taskFiles = document.createElement('div');
+    taskFiles.classList.add('files');
+    task.files.forEach(file => {
+      taskFiles.appendChild(buildButton('/icons/view.svg', file.filename, () => {
+        const url = "https://storage.liscitransmitter.live/" + file.path;
+        download(url, file.filename);
+      }))
+    });
+
+    taskElement.appendChild(taskFiles);
+  }
+
   const taskFooter = document.createElement('div')
   taskFooter.appendChild(buildButton('/icons/delete.svg', "delete", () => {
     console.log("Delete")
@@ -380,8 +413,6 @@ function buildTaskElement(task) {
 }
 
 fetchHomeworks().then(() => {
-  displayCalender();
-  const today = new Date();
-  today.setDate(today.getDate() - 1)
+  const today = displayCalender();
   loadDayView(today);
 })
