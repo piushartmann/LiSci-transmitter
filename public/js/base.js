@@ -600,7 +600,7 @@ function registerServiceWorker() {
                         registration.onupdatefound = () => {
                             console.log('Service Worker updating');
                             console.log("Reloading because of Service worker update")
-                            location.reload();
+                            //location.reload();
                             return;
                         };
                         if (loggedIn === true) {
