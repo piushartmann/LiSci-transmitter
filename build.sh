@@ -4,7 +4,7 @@ find . -type f -path '*/public/*.js' -exec sh -c '
     relative_path="${base_path#*/}"
     foldername="$(dirname "$base_path")"
     output="${file%.js}.min.js"
-    map_url="${relative_path%.js}.min.js.map"
+    map_url="/${relative_path%.js}.min.js.map"
     echo "Minifying $relative_path"
     terser "$file" -o "$output" --compress --mangle --source-map "base=\"$foldername\",filename=\"$map_url\",url=\"$map_url\""
   done

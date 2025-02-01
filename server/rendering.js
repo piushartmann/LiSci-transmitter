@@ -112,8 +112,15 @@ function middleware(db, viewDirs, publicDirs, moduleConfigs) {
                     srcs.push(src);
                     continue;
                 }
-                const srcPath = path.join(publicDirs[0], src.replace(/\.js$/, '.min.js'))
-                if (!fs.existsSync(srcPath)) {
+                let srcPath = null;
+                publicDirs.forEach(publicDir => {
+                    if (srcPath) return;
+                    const srcPathToCheck = path.join(publicDir, src.replace(/\.js$/, '.min.js'))
+                    if (fs.existsSync(srcPathToCheck)) {
+                        srcPath = srcPathToCheck;
+                    }
+                });
+                if (!srcPath) {
                     srcs.push(src);
                     continue;
                 }
@@ -122,18 +129,7 @@ function middleware(db, viewDirs, publicDirs, moduleConfigs) {
             }
 
             while ((match = hrefRegex.exec(indexFileContent)) !== null) {
-                const src = match[1]
-                if (src.endsWith('.min.js')) {
-                    srcs.push(src);
-                    continue;
-                }
-                const srcPath = path.join(publicDirs[0], src.replace(/\.js$/, '.min.js'))
-                if (!fs.existsSync(srcPath)) {
-                    srcs.push(src);
-                    continue;
-                }
-                html = html.replace(src, src.replace(/\.js$/, '.min.js'));
-                srcs.push(src.replace(/\.js$/, '.min.js'));
+                srcs.push(match[1]);
             }
 
             while ((match = imgRegex.exec(indexFileContent)) !== null) {
