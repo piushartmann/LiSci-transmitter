@@ -67607,6 +67607,111 @@
         "state": "REGULAR"
       },
       {
+        "type": 2,
+        "id": 52,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 59,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 173,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 180,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 218,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 263,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 352,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 364,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 367,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 370,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 387,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 480,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 553,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 1089,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
+        "type": 2,
+        "id": 1568,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR"
+      },
+      {
         "type": 4,
         "id": 51,
         "orgId": 0,
@@ -67898,7 +68003,233 @@
         }
       }
     ],
-    "teachers": [],
+    "teachers": [
+      {
+        "type": 2,
+        "id": 52,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 52,
+          "name": "Rb",
+          "canViewTimetable": true,
+          "externKey": "20476",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 59,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 59,
+          "name": "Sn",
+          "canViewTimetable": true,
+          "externKey": "20518",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 173,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 173,
+          "name": "On",
+          "canViewTimetable": true,
+          "externKey": "20508",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 180,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 180,
+          "name": "Su",
+          "canViewTimetable": true,
+          "externKey": "20571",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 218,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 218,
+          "name": "Be",
+          "canViewTimetable": true,
+          "externKey": "42287",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 263,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 263,
+          "name": "My",
+          "canViewTimetable": true,
+          "externKey": "32438",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 352,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 352,
+          "name": "Gh",
+          "canViewTimetable": true,
+          "externKey": "20543",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 364,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 364,
+          "name": "Gü",
+          "canViewTimetable": true,
+          "externKey": "57729",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 367,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 367,
+          "name": "Mö",
+          "canViewTimetable": true,
+          "externKey": "57737",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 370,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 370,
+          "name": "Sfl",
+          "canViewTimetable": true,
+          "externKey": "57726",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 387,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 387,
+          "name": "Hß",
+          "canViewTimetable": true,
+          "externKey": "60134",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 480,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 480,
+          "name": "Pe",
+          "canViewTimetable": true,
+          "externKey": "71402",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 553,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 553,
+          "name": "Sd",
+          "canViewTimetable": true,
+          "externKey": "85345",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 1089,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 1089,
+          "name": "Pz",
+          "canViewTimetable": true,
+          "externKey": "20472",
+          "roomCapacity": 0
+        }
+      },
+      {
+        "type": 2,
+        "id": 1568,
+        "orgId": 0,
+        "missing": false,
+        "state": "REGULAR",
+        "element": {
+          "type": 2,
+          "id": 1568,
+          "name": "Lr",
+          "canViewTimetable": true,
+          "externKey": "",
+          "roomCapacity": 0
+        }
+      }
+    ],
     "subjects": [],
     "rooms": [
       {

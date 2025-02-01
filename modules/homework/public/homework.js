@@ -112,8 +112,8 @@ function onLessonClick(lesson) {
   selectedLesson = lesson;
   hideModal('timeTableModal');
   const modal = getModal('taskModal');
-  modal.querySelector('#selector_other').innerHTML = "Andere (" + lesson.name + ")";
-  onClassSelect(modal.querySelector('#classSelector'), modal, true);
+  modal.querySelector('#classSelector option[value=other]').innerHTML = "Andere (" + lesson.name + ")";
+  getUntilOptions(modal.querySelector('#classSelector'), modal, true);
 }
 
 function displayTimetable() {
@@ -150,8 +150,9 @@ let weekOffset = 0;
 let selectedLessonId = null;
 let selectedLesson = null;
 
-function openCreateTask() {
-  selectedLessonId = null;
+function openCreateTask(task) {
+  const edit = task != null;
+  selectedLessonId = edit ? task.lesson.id : null;
   const taskModal = openModal('taskModal');
   addFileEventListerners(taskModal);
   const classSelector = taskModal.querySelector('#classSelector');
@@ -162,6 +163,13 @@ function openCreateTask() {
 
   fetch('/homework/internal/getCloseLessons').then(res => res.json()).then(data => {
     classSelector.innerHTML = '';
+    if (edit) {
+      let lesson = document.createElement('option');
+      lesson.value = task.lesson.lessonID;
+      lesson.innerHTML = `${task.lesson.longName} bei ${task.lesson.teacher} (aktuell)`;
+      lesson.selected = true;
+      classSelector.appendChild(lesson);
+    }
     data.beforeLessons.forEach(lesson => {
       let option = document.createElement('option');
       option.value = lesson.id;
@@ -172,7 +180,7 @@ function openCreateTask() {
       let lesson = document.createElement('option');
       lesson.value = data.currentLesson.id;
       lesson.innerHTML = makeLessonContent(data.currentLesson);
-      lesson.selected = true;
+      lesson.selected = edit ? false : true;
       classSelector.appendChild(lesson);
     }
     data.afterLessons.forEach(lesson => {
@@ -182,19 +190,37 @@ function openCreateTask() {
       classSelector.appendChild(option);
     });
     let other = document.createElement('option');
-    other.id = 'selector_other';
     other.value = 'other';
-    other.innerHTML = 'Andere';
+    other.innerHTML = "Andere";
     classSelector.appendChild(other);
-    onClassSelect(classSelector, taskModal, true);
+
+    const until = taskModal.querySelector('#untilSelector');
+    until.innerHTML = '';
+
+    if (edit) {
+      const option = document.createElement('option')
+      const date = new Date(task.until.untilStart);
+      let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']; //fallback days
+      if (languageFile && languageFile.days) {
+        days = Object.values(languageFile.days);
+      }
+      option.appendChild(document.createTextNode(`Ausgewählt: (${days[date.getDay()]} ${date.getDate()}.${(date.getMonth() + 1)})`));
+      option.value = task.until.id;
+      option.selected = true;
+      until.appendChild(option);
+    }
+
+    getUntilOptions(classSelector, taskModal, true, edit);
   });
 
   classSelector.onchange = () => {
-    onClassSelect(classSelector, taskModal);
+    getUntilOptions(classSelector, taskModal);
   };
+
+  return taskModal;
 }
 
-function onClassSelect(classSelector, taskModal, first = false) {
+function getUntilOptions(classSelector, taskModal, first = false, edit = false) {
 
   if (classSelector.value == 'other') {
     taskModal.querySelector('#other_select_button').style.display = 'block';
@@ -209,9 +235,8 @@ function onClassSelect(classSelector, taskModal, first = false) {
     if (!first) timeTableModal = showUntisModal();
   } else {
     const until = taskModal.querySelector('#untilSelector');
-    until.innerHTML = '';
     appendOption(until, 'Heute', 0);
-    appendOption(until, 'Nächsten Sitzung', 1, true);
+    appendOption(until, 'Nächsten Sitzung', 1, !edit);
     appendOption(until, 'Übernächste Sitzung', 2);
     until.disabled = false;
   }
@@ -370,13 +395,28 @@ function buildTaskElement(task) {
   const headerTitle = document.createElement('p');
   headerTitle.classList.add('title')
   headerTitle.innerHTML = `${task.lesson.longName} bei ${task.lesson.teacher}`;
-
-
   taskHeader.appendChild(headerTitle);
 
-  const profilePic = buildProfilePic(task.userID.profilePic, task.userID.username);
-  taskHeader.appendChild(profilePic);
+  const rightHeader = document.createElement('div');
+  rightHeader.classList.add('rightHeader');
 
+  const edit = buildButton('/icons/edit.svg', "", () => {
+    const editModal = openCreateTask(task);
+    editModal.querySelector('#taskTitle').innerHTML = "Aufgabe bearbeiten";
+    editModal.querySelector('#content').value = task.content;
+    task.files.forEach(file => {
+      const fileInput = editModal.querySelector('#files .file_upload');
+      fileInput.files = [new File([], file.filename, { type: 'application/octet-stream' })];
+    });
+  }, "", "");
+  edit.style.height = "40px";
+  edit.style.width = "40px";
+  rightHeader.appendChild(edit);
+
+  const profilePic = buildProfilePic(task.userID.profilePic, task.userID.username);
+  rightHeader.appendChild(profilePic);
+
+  taskHeader.appendChild(rightHeader);
   taskElement.appendChild(taskHeader);
 
   taskElement.appendChild(document.createElement('hr'));
@@ -389,7 +429,7 @@ function buildTaskElement(task) {
 
   if (task.files.length > 0) {
     taskElement.appendChild(document.createElement('hr'));
-    
+
     const taskFiles = document.createElement('div');
     taskFiles.classList.add('files');
     task.files.forEach(file => {
@@ -402,13 +442,6 @@ function buildTaskElement(task) {
     taskElement.appendChild(taskFiles);
   }
 
-  const taskFooter = document.createElement('div')
-  taskFooter.appendChild(buildButton('/icons/delete.svg', "delete", () => {
-    console.log("Delete")
-  }, "interaction delete", ""))
-
-  //taskElement.appendChild(taskFooter)
-
   return taskElement;
 }
 
@@ -416,3 +449,5 @@ fetchHomeworks().then(() => {
   const today = displayCalender();
   loadDayView(today);
 })
+
+openCreateTask();

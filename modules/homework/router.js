@@ -1,11 +1,11 @@
 const { Router } = require('express');
 const router = Router();
+const sanitizeHtml = require('sanitize-html');
 
 /**
  * @param {MongoConnector} db - The MongoDB connector instance.
  * @returns {Router} The router instance.
  */
-
 
 module.exports = (db) => {
     const config = require('../../config.json');
@@ -55,50 +55,77 @@ module.exports = (db) => {
         return res.json(response);
     });
 
+
+    /**
+     * Determines if a lesson is canceled based on its state, location, and teacher's availability.
+     *
+     * @param {Object} lesson - The lesson object to check.
+     * @returns {boolean} - Returns true if the lesson is canceled, otherwise false.
+     */
     function lessonIsCanceled(lesson) {
-        if (lesson.cellState === "CANCEL" || lesson.cellState === "FREE") return true;
-        if (lesson.rooms[0].element.displayname === "z.H.") return true;
-        if (lesson.teachers[0].state === "ABSENT" || lesson.teachers[0].element.name === "---") return true;
+        if (lesson.cellState === "CANCEL" || lesson.cellState === "FREE") return true; //filter out canceled and free lessons
+        if (lesson.rooms[0].element.displayname === "z.H.") return true; //filter out lessons that are at home
+        if (lesson.teachers[0].state === "ABSENT" || lesson.teachers[0].element.name === "---") return true; //filter out lessons where the teacher is absent
         return false;
     }
 
+    /**
+    * Get the next lesson of a specific lesson.
+    *
+    * @param {number} id - The id of the lesson.
+    * @param {number} offset - The offset of the lesson.
+    * @returns {object} The next lesson.
+    */
     router.post('/internal/getNextLesson', async (req, res) => {
+        //parse parameters and check if they are valid
         const id = req.body.id;
         const offset = req.body.offset || 0;
         if (typeof id !== "number" || typeof offset !== "number") return res.status(400).send("Invalid parameters");
+        //get the timetable and the selected lesson
         const timetable = await untis.getTimetable(0, "all");
         const selectedLesson = timetable.find(l => l.id === id);
         if (!selectedLesson) return res.status(400).send("Invalid lesson");
+        //filter the timetable to only include relevant lessons
         const nextLesson = timetable.filter(l => {
-            if (!(l.subjects && l.subjects[0])) return false;
-            if (lessonIsCanceled(l)) return false;
-            return l.subjects[0].element.displayname === selectedLesson.subjects[0].element.displayname && l.start.getTime() > selectedLesson.end.getTime();
+            if (!(l.subjects && l.subjects[0])) return false; //filter out events (no subjects)
+            if (!(l.subjects[0].element.displayname === selectedLesson.subjects[0].element.displayname)) return false; //filter lessons that have the same subject
+            if (lessonIsCanceled(l)) return false; //filter out canceled lessons
+            if (!(l.start.getTime() > selectedLesson.end.getTime())) return false; //filter out lessons that are before the selected lesson
+            return true;
         });
+        //sort the lessons by start time and remove duplicates
         const uniqueLessons = [...new Set(nextLesson.map(l => l.start.getDate()))].map(date => nextLesson.find(l => l.start.getDate() === date));
+        //return the lesson at the offset
         return res.json(uniqueLessons[offset]);
     });
 
     router.post('/internal/createTask', async (req, res) => {
-        const { lesson, until, content, files } = req.body;
+        //parse parameters and check if they are valid
+        let { lesson, until, content, files } = req.body;
         if (typeof lesson !== "number" || typeof content !== "string" || typeof until !== "number") return res.status(400).send("Invalid parameters");
+        lesson = sanitizeHtml(lesson);
 
         if (typeof files !== "object") return res.status(400).send("files must be a list");
         files.forEach(file => {
             if (typeof file !== "string") return res.status(400).send("files must be a list of strings");
         });
 
+        //get the timetable and the selected lesson
         const timetable = await untis.getTimetable(0, "all");
-        const selectedLesson = timetable.find(l => l.id === lesson);
+        const selectedLesson = timetable.find(l => l.id == lesson);
         if (!selectedLesson) return res.status(400).send("Invalid lesson");
 
         const untilLesson = timetable.find(l => l.id === until);
         if (!untilLesson) return res.status(400).send("Invalid until lesson");
 
+        //create the homework and check if it was successful
         const homework = await db.createHomework(req.session.userID, selectedLesson, untilLesson, content, files);
         if (!homework) return res.status(500).send("Internal server error");
+        //return success
         return res.status(200).send("Success");
     });
 
+    //get all homeworks
     router.get('/internal/getHomeworks', async (req, res) => {
         const homeworks = await db.getHomeworks();
         return res.json(homeworks);
