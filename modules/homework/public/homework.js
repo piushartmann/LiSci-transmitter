@@ -165,7 +165,7 @@ function openCreateTask(task) {
   edit ? files = task.files : files = [];
 
   if (edit) {
-    taskModal.querySelector('#deleteTaskButton').style.display = 'block';
+    if (editingTask.isAuthor) taskModal.querySelector('#deleteTaskButton').style.display = 'block';
   }
 
   function makeLessonContent(lesson) {

@@ -142,7 +142,7 @@ module.exports = (db) => {
         //delete the homework and check if it was successful
         const homework = await db.getHomework(id);
         if (!homework) return res.status(400).send("Homework not found");
-        if (homework.userID._id.toString() !== req.session.userID) return res.status(403).send("You do not have permission to delete this homework");
+        if (homework.userID._id.toString() !== req.session.userID && !(await db.getUserPermissions(req.session.userID)).includes("admin")) return res.status(403).send("You do not have permission to delete this homework");
         const success = await db.deleteHomework(id);
         if (!success) return res.status(500).send("Internal server error");
         //return success
@@ -152,12 +152,14 @@ module.exports = (db) => {
     //get all homeworks
     router.get('/internal/getHomeworks', async (req, res) => {
         let homeworks = await db.getHomeworks();
-        homeworks.map(() => {
-            homeworks.forEach(homework => {
-                if (homework.userID._id.toString() == req.session.userID) homework.isAuthor = true;
-                else homework.isAuthor = false;
-            });
-        })
+        homeworks = await Promise.all(homeworks.map(async (homework) => {
+            if (homework.userID._id.toString() == req.session.userID || (await db.getUserPermissions(req.session.userID)).includes("admin")) {
+                homework.isAuthor = true;
+            } else {
+                homework.isAuthor = false;
+            }
+            return homework;
+        }));
         return res.json(homeworks);
     })
 
