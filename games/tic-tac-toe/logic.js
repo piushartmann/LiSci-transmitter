@@ -1,4 +1,4 @@
-const tttAI = require('./ai.js');
+const tttAI = require('./engine.js');
 const path = require('path');
 
 async function newGame(db, players) {
