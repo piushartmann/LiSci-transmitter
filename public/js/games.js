@@ -59,7 +59,7 @@ function playSinglePlayer(game) {
 function playSinglePlayerWithDifficulties(game, difficulties) {
     difficulties = JSON.parse(difficulties);
 
-    const modal = openModal(document.getElementById('difficultiesModal'));
+    const modal = openModal('difficultiesModal');
     difficultiesElement = modal.querySelector('#difficulties');
 
     difficultiesElement.innerHTML = '';

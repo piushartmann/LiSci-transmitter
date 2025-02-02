@@ -368,7 +368,7 @@ function hideModal(id) {
 function buildModal(id) {
     const modal = document.createElement('div');
     modal.className = 'modal';
-    modal.style.display = 'block';
+    // modal.style.display = 'block';
     modal.id = id + "-modal";
 
     const modalClose = document.createElement('span');
@@ -411,10 +411,17 @@ function openModal(id, clear = true) {
     if (clear && document.getElementById(id + "-modal")) {
         document.getElementById(id + "-modal").remove();
     }
-    
-    if (document.getElementById(id + "-modal")){
-        
-        modal = document.getElementById(id + "-modal").style.display = 'block';
+
+    modal = loadModal(id);
+    modal.style.display = 'block';
+
+    return modal;
+}
+
+function loadModal(id) {
+    if (document.getElementById(id + "-modal")) {
+
+        modal = document.getElementById(id + "-modal");
     }
     else {
         modal = buildModal(id);
@@ -424,7 +431,7 @@ function openModal(id, clear = true) {
 }
 
 function getModal(id) {
-    return document.getElementById(id + "-modal");
+    return loadModal(id);
 }
 
 /**

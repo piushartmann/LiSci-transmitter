@@ -4,12 +4,12 @@ function weekdayIndex(day) {
   return index;
 }
 
-function displayCalender() {
+function displayCalender(weeks = 2) {
   const calendarElement = document.getElementById('calendar');
   const today = new Date();
   const todayWeekdayIndex = weekdayIndex(today)
 
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 7*weeks; i++) {
     const day = new Date();
     day.setDate(today.getDate() - todayWeekdayIndex + i);
 

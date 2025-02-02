@@ -69,8 +69,6 @@ function updateBoard(board, player, nextGame) {
     const turnDescription = document.getElementById('turnDescription');
     const currentSymbol = document.getElementById('currentSymbol');
 
-    console.log(board);
-
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
             const square = squares[i * 9 + j];
