@@ -121,7 +121,7 @@
             "decline": "Ablehnen"
         },
         "selector": {
-            "play_singleplayer": "Singleplayer",
+            "play_singleplayer": "Einzelspieler",
             "search_for_others": "Suche nach anderen Spielern",
             "modal": {
                 "title": "Spieler auswählen",

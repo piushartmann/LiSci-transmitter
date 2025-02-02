@@ -117,7 +117,9 @@ function discoverOtherPlayers(game) {
 
     discoverGame = game;
 
-    const createInviteButton = document.getElementById('createInviteButton');
+    const modal = getModal('multiplayerModal');
+
+    const createInviteButton = modal.querySelector('#createInviteButton');
     createInviteButton.onclick = () => {
         createInviteLink(game);
     }
@@ -129,6 +131,7 @@ function hideDiscovery() {
 }
 
 function createInviteLink(game) {
+    const modal = getModal('multiplayerModal');
     console.log("Creating invite link");
 
     fetch(`/games/${game}/newInviteLink`, {
@@ -140,8 +143,8 @@ function createInviteLink(game) {
         if (res.ok) {
             const data = await res.json();
             console.log(data);
-            const inviteLink = document.getElementById('inviteLink');
-            const copyLink = document.getElementById('copyLink');
+            const inviteLink = modal.querySelector('#inviteLink');
+            const copyLink = modal.querySelector('#copyLink');
             inviteLink.value = data.invite;
             inviteLink.style.display = 'block';
             copyLink.style.display = 'block';
