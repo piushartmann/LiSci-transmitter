@@ -15,6 +15,19 @@ body {
     display: none;
 }
 
+.hiddenInput {
+    position: absolute;
+    color: transparent;
+    z-index: -1;
+    height: 0;
+    width: 0;
+    opacity: 0;
+}
+
+.hiddenInput [type="file"] {
+    visibility: hidden;
+}
+
 .pageSelector {
     display: flex;
     justify-content: center;
@@ -228,6 +241,7 @@ a {
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 5vh;
+    position: relative;
 }
 
 .close {

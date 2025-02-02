@@ -156,9 +156,9 @@ module.exports = (db, s3Client) => {
         const oldFilename = req.query.filename;
         if (!oldFilename) return res.status(400).send("Missing filename");
         try {
-            newFilename = await uploadFile(req, res, "homework");
+            newFilename = await uploadFile(req, res, "homework", [], false);
             const entry = await registerFileInDB(req.session.userID, oldFilename, newFilename, "homework");
-            return res.status(200).send(entry.id);
+            return res.status(200).send(entry.path);
         } catch (error) {
             return res.status(500).send(error.message);
         }

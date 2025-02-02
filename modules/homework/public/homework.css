@@ -201,6 +201,27 @@
     flex-direction: column;
     flex-wrap: wrap;
     gap: 10px;
+    /* border: 1px solid #ff0000; */
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#files .file {
+    display: flex;
+    border: 1px solid var(--post-outline-color);
+    border-radius: 8px;
+    margin-right: 5px;
+    justify-content: space-between;
+}
+
+#files .file button {
+    border: none;
+}
+
+#deleteTaskButton {
+    position: absolute;
+    top: 15px;
+    right: 10px;
 }
 
 @media (max-width: 768px) {

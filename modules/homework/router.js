@@ -102,6 +102,16 @@ module.exports = (db) => {
     router.post('/internal/createTask', async (req, res) => {
         //parse parameters and check if they are valid
         let { lesson, until, content, files } = req.body;
+        let { edit } = req.body;
+        if (edit === true) edit = true;
+        else edit = false;
+        let id;
+        if (edit) {
+            id = req.body.id;
+            if (typeof id !== "string") return res.status(400).send("Invalid parameters");
+        }
+        else id = null;
+
         if (typeof lesson !== "number" || typeof content !== "string" || typeof until !== "number") return res.status(400).send("Invalid parameters");
         lesson = sanitizeHtml(lesson);
 
@@ -119,15 +129,32 @@ module.exports = (db) => {
         if (!untilLesson) return res.status(400).send("Invalid until lesson");
 
         //create the homework and check if it was successful
-        const homework = await db.createHomework(req.session.userID, selectedLesson, untilLesson, content, files);
+        const homework = await db.createHomework(req.session.userID, selectedLesson, untilLesson, content, files, id);
         if (!homework) return res.status(500).send("Internal server error");
+        //return success
+        return res.status(200).send("Success");
+    });
+
+    router.post('/internal/deleteTask', async (req, res) => {
+        //parse parameters and check if they are valid
+        const id = req.body.id;
+        if (typeof id !== "string") return res.status(400).send("Invalid parameters");
+        //delete the homework and check if it was successful
+        const success = await db.deleteHomework(id);
+        if (!success) return res.status(500).send("Internal server error");
         //return success
         return res.status(200).send("Success");
     });
 
     //get all homeworks
     router.get('/internal/getHomeworks', async (req, res) => {
-        const homeworks = await db.getHomeworks();
+        let homeworks = await db.getHomeworks();
+        homeworks.map(() => {
+            homeworks.forEach(homework => {
+                if (homework.userID._id.toString() == req.session.userID) homework.isAuthor = true;
+                else homework.isAuthor = false;
+            });
+        })
         return res.json(homeworks);
     })
 

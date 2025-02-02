@@ -1047,7 +1047,7 @@ module.exports.MongoConnector = class MongoConnector {
         }));
     }
 
-    async createHomework(userID, lesson, untilLesson, content, files) {
+    async createHomework(userID, lesson, untilLesson, content, files, id = null) {
         const lessonID = lesson.id;
         const start = lesson.start;
         const longname = lesson.subjects[0].element.longName;
@@ -1068,6 +1068,27 @@ module.exports.MongoConnector = class MongoConnector {
             untilID,
             untilStart,
 
+        }
+
+        try {
+            files = await Promise.all(files.map(async file => {
+                return await this.File.findOne({ $or: [{ _id: new ObjectId(Number(file)) }, { path: file }] });
+            }));
+        }
+        catch (error) {
+            console.log('Error while fetching files for homework: ' + error);
+            return null;
+        }
+
+        if (id) {
+            const homework = await this.Homework.findById(id);
+            homework.userID = userID;
+            homework.lesson = lessonElement;
+            homework.until = untilElement;
+            homework.content = content;
+            homework.files = files;
+            await homework.save();
+            return homework;
         }
 
         const homework = new this.Homework({ userID, lesson: lessonElement, until: untilElement, content, files });
@@ -1095,5 +1116,9 @@ module.exports.MongoConnector = class MongoConnector {
             return this.restructureUser(hw);
         });
         return restructuredHomework;
+    }
+
+    async deleteHomework(id) {
+        return await this.Homework.findByIdAndDelete(id);
     }
 };
