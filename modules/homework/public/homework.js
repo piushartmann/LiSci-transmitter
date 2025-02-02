@@ -6,6 +6,7 @@ function weekdayIndex(day) {
 
 function displayCalender(weeks = 2) {
   const calendarElement = document.getElementById('calendar');
+  calendarElement.innerHTML = '';
   const today = new Date();
   const todayWeekdayIndex = weekdayIndex(today)
 
@@ -541,6 +542,16 @@ function deleteTask() {
   }).catch(error => {
     console.error("Error while deleting task:", error);
   });
+}
+
+let expanded = false;
+function expandCalendar() {
+  const expandCalendarIndicator = document.getElementById('expandCalendarIndicator');
+  const expandCalendarLabel = document.getElementById('expandCalendarLabel');
+  expandCalendarIndicator.classList.toggle('expanded');
+  expanded ? displayCalender() : displayCalender(4);
+  expanded ? expandCalendarLabel.innerHTML = "Mehr anzeigen" : expandCalendarLabel.innerHTML = "Weniger anzeigen";
+  expanded = !expanded;
 }
 
 fetchHomeworks().then(() => {

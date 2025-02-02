@@ -26,6 +26,10 @@
     <!-- Calendar days will be dynamically generated -->
   </div>
 
+  <button type="button" id="expandCalendar" onclick="expandCalendar()">
+    <label id="expandCalendarLabel">Mehr anzeigen</label> <label id="expandCalendarIndicator" class="expanded">^</label>
+  </button>
+
   <div id="dayView">
     <div class="dateDisplay">
       <h1 id="dayView-Date">DD MM DD</h1>
@@ -36,8 +40,9 @@
       <p>Aufgaben sind an diesm Tag fällig.</p>
     </div>
   </div>
+
   <div id="taskView">
-    
+    <!-- Task will be generated here -->
   </div>
 
   <!-- Modal Template for creating and editing homeworks -->

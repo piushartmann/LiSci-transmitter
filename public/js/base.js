@@ -672,9 +672,7 @@ function checkOnline() {
 }
 
 console.time('Base JS load time');
-let envVariables;
 document.addEventListener('DOMContentLoaded', async () => {
-    envVariables = Object.fromEntries(performance.getEntriesByType("navigation")?.[0]?.serverTiming?.map?.(({ name, description }) => ([name, description])) ?? [])
     checkOnline();
     checkVersion();
     loadLanguage();

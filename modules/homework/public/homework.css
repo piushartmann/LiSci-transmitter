@@ -224,6 +224,19 @@
     right: 10px;
 }
 
+#expandCalendar {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    top: -10px;
+    left: max(calc(50% - 450px), 0%);
+}
+
+.expanded {
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
 @media (max-width: 768px) {
     .calendar .day {
         padding: 5px;

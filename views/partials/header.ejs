@@ -53,10 +53,10 @@
 
 </header>
 
+<div class="background" id="menuBackground"></div>
+<div class="background" id="mobileMenuBackground"></div>
 
-
-
-<div class="userMenu" id="userMenu" style="display: none">
+<div class="userMenu menuHidden" id="userMenu">
 
   <% if (typeof isSettingsPage == "undefined") { %>
   <div class="content">
@@ -75,9 +75,9 @@
   </div>
 </div>
 
-<div class="mobileMenu" id="mobileMenu" style="display: none">
+<div class="mobileMenu menuHidden" id="mobileMenu">
   <ul>
-    <!-- <li><a href="/archive">Archiv</a></li> -->
+    <li><a href="/" data-lang-content="header home"></a></li>
     <% if (usertype.includes("classmate")) { %>
     <li><a href="/citations" data-lang-content="header citations"></a></li>
     <% } %>
