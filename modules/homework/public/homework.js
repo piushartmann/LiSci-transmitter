@@ -553,6 +553,4 @@ fetchHomeworks().then(() => {
     }
   }
   loadDayView(today);
-})
-
-openCreateTask();
+});

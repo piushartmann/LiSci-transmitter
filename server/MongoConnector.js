@@ -1118,6 +1118,10 @@ module.exports.MongoConnector = class MongoConnector {
         return restructuredHomework;
     }
 
+    async getHomework(id) {
+        return await this.Homework.findById(id);
+    }
+
     async deleteHomework(id) {
         return await this.Homework.findByIdAndDelete(id);
     }

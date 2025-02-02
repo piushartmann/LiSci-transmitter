@@ -140,6 +140,9 @@ module.exports = (db) => {
         const id = req.body.id;
         if (typeof id !== "string") return res.status(400).send("Invalid parameters");
         //delete the homework and check if it was successful
+        const homework = await db.getHomework(id);
+        if (!homework) return res.status(400).send("Homework not found");
+        if (homework.userID._id.toString() !== req.session.userID) return res.status(403).send("You do not have permission to delete this homework");
         const success = await db.deleteHomework(id);
         if (!success) return res.status(500).send("Internal server error");
         //return success
