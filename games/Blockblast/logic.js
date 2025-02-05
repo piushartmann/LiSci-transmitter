@@ -1,14 +1,15 @@
+const blockblast = require('./engine.js');
 const path = require('path');
 
 module.exports = {
     newGame: async function newGame(db, players) {
-        const ongoingGame = await db.getGamesFromUsers(players, 'testGame');
+        const ongoingGame = await db.getGamesFromUsers(players, 'blockblast');
         if (ongoingGame[0]) {
             return ongoingGame[0]._id;
         }
 
-        const board = []
-        const game = await db.createGame(players, 'testGame', board);
+        const board = blockblast.emptyBoard();
+        const game = await db.createGame(players, 'blockblast', board);
         if (!game) {
             return null;
         }

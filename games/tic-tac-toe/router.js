@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const tttAI = require('./ai.js');
+const tttAI = require('./engine.js');
 const logic = require('./logic.js');
 const path = require('path');
 

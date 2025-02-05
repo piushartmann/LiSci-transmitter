@@ -6,7 +6,7 @@
     "multiplayer": true,
     "router": "router.js",
     "ejs": "tic-tac-toe.ejs",
-    "aiPath": "ai.js",
+    "aiPath": "engine.js",
     "logic": "logic.js",
     "public": "public",
     "css": "tic-tac-toe.css",

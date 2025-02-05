@@ -2,7 +2,7 @@
 const boardSize = 9;
 const availableBodiesCount = 3;
 const scoreIndex = boardSize;
-const availableBodiesIndex = scoreIndex++;
+const availableBodiesIndex = scoreIndex+1;
 
 const bodies = [
     [[0,0], [1,0], [2,0], [3,0]], // line v
@@ -11,7 +11,7 @@ const bodies = [
 ];
 
 function getRandomBodies(count) {
-    max = bodies.length()
+    max = bodies.length
     var arr = Array.from(Array(count), () => Math.floor(Math.random() * max));
     return arr
 }
@@ -40,14 +40,14 @@ function doesBodyFit(board, body, position) {
     return true;
 }
 
-function getBody(index) {
+function getBody(board, index) {
     if (index < 0 || index >= availableBodiesCount) {
         return false;
     }
-    if (board[availableBodiesIndex][availableBodyIndex] == -1) {
+    if (board[availableBodiesIndex][index] == -1) {
         return false;
     }
-    var bodyIndex = board[availableBodiesIndex][availableBodyIndex];
+    var bodyIndex = board[availableBodiesIndex][index];
     var body = bodies[bodyIndex];
     return body;
 }
@@ -59,8 +59,8 @@ function placeBody(board, body, position) {
     });
 }
 
-function removeBodyListing(index) {
-    var board[availableBodiesIndex][index] = -1;
+function removeBodyListing(board, index) {
+    board[availableBodiesIndex][index] = -1;
     for (var i=0; i<availableBodiesCount; i++) {
         if (board[availableBodiesIndex][i] != -1) {
             return;
@@ -122,17 +122,19 @@ function checkClears(board) {
 // ------------ Game logic ------------ 
 
 function doMove(board, availableBodyIndex, position) {
-    var body = getBody(availableBodyIndex);
+    var body = getBody(board, availableBodyIndex);
     if (!body) {
+        console.log("body not available");
         return false;
     }
 
     if (!doesBodyFit(board, body, position)) {
+        console.log("body not fitting");
         return false;
     }
 
     placeBody(board, body, position);
-    removeBodyListing(availableBodyIndex);
+    removeBodyListing(board, availableBodyIndex);
 
     score = checkClears(board);
     board[scoreIndex]+= score;

@@ -1,7 +1,7 @@
 {
-    "url": "template",
-    "name": "Test Game",
-    "description": "Nur ein Test Game",
+    "url": "blockblast",
+    "name": "Blockblast",
+    "description": "Tetris nur anders",
     "singleplayer": true,
     "multiplayer": false,
     "priority": 10,
