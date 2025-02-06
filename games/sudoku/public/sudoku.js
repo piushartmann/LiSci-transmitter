@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     connectToWS(gameID);
 
     window.addEventListener("focus", () => {
-        if (typeof ws !== 'undefined') return;
-        ws.connect();
+        if (typeof blockBlastWS !== 'undefined') return;
+        sudokuWS.connect();
     });
 });
 
@@ -69,7 +69,7 @@ function sendPreferencesUpdate() {
     const showErrors = modal.querySelector('#showErrors');
     const preventErrors = modal.querySelector('#preventErrors');
 
-    ws.send(JSON.stringify({ type: 'preferences', preferences: { showErrors: showErrors.checked, preventErrors: preventErrors.checked } }));
+    blockBlastWS.send(JSON.stringify({ type: 'preferences', preferences: { showErrors: showErrors.checked, preventErrors: preventErrors.checked } }));
 }
 
 function deleteGame() {
@@ -90,16 +90,16 @@ function deleteGame() {
 }
 
 function connectToWS(gameID) {
-    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/sudoku/${gameID}`);
+    blockBlastWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/sudoku/${gameID}`);
 
     const modal = getModal('settingsModal');
     const showErrorsCheckbox = modal.querySelector('#showErrors');
     const preventErrorsCheckbox = modal.querySelector('#preventErrors');
 
-    ws.onopen = () => {
+    blockBlastWS.onopen = () => {
         console.log('Connected to server');
     }
-    ws.onmessage = (event) => {
+    blockBlastWS.onmessage = (event) => {
         data = JSON.parse(event.data);
         if (data.type === 'board') {
             renderBoard(data.board, data.originalBoard);
@@ -113,11 +113,11 @@ function connectToWS(gameID) {
             board = data.board;
         }
     }
-    ws.onclose = () => {
+    blockBlastWS.onclose = () => {
         console.log('Disconnected from server');
         connectToWS(gameID);
     }
-    return ws;
+    return blockBlastWS;
 }
 
 function addInnerBoards(game, depth) {
@@ -274,10 +274,10 @@ function updateBoard(changeSquare, storedValue) {
         }
     }
 
-    if (ws.readyState === 1) {
+    if (blockBlastWS.readyState === 1) {
 
         board[changedIndex[0]][changedIndex[1]] = value;
-        ws.send(JSON.stringify({ type: 'move', index: changedIndex, value: value }));
+        blockBlastWS.send(JSON.stringify({ type: 'move', index: changedIndex, value: value }));
 
         checkWon();
 

@@ -36,6 +36,8 @@ module.exports = (db, gameConfigs, connectedUsers) => {
     router.get('/', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
+        userFilteredGameConfigs = gameConfigs.filter((gameConfig) => (!(gameConfig.enabled == false) || (gameConfig.enabled == false && gameConfig.preview && gameConfig.preview == true && permissions.includes("preview"))))
+
 
         const prefetches = [
             "/css/games.css",
@@ -43,7 +45,7 @@ module.exports = (db, gameConfigs, connectedUsers) => {
         ];
 
         res.render('games', {
-            games: gameConfigs
+            games: userFilteredGameConfigs
         });
     });
 
@@ -75,10 +77,14 @@ module.exports = (db, gameConfigs, connectedUsers) => {
 
         gameConfig.routerInstance.get('/:gameID', async (req, res) => {
             const permissions = await db.getUserPermissions(req.session.userID);
-
-            return res.render('game', {
-                title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
-            });
+            if (!(gameConfig.enabled == false) || (gameConfig.enabled == false && gameConfig.preview && gameConfig.preview == true && permissions.includes("preview"))) {
+                return res.render('game', {
+                    title: gameConfig.name, gameEjs: (gameConfig.ejs || gameConfig.url + '.ejs'), css: "/" + gameConfig.url + "/" + (gameConfig.css || gameConfig.url + ".css"), js: "/" + gameConfig.url + "/" + (gameConfig.js || gameConfig.url + ".js")
+                });
+            }
+            else {
+                return res.status(302).send("Not authorized")
+            }
         });
 
         gameConfig.routerInstance.post('/startGame', async (req, res) => {

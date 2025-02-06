@@ -21,7 +21,7 @@ games.forEach(function (file) {
             if (gameFile === "manifest.json") {
                 const manifest = JSON.parse(fs.readFileSync(path.join(fileDir, gameFile)));
                 //console.log(manifest);
-                if (!(manifest.enabled == false)) {
+                if (!(manifest.enabled == false) || (manifest.enabled == false && manifest.preview && manifest.preview == true)) { //if manifest.enabled exists and is true or if preview is enabled
                     gameConfigs.push(manifest);
                 }
             }

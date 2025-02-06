@@ -10,7 +10,7 @@ const bodySize = 4;
 const cellSize = 40;
 
 let gameID;
-let ws;
+let blockBlastWS;
 
 function showTileShadow(x, y) {
     var hovered = document.elementsFromPoint(x, y).filter(el => el.classList.contains('cell'));
@@ -159,7 +159,7 @@ function displayScore(score) {
 
 function restartGame(_) {
     try {
-        ws.send(JSON.stringify({
+        blockBlastWS.send(JSON.stringify({
             "type": "clear",
         }));
     } catch (error) {
@@ -170,7 +170,7 @@ function restartGame(_) {
 
 function sendMove(pos, displayIndex) {
     try {
-        ws.send(JSON.stringify({
+        blockBlastWS.send(JSON.stringify({
             "type": "move",
             "x": pos[0],
             "y": pos[1],
@@ -198,20 +198,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function connectToWS(gameID) {
-    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/blockblast/${gameID}`);
-    ws.onopen = () => {
+    blockBlastWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/blockblast/${gameID}`);
+    blockBlastWS.onopen = () => {
         console.log('Connected to server');
     }
-    ws.onmessage = (event) => {
+    blockBlastWS.onmessage = (event) => {
         data = JSON.parse(event.data);
         if (data.type === 'board') {
+            console.log(data)
             displayGrid(data.board);
             displayAvailableBodies(data.bodies);
             displayScore(data.score);
         }
     }
-    ws.onclose = () => {
+    blockBlastWS.onclose = () => {
         console.log('Disconnected from server');
     }
-    return ws;
+    return blockBlastWS;
 }

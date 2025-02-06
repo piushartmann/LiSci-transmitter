@@ -25,7 +25,8 @@
         "push",
         "canPost",
         "games",
-        "apiAccess"
+        "apiAccess",
+        "preview"
     ],
     "profilePictureResolution": 1024,
     "schoolIP": "141.91.210.103",

@@ -5,5 +5,6 @@
     "singleplayer": true,
     "multiplayer": false,
     "priority": 10,
-    "enabled": false
+    "enabled": false,
+    "preview": true
 }
