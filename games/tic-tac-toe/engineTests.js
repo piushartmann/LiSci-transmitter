@@ -13,8 +13,6 @@ const STATUS_DRAW = 2;
 const STD_DEPTH = 7;
 const MAX_EVAL = 1000;
 
-const prompt = require("prompt-sync")({ sigint: true });
-
 const winning_idecies_table = [
     // Rows
     [0, 1, 2],
@@ -170,28 +168,28 @@ function evaluation_of_pairs(game) {
 
 function evaluation_of_pairs_with_heat_map(game) {
     let value = 0;
-    let heat_map = [1, 1, 1, 1, 1, 1, 1, 1, 1]
+    let heat_map = [false, false, false, false, false, false, false, false, false];
 
     for (const pattern of winning_idecies_table) {
         const [n1, n2, n3] = pattern;
         if (game[n1] === 0 && game[n2] === 1 && game[n3] === 1) {
             value++;
-            heat_map[n1]++;
+            heat_map[n1] = true;
         } else if (game[n1] === 1 && game[n2] === 0 && game[n3] === 1) {
             value++;
-            heat_map[n2]++;
+            heat_map[n2] = true;
         } else if (game[n1] === 1 && game[n2] === 1 && game[n3] === 0) {
             value++;
-            heat_map[n3]++;
+            heat_map[n3] = true;
         } else if (game[n1] === 0 && game[n2] === -1 && game[n3] === -1) {
             value--;
-            heat_map[n1]++;
+            heat_map[n1] = true;
         } else if (game[n1] === -1 && game[n2] === 0 && game[n3] === -1) {
             value--;
-            heat_map[n2]++;
+            heat_map[n2] = true;
         } else if (game[n1] === -1 && game[n2] === -1 && game[n3] === 0) {
             value--;
-            heat_map[n3]++;
+            heat_map[n3] = true;
         }
     }
 
@@ -259,7 +257,7 @@ function find_best_move(board, depth = STD_DEPTH, alpha = -MAX_EVAL - 1, beta = 
 
         });
 
-        let evaluation;
+        let evaluation, move, b;
         if (is_board_level) {
             do_game_selection(new_board, index);
             evaluation = find_best_move(new_board, depth, alpha, beta)[0];
@@ -294,9 +292,10 @@ function find_best_move(board, depth = STD_DEPTH, alpha = -MAX_EVAL - 1, beta = 
     return [best_eval, move, is_board_level];
 }
 
-function get_best_move(board, depth = STD_DEPTH) {
+function play_best_move(board, depth = STD_DEPTH) {
     if (!board) return;
-    const [_, move, is_board_level] = find_best_move(board, depth);
+    var [score, move, is_board_level] = find_best_move(board, depth);
+    var move2 = undefined;
     let new_board = board.map(innerArray => {
         if (innerArray.constructor === Array) {
             return innerArray.slice();
@@ -308,16 +307,43 @@ function get_best_move(board, depth = STD_DEPTH) {
         new_board = do_game_selection(new_board, move) || board;
         [score, move2, _] = find_best_move(new_board, depth);
         new_board = do_square_selection(new_board, move2) || board;
+        console.log(`Move: ${move2}, ${move}`);
     } else {
         new_board = do_square_selection(new_board, move) || board;
+        console.log(`Move: ${move}`);
     }
+
+    console.log(`Expected score: ${score}`);
 
     return new_board;
 }
 
+var board = [
+    [-1, 1, 1, 0, 0, 0, 1, 0, -1, STATUS_ONGOING],
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, STATUS_XWON],
+    [0, -1, 0, 0, 0, 0, 0, 1, 1, STATUS_ONGOING],
+    [-1, 1, -1, -1, 0, 0, 0, 0, 1, STATUS_ONGOING],
+    [1, 0, 0, 1, 0, 1, 0, 0, 0, STATUS_ONGOING],
+    [0, -1, 0, 0, 0, 0, 1, 0, 0, STATUS_ONGOING],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, STATUS_OWON],
+    [0, 0, 0, -1, 0, 0, 0, 0, 0, STATUS_ONGOING],
+    [0, 0, 0, 1, -1, -1, 0, 0, 0, STATUS_ONGOING],
+];
+
+board[STATUS_INDEX] = STATUS_ONGOING;
+board[TURN_INDEX] = TURN_O;
+board[NEXT_GAME_INDEX] = 0;
+
+
+//console.log(evaluate_board(board));
+play_best_move(board, depth=3);
+
+//changes:
+// zweiter find best move call
+
 module.exports = {
     generate_empty_board,
-    get_best_move,
+    play_best_move,
     is_board_expecting_game_selection,
     game_selection_possibilities,
     do_game_selection,
