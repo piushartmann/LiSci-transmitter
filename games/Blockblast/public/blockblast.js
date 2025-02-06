@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function connectToWS(gameID) {
-    const ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/blockblast/${gameID}`);
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/blockblast/${gameID}`);
     ws.onopen = () => {
         console.log('Connected to server');
     }
