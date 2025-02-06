@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<!-- TODO: Add homework.title to en and de language files -->
+
+<head>
+  <%- include("./partials/baseHead.ejs") %>
+
+
+  <title data-lang-content="homework title">Hausaufgaben</title>
+  <script src="homework.js" defer></script>
+  <script src="/js/partials/untis.js"></script>
+  <link rel="stylesheet" href="homework.css">
+  <link rel="stylesheet" href="/css/untis.css">
+  <script src="/js/partials/autocomplete.js"></script>
+  <link rel="stylesheet" href="/css/autocomplete.css">
+</head>
+
+<body>
+  <%- include('./partials/base.ejs') %>
+
+
+  <button type="button" class="online-only" id="taskSubmit" onclick="openCreateTask()">Create Task</button>
+
+  <div class="calendar" id="calendar">
+    <!-- Calendar days will be dynamically generated -->
+  </div>
+
+  <button type="button" id="expandCalendar" onclick="expandCalendar()">
+    <label id="expandCalendarLabel">Mehr anzeigen</label> <label id="expandCalendarIndicator" class="expanded">^</label>
+  </button>
+
+  <div id="dayView">
+    <div class="dateDisplay">
+      <h1 id="dayView-Date">DD MM DD</h1>
+      <h1 id="dayView-dayCount">(in 5 Tagen)</h1>
+    </div>
+    <div class="taskCount">
+      <p class="count" id="dayTaskCount">5</p>
+      <p>Aufgaben sind an diesm Tag fällig.</p>
+    </div>
+  </div>
+
+  <div id="taskView">
+    <!-- Task will be generated here -->
+  </div>
+
+  <!-- Modal Template for creating and editing homeworks -->
+  <div class="modal-template" id="timeTableModal">
+    <button type="button" onclick="untisPreviousWeek()"><</button>
+    <button type="button" onclick="untisNextWeek()">></button>
+    <button type="button" onclick="thisWeek()">Today</button>
+    <h1>Wähle die Stunde aus</h1>
+    <div class="timetable"></div>
+  </div>
+
+  <div class="modal-template" id="taskModal">
+    <h1 id="taskTitle">Neue Aufgabe eintragen</h1>
+
+    <div id="deleteTaskButton" style="display: none;">
+      <button type="button" class="button"  onclick="deleteTask()">
+        <img class="icon" src="/icons/delete.svg" alt="file">
+        <label class="label" for="file">Hausaufgabe löschen</label>
+      </button>
+    </div>
+
+    <select id="classSelector" class="online-only" required>
+      <option selected="selected">Loading...</option>
+    </select>
+
+    <button id="other_select_button" class="hidden" type="button" onclick="showUntisModal()">select</button>
+
+    <select id="untilSelector" class="online-only" required disabled>
+      <option>Please select a Subject</option>
+    </select>
+    <textarea type="text" name="content" id="content" class="online-only" placeholder="Aufgabenbeschreibung" oninput="textAreaOnInput(this, true)" required></textarea>
+
+    <label for="files">Files:</label>
+    <div id="files">
+      <!-- Files will appear here -->
+      <button type="button" class="button newFile" id="newFile" onclick="addFileInput()">
+        <img class="icon" src="/icons/file-added.svg" alt="file">
+        <label class="label short-label" for="file">Datei hinzufügen</label>
+      </button>
+    </div>
+    <button type="button" name="Submit" onclick="submitTask()">Submit</button>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+  const untisClasses = "<%= untisClasses %>".split(",").map(c => c.trim());
+</script>

@@ -121,7 +121,7 @@
             "decline": "Ablehnen"
         },
         "selector": {
-            "play_singleplayer": "Singleplayer",
+            "play_singleplayer": "Einzelspieler",
             "search_for_others": "Suche nach anderen Spielern",
             "modal": {
                 "title": "Spieler auswählen",
@@ -153,6 +153,12 @@
             "oldest": "Älteste zuerst"
         }
     },
+    "homework": {
+        "title": "Hausaufgaben"
+    },
+    "charts": {
+        "title": "Graphen"
+    },
     "languages": {
         "de": "Deutsch",
         "en": "Englisch",
@@ -162,5 +168,14 @@
         "dwa": "Zwergisch",
         "nl": "Niederländisch",
         "wurstwasser": "Wurstwasser"
+    },
+    "days": {
+        "sunday": "Sonntag",
+        "monday": "Montag",
+        "tuesday": "Dienstag",
+        "wednesday": "Mittwoch",
+        "thursday": "Donnerstag",
+        "friday": "Freitag",
+        "saturday": "Samstag"
     }
 }

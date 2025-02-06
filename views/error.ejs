@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <%- include("./partials/baseHead.ejs") %>
+
+    <title data-lang-content="error title">Error</title>
+</head>
+
+<body>
+    <%- include('./partials/base.ejs') %>
+
+    <div class="container">
+        <div class="code"><%= code %></div>
+        <div class="message"><%= message %></div>
+    </div>
+
+</body>
+
+</html>
+
+<style>
+        .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                height: 100vh;
+                margin-top: 20vh;
+                text-align: center;
+        }
+
+        .code {
+                font-size: 10em;
+                font-weight: bold;
+        }
+        
+        .message {
+                font-size: 1.5em;
+        }
+</style>

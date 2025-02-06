@@ -1,6 +1,6 @@
 let yourTurn = false;
 let gameID = null;
-let ws;
+let tttWS;
 
 const gameHTML = `<div class="inner game">
 <div class="inner square top left"></div>
@@ -68,8 +68,6 @@ function updateBoard(board, player, nextGame) {
     const games = Array.from(document.getElementsByClassName('game'));
     const turnDescription = document.getElementById('turnDescription');
     const currentSymbol = document.getElementById('currentSymbol');
-
-    console.log(board);
 
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {

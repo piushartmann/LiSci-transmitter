@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <%- include("./partials/baseHead.ejs") %>
+  <title data-lang-content="charts title">Statistics</title>
+  <script src="statistics.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <link rel="stylesheet" href="statistics.css">
+</head>
+
+<body>
+  <%- include('./partials/base.ejs') %>
+
+  <select id="timespanSelector">
+    <option value="">All Time</option>
+    <option value="month">Last Month</option>
+    <option value="week">Last Week</option>
+    <option value="day">Last Day</option>
+  </select>
+
+  <div class="chartContainer">
+    <div class="chart">
+      <canvas id="allCitations"></canvas>
+    </div>
+    <div class="chart">
+      <canvas id="mostCited"></canvas>
+    </div>
+    <div class="chart">
+      <canvas id="citationsOverTime"></canvas>
+    </div>
+  </div>
+
+</body>
+
+</html>

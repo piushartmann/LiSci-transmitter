@@ -1,4 +1,4 @@
-function autocomplete(input, arr, callback = () => { }) {
+function autocomplete(input, arr, callback = () => { }, inline = false) {
     var currentFocus;
     input.addEventListener("input", function (e) {
         var autocompleteContainer, autocompleteItem, index, inputValue = this.value;
@@ -6,8 +6,9 @@ function autocomplete(input, arr, callback = () => { }) {
         if (!inputValue) { return false; }
         currentFocus = -1;
         autocompleteContainer = document.createElement("DIV");
+        autocompleteContainer.classList.add("autocomplete-items");
+        if (inline) autocompleteContainer.classList.add("inline");
         autocompleteContainer.setAttribute("id", this.id + "autocomplete-list");
-        autocompleteContainer.setAttribute("class", "autocomplete-items");
         this.parentNode.insertBefore(autocompleteContainer, this.nextSibling);
         for (index = 0; index < arr.length; index++) {
             try {

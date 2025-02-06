@@ -1,18 +1,35 @@
 const path = require('path');
 const fs = require('fs');
 
-function ejs(viewDirs, publicDirs) {
-    return middleware;
+const basePrefetches = [
 
+];
+const version = process.env.VERSION;
+const config = require("../config.json")
 
-    function middleware(req, res, next) {
+function middleware(db, viewDirs, publicDirs, moduleConfigs) {
+    return renderer;
+
+    function renderer(req, res, next) {
         res.render = (function (render) {
-            return function (view, options, callback) {
+            return async function (view, additionalOptions, callback) {
+                const permissions = await db.getUserPermissions(req.session.userID) || [];
+                const preferences = await db.getPreferences(req.session.userID) || {};
+                const profilePic = await db.getPreference(req.session.userID, 'profilePic');
+                const ips = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+                const ip = ips.split(",")[0];
+                const modules = moduleConfigs || [];
+        
+                const isInSchool = ip == config.schoolIP;
+                let options = {
+                    loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {}, isInSchool, modules,
+                    ...additionalOptions
+                };
                 render.call(this, view, options, (err, html) => {
                     if (err) {
                         return callback ? callback(err) : next(err);
                     }
-                    versioningCalc(res, html, view, (transformedView) => {
+                    versioning(res, html, view, (transformedView) => {
                         callback ? callback(null, transformedView) : res.send(transformedView);
                     });
                 });
@@ -21,7 +38,7 @@ function ejs(viewDirs, publicDirs) {
         next();
     }
 
-    function versioningCalc(res, html, view, send) {
+    function versioning(res, html, view, send) {
         function versionPrefetches(prefetches) {
             const versionedPrefetches = [];
             prefetches.forEach(prefetchURL => {
@@ -95,8 +112,15 @@ function ejs(viewDirs, publicDirs) {
                     srcs.push(src);
                     continue;
                 }
-                const srcPath = path.join(publicDirs[0], src.replace(/\.js$/, '.min.js'))
-                if (!fs.existsSync(srcPath)) {
+                let srcPath = null;
+                publicDirs.forEach(publicDir => {
+                    if (srcPath) return;
+                    const srcPathToCheck = path.join(publicDir, src.replace(/\.js$/, '.min.js'))
+                    if (fs.existsSync(srcPathToCheck)) {
+                        srcPath = srcPathToCheck;
+                    }
+                });
+                if (!srcPath) {
                     srcs.push(src);
                     continue;
                 }
@@ -105,18 +129,7 @@ function ejs(viewDirs, publicDirs) {
             }
 
             while ((match = hrefRegex.exec(indexFileContent)) !== null) {
-                const src = match[1]
-                if (src.endsWith('.min.js')) {
-                    srcs.push(src);
-                    continue;
-                }
-                const srcPath = path.join(publicDirs[0], src.replace(/\.js$/, '.min.js'))
-                if (!fs.existsSync(srcPath)) {
-                    srcs.push(src);
-                    continue;
-                }
-                html = html.replace(src, src.replace(/\.js$/, '.min.js'));
-                srcs.push(src.replace(/\.js$/, '.min.js'));
+                srcs.push(match[1]);
             }
 
             while ((match = imgRegex.exec(indexFileContent)) !== null) {
@@ -150,4 +163,4 @@ function ejs(viewDirs, publicDirs) {
     }
 }
 
-module.exports = ejs
+module.exports = middleware

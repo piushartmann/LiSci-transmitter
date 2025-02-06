@@ -14,6 +14,13 @@
       <% if (usertype.includes("games")) { %>
       <li><a href="/games" data-lang-content="header games"></a></li>
       <% } %>
+      <% if (loggedIn) { %>
+      <% for( let i = 0; i < modules.length; i++ ) { %>
+      <% if (modules[i].visible == true) { %>
+      <li><a href="/<%= modules[i].name %>" data-lang-content="<%= modules[i].name %>"><%= modules[i].name %></a></li>
+      <% } %>
+      <% } %>
+      <% } %>
 
       <li><a href="/about" data-lang-content="header about"></a></li>
     </ul>
@@ -46,10 +53,10 @@
 
 </header>
 
+<div class="background" id="menuBackground"></div>
+<div class="background" id="mobileMenuBackground"></div>
 
-
-
-<div class="userMenu" id="userMenu" style="display: none">
+<div class="userMenu menuHidden" id="userMenu">
 
   <% if (typeof isSettingsPage == "undefined") { %>
   <div class="content">
@@ -68,9 +75,9 @@
   </div>
 </div>
 
-<div class="mobileMenu" id="mobileMenu" style="display: none">
+<div class="mobileMenu menuHidden" id="mobileMenu">
   <ul>
-    <!-- <li><a href="/archive">Archiv</a></li> -->
+    <li><a href="/" data-lang-content="header home"></a></li>
     <% if (usertype.includes("classmate")) { %>
     <li><a href="/citations" data-lang-content="header citations"></a></li>
     <% } %>
@@ -83,11 +90,21 @@
     <li><a href="/games" data-lang-content="header games"></a></li>
     <% } %>
 
-    <li><a href="/about" data-lang-content="header about"></a></li>
+    <% for( let i = 0; i < modules.length; i++ ) { %>
+    <% if (modules[i].visible == true) { %>
+    <li><a href="/<%= modules[i].name %>" data-lang-content="<%= modules[i] %>"><%= modules[i].name %></a></li>
+    <% } %>
+    <% } %>
 
     <% if (loggedIn) { %>
     <li><a href="/settings" data-lang-content="header settings"></a></li>
+    <% } %>
+    
+    <li><a href="/about" data-lang-content="header about"></a></li>
+
+    <% if (loggedIn) { %>
     <li><a href="#" onclick="logout()" data-lang-content="header logout"></a></li>
     <% } %>
+
   </ul>
 </div>

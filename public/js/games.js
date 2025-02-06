@@ -1,12 +1,12 @@
 let invited = [];
 let invites = [];
-let users = [];
+let discoveredUsers = [];
 let discoverGame = null;
 
-function buildDiscoveryList(players) {
-    const playerConnections = document.getElementById('playerConnections');
+function buildDiscoveryList() {
+    const playerConnections = getModal('multiplayerModal').querySelector('.modal-content #playerConnections');
     playerConnections.innerHTML = '';
-    players.forEach(player => {
+    discoveredUsers.forEach(player => {
         const playerElement = buildButton("icons/games/connect.svg", player.username, () => {
             if (invited.includes(player.userID)) {
                 playerElement.classList.remove('invited');
@@ -14,13 +14,9 @@ function buildDiscoveryList(players) {
                 uninvitePlayer(discoverGame, player.userID);
             }
             else {
-                if (invites.find(i => i.user === player.userID)) {
-                    acceptInvite(discoverGame, player.userID);
-                } else {
-                    playerElement.classList.add('invited');
-                    invited.push(player.userID);
-                    invitePlayer(discoverGame, player.userID);
-                }
+                playerElement.classList.add('invited');
+                invited.push(player.userID);
+                invitePlayer(discoverGame, player.userID);
             }
         });
 
@@ -28,12 +24,7 @@ function buildDiscoveryList(players) {
             playerElement.classList.add('invited');
         }
 
-        if (invites.find(i => i.user === player.userID)) {
-            playerElement.classList.add('invitedBy');
-        }
-
         playerElement.classList.add('player');
-        playerElement.type = 'button';
         playerElement.dataset.userid = player.userID;
         playerConnections.appendChild(playerElement);
     });
@@ -68,7 +59,7 @@ function playSinglePlayer(game) {
 function playSinglePlayerWithDifficulties(game, difficulties) {
     difficulties = JSON.parse(difficulties);
 
-    const modal = openModal(document.getElementById('difficultiesModal'));
+    const modal = openModal('difficultiesModal');
     difficultiesElement = modal.querySelector('#difficulties');
 
     difficultiesElement.innerHTML = '';
@@ -96,8 +87,8 @@ function invitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    if (gamesWS && gamesWS.readyState === WebSocket.OPEN) {
-        gamesWS.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'invite', "user": player, "game": game }));
     }
     else {
         console.log("Websocket not open");
@@ -109,8 +100,8 @@ function uninvitePlayer(game, player) {
     console.log(game);
     console.log(player);
 
-    if (gamesWS && gamesWS.readyState === WebSocket.OPEN) {
-        gamesWS.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'uninvite', "user": player, "game": game }));
     }
     else {
         console.log("Websocket not open");
@@ -120,12 +111,15 @@ function uninvitePlayer(game, player) {
 function discoverOtherPlayers(game) {
     console.log("Discovering other players");
 
-    const connectionModal = document.getElementById('multiplayerModal');
-    openModal(connectionModal);
+    openModal('multiplayerModal');
+
+    buildDiscoveryList();
 
     discoverGame = game;
 
-    const createInviteButton = document.getElementById('createInviteButton');
+    const modal = getModal('multiplayerModal');
+
+    const createInviteButton = modal.querySelector('#createInviteButton');
     createInviteButton.onclick = () => {
         createInviteLink(game);
     }
@@ -137,6 +131,7 @@ function hideDiscovery() {
 }
 
 function createInviteLink(game) {
+    const modal = getModal('multiplayerModal');
     console.log("Creating invite link");
 
     fetch(`/games/${game}/newInviteLink`, {
@@ -148,8 +143,8 @@ function createInviteLink(game) {
         if (res.ok) {
             const data = await res.json();
             console.log(data);
-            const inviteLink = document.getElementById('inviteLink');
-            const copyLink = document.getElementById('copyLink');
+            const inviteLink = modal.querySelector('#inviteLink');
+            const copyLink = modal.querySelector('#copyLink');
             inviteLink.value = data.invite;
             inviteLink.style.display = 'block';
             copyLink.style.display = 'block';

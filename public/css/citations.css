@@ -70,18 +70,6 @@
     margin: 5px;
 }
 
-.sentenceStructure .content textarea,
-.sentenceStructure .author textarea {
-    padding: 10px;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 1em;
-    resize: none;
-    height: 40px;
-    overflow: hidden;
-    width: 100%;
-}
-
 
 .citationSubmit {
     padding: 10px 20px;

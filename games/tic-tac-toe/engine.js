@@ -144,6 +144,10 @@ function do_square_selection(board, index) {
 function evaluation_of_pairs(game) {
     let value = 0;
 
+    if (game[STATUS_INDEX] != STATUS_ONGOING) {
+        return 0;
+    }
+
     for (const pattern of winning_idecies_table) {
         const [n1, n2, n3] = pattern;
         if (game[n1] === 0 && game[n2] === 1 && game[n3] === 1) {
@@ -202,20 +206,21 @@ function evaluate_board(board) {
 
     for (const state of game_states) {
         if (state !== 2) {
-            value += state * (MAX_EVAL / 10);
+            value += state * 10;
         }
     }
 
     let [board_pairs_value, board_heat_map] = evaluation_of_pairs_with_heat_map(game_states);
-    // the heat_map marks games that would decide the entire game
-    value += board_pairs_value * (MAX_EVAL / 50);
+    value += board_pairs_value * 15;
 
     for (var i = 0; i < 9; i++) {
-        // to encourage working on games that would decide the entire game pairs are valued more there
-        value += Math.min(evaluation_of_pairs(board[i]), 3) * board_heat_map[i];
+        // the heat_map marks games that would decide the entire game
+        // to encourage working on games that would decide the entire game, pairs there are valued more
+        var v = evaluation_of_pairs(board[i]);
+        value += Math.min(v, 2) * (board_heat_map[i] ? 8 : 1);
     }
 
-    return value;
+    return Math.round(value);
 }
 
 function find_best_move(board, depth = STD_DEPTH, alpha = -MAX_EVAL - 1, beta = MAX_EVAL + 1) {
@@ -301,7 +306,8 @@ function get_best_move(board, depth = STD_DEPTH) {
 
     if (is_board_level) {
         new_board = do_game_selection(new_board, move) || board;
-        new_board = do_square_selection(new_board, move) || board;
+        [score, move2, _] = find_best_move(new_board, depth);
+        new_board = do_square_selection(new_board, move2) || board;
     } else {
         new_board = do_square_selection(new_board, move) || board;
     }

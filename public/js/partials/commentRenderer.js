@@ -1,8 +1,7 @@
 function renderComments(post) {
-    const commentModal = document.getElementById('commentModal');
-    commentModal.style.display = 'block';
+    const modal = openModal('commentModal', true)
 
-    const commentButton = document.getElementById('commentButton');
+    const commentButton = modal.querySelector('#commentButton');
     commentButton.onclick = () => submitComment(post);
 
     window.addEventListener('keydown', (event) => {
@@ -17,7 +16,7 @@ function renderComments(post) {
         buildComment(comment);
     });
 
-    const textarea = document.getElementById('commentTextarea');
+    const textarea = modal.querySelector('#commentTextarea');
     if (!loggedIn) {
         textarea.disabled = true;
         textarea.placeholder = "Please log in to comment";
@@ -27,14 +26,16 @@ function renderComments(post) {
 }
 
 function hideComments() {
-    const commentModal = document.getElementById('commentModal');
-    const commentContainer = document.getElementById('commentContainer');
+    const modal = getModal('commentModal');
+    const commentModal = hideModal('commentModal');
+    const commentContainer = modal.querySelector('#commentContainer');
     commentContainer.innerHTML = '';
     commentModal.style.display = 'none';
 }
 
 async function submitComment(post) {
-    const textarea = document.getElementById('commentTextarea');
+    const modal = getModal('commentModal');
+    const textarea = modal.querySelector('#commentTextarea');
     const content = textarea.value;
     await fetch('internal/createComment', {
         method: 'post',
@@ -47,7 +48,8 @@ async function submitComment(post) {
 }
 
 function buildComment(comment) {
-    const commentContainer = document.getElementById('commentContainer');
+    const modal = getModal('commentModal');
+    const commentContainer = modal.querySelector('#commentContainer');
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.dataset.id = comment._id;

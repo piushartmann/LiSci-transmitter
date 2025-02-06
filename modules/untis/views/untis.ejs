@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+<!-- TODO: Add untis.title to en and de language files -->
+
+<head>
+  <%- include("./partials/baseHead.ejs") %>
+
+
+  <title data-lang-content="untis title">Untis</title>
+  <script src="untis.js" defer></script>
+  <script src="/js/partials/untis.js"></script>
+  <link rel="stylesheet" href="untis.css">
+  <link rel="stylesheet" href="/css/untis.css">
+</head>
+
+<body>
+  <%- include('./partials/base.ejs') %>
+
+  <button type="button" onclick="untisPreviousWeek()"><</button>
+    <button type="button" onclick="untisNextWeek()">></button>
+    <button type="button" onclick="thisWeek()">Today</button>
+    
+  <div class="timetable"></div>
+
+</body>
+
+</html>
+
+<script>
+  const untisClasses = "<%= untisClasses %>".split(",").map(c => c.trim());
+</script>

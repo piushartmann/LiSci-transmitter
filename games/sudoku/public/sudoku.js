@@ -10,7 +10,7 @@ const gameHTML = `<div class="inner game">
 <div class="inner square bottom right"></div>
 </div>`
 
-let ws;
+let sudokuWS;
 let highlightedSquares = [];
 let board = [];
 let preventImpossibleValues = true;
@@ -30,9 +30,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof ws !== 'undefined') return;
         ws.connect();
     });
+});
 
-    const showErrorsCheckbox = document.getElementById('showErrors');
-    const preventErrorsCheckbox = document.getElementById('preventErrors');
+function showSettingsModal() {
+    const modal = openModal('settingsModal');
+
+    const showErrorsCheckbox = modal.querySelector('#showErrors');
+    const preventErrorsCheckbox = modal.querySelector('#preventErrors');
+
+    showErrorsCheckbox.checked = highlightImpossibleValues;
+    preventErrorsCheckbox.checked = preventImpossibleValues;
+
+    if (!highlightImpossibleValues) {
+        preventErrorsCheckbox.checked = false;
+        preventErrorsCheckbox.disabled = true;
+    }
 
     showErrorsCheckbox.addEventListener('change', () => {
         highlightImpossibleValues = showErrorsCheckbox.checked;
@@ -50,11 +62,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         preventImpossibleValues = preventErrorsCheckbox.checked;
         sendPreferencesUpdate();
     });
-});
+}
 
 function sendPreferencesUpdate() {
-    const showErrors = document.getElementById('showErrors');
-    const preventErrors = document.getElementById('preventErrors');
+    const modal = getModal('settingsModal');
+    const showErrors = modal.querySelector('#showErrors');
+    const preventErrors = modal.querySelector('#preventErrors');
 
     ws.send(JSON.stringify({ type: 'preferences', preferences: { showErrors: showErrors.checked, preventErrors: preventErrors.checked } }));
 }
@@ -79,8 +92,9 @@ function deleteGame() {
 function connectToWS(gameID) {
     ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/sudoku/${gameID}`);
 
-    const showErrorsCheckbox = document.getElementById('showErrors');
-    const preventErrorsCheckbox = document.getElementById('preventErrors');
+    const modal = getModal('settingsModal');
+    const showErrorsCheckbox = modal.querySelector('#showErrors');
+    const preventErrorsCheckbox = modal.querySelector('#preventErrors');
 
     ws.onopen = () => {
         console.log('Connected to server');

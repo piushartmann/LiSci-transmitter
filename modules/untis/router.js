@@ -9,12 +9,18 @@ const router = Router();
 
 sanitizeHtmlAllowedTags = sanitizeHtml.defaults.allowedTags.concat(['img', 'embed', 'iframe']);
 
-// TODO: Add Homework server Code here note: only for internal api things the /homework route is defined in the base.js file
 module.exports = (db) => {
 
-    router.get('/', (req, res) => {
-        res.send("Internal Homework API");
+// TODO: Add router routes here
+
+    router.get('/', async (req, res) => {
+        const untisClasses = await db.getPreference(req.session.userID, 'untisClasses');
+
+        return res.render('untis', {
+            untisClasses: untisClasses
+        });
     });
+
 
     return router;
 };

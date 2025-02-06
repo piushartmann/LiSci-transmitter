@@ -40,8 +40,6 @@ module.exports = (db, logic) => {
                 receiveMove(game, message.index, message.value);
             }
             else if (message.type === "preferences") {
-                console.log("Received preferences");
-                console.log(message.preferences);
                 let game = await db.getGame(gameID);
                 let preferences = message.preferences;
                 if (!"showErrors" in preferences || typeof preferences["showErrors"] !== "boolean") return;

@@ -40,7 +40,7 @@ module.exports = (db, s3Client) => {
      * @param {string[]} [forceFormats=[]] - An array of allowed file formats. If provided, only files with these formats will be accepted.
      * @returns {Promise<string>} - A promise that resolves with the S3 key of the uploaded file, or rejects with an error.
      */
-    function uploadFile(req, res, directory = "", forceFormats = []) {
+    function uploadFile(req, res, directory = "", forceFormats = [], registerFile = true) {
         return new Promise((resolve, reject) => {
             const filename = generateRandomFilename();
             let s3Path;
@@ -80,7 +80,7 @@ module.exports = (db, s3Client) => {
                     reject(error);
                 } else {
                     if (req.files && req.files.length > 0) {
-                        registerFileInDB(req.session.userID, req.files[0].key, s3Path, directory);
+                        if (registerFile) registerFileInDB(req.session.userID, req.files[0].key, s3Path, directory);
                         resolve(req.files[0].key);
                     } else {
                         reject(new Error("No files uploaded"));
@@ -90,12 +90,16 @@ module.exports = (db, s3Client) => {
         });
     }
 
-    function registerFileInDB(userID, filename, path, type) {
-        db.createFileEntry(userID, filename, path, type).then(() => {
-            console.log("File entry created in database");
-        }).catch((error) => {
-            console.error("Error creating file entry in database:", error);
-        });
+    async function registerFileInDB(userID, filename, path, type) {
+        try {
+            const entry = await db.createFileEntry(userID, filename, path, type)
+            console.log("File registered in database:", filename);
+            return entry;
+        }
+        catch (error) {
+            console.error("Error registering file in database:", error);
+            return null;
+        }
     }
 
     function deleteFile(path) {
@@ -127,7 +131,7 @@ module.exports = (db, s3Client) => {
             return res.status(500).send(error.message);
         }
         return res.status(200).send(filename);
-    })
+    });
 
     router.post('/uploadImage', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -141,7 +145,24 @@ module.exports = (db, s3Client) => {
             return res.status(500).send(error.message);
         }
         return res.status(200).send(filename);
-    })
+    });
+
+    router.post('/uploadHomework', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+        const permissions = await db.getUserPermissions(req.session.userID);
+        if (!permissions.includes("admin") && !permissions.includes("classmate")) return res.status(403).send("You cannot upload a Homework");
+
+        let newFilename;
+        const oldFilename = req.query.filename;
+        if (!oldFilename) return res.status(400).send("Missing filename");
+        try {
+            newFilename = await uploadFile(req, res, "homework", [], false);
+            const entry = await registerFileInDB(req.session.userID, oldFilename, newFilename, "homework");
+            return res.status(200).send(entry.path);
+        } catch (error) {
+            return res.status(500).send(error.message);
+        }
+    });
 
     router.post('/uploadProfilePicture', multer().single('file'), async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
@@ -183,7 +204,12 @@ module.exports = (db, s3Client) => {
                 return res.status(400).send("Invalid crop");
             }
 
-            image.extract({ width: extractWidth, height: extractHeight, left: extractLeft, top: extractTop }).resize(config.profilePictureResolution, config.profilePictureResolution).toBuffer().then(async (data) => {
+            image
+            .rotate()
+            .extract({ width: extractWidth, height: extractHeight, left: extractLeft, top: extractTop })
+            .resize(config.profilePictureResolution, config.profilePictureResolution)
+            .toBuffer()
+            .then(async (data) => {
                 //write the file to local disk on fs
                 console.log("Writing file to disk");
                 const filename = generateRandomFilename();
@@ -201,7 +227,7 @@ module.exports = (db, s3Client) => {
                 }));
                 registerFileInDB(req.session.userID, newFilename, s3Path, "profile-pictures");
                 const currentProfilePic = await db.getPreference(req.session.userID, 'profilePic');
-                if (currentProfilePic.type === "custom"){
+                if (currentProfilePic.type === "custom") {
                     console.log("Deleting old profile picture");
                     await deleteFile(currentProfilePic.content);
                 };
@@ -218,7 +244,7 @@ module.exports = (db, s3Client) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
 
         const currentProfilePic = await db.getPreference(req.session.userID, 'profilePic');
-        if (currentProfilePic.type === "custom"){
+        if (currentProfilePic.type === "custom") {
             console.log("Deleting old profile picture");
             await deleteFile(currentProfilePic.content);
         };

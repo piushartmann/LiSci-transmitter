@@ -1,0 +1,248 @@
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    width: 100%;
+    max-width: 900px;
+    padding: 20px 0px;
+    margin: 0 auto;
+}
+
+.calendar .day {
+    position: relative;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: filter 0.3s;
+}
+
+.dayTaskCount {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    border-radius: 100%;
+    aspect-ratio: 1/1;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    color: white;
+}
+
+.calendar .day-weekend {
+    background-color: #a6b4ba;
+}
+
+.calendar .day-today {
+    background-color: #6fe37d;
+}
+
+.calendar .day-pastDay {
+    background-color: #d7d7d9;
+}
+
+.calendar .day:hover {
+    filter: brightness(0.9);
+}
+
+.calendar .day-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.newTaskContainer {
+    display: flex;
+    margin-bottom: 1vh;
+    border-radius: 8px;
+    box-shadow: 1px 1px 3px 0px #a7a7a7;
+    padding: 5px;
+    white-space: nowrap;
+}
+
+.newTaskContainer .subject {
+    width: 10%;
+}
+
+.newTaskContainer .teacher {
+    width: 10%;
+}
+
+.newTaskContainer .content {
+    width: 100%;
+}
+
+.newTaskContainer .content,
+.newTaskContainer .subject,
+.newTaskContainer .teacher {
+    margin: 5px;
+}
+
+.newTaskContainer .subject textarea,
+.newTaskContainer .teacher textarea,
+.newTaskContainer .content textarea {
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    resize: none;
+    height: 40px;
+    overflow: hidden;
+    width: 100%;
+}
+
+#taskSubmit {
+    display: block;
+    padding: 10px 20px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 150px;
+    margin-top: 5px;
+    margin-left: auto;
+}
+
+#subject,
+#teacher,
+#content {
+    padding: 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1em;
+    resize: none;
+    height: 40px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.dateDisplay {
+    display: flex;
+    justify-content: left;
+}
+
+.dateDisplay h1 {
+    padding: 10px;
+}
+
+#dayView-dayCount {
+    font-style: italic;
+    color: #707070;
+}
+
+.taskCount {
+    padding-left: 30px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    font-style: italic;
+}
+
+.taskCount .count {
+    padding: 5px;
+    font-weight: bold;
+}
+
+.taskElement {
+    position: relative;
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #a6a6a6;
+    border-radius: 8px;
+    background-color: #fff;
+    padding-top: 15px;
+    overflow: hidden;
+}
+
+.taskElement .header {
+    display: flex;
+    height: 30px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.taskElement .header .rightHeader {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+}
+
+.taskElement .subject,
+.taskElement .teacher,
+.taskElement .title {
+    font-size: 1.2em;
+    font-weight: bold;
+    justify-content: right;
+    margin: 0;
+    padding-inline: 30px;
+}
+
+.taskElement .content {
+    padding-inline: 20px;
+}
+
+.username {
+    margin: 10px;
+}
+
+.meta-info {
+    display: flex;
+}
+
+.modal #content {
+    min-height: 200px;
+}
+
+#files {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    gap: 10px;
+    /* border: 1px solid #ff0000; */
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#files .file {
+    display: flex;
+    border: 1px solid var(--post-outline-color);
+    border-radius: 8px;
+    margin-right: 5px;
+    justify-content: space-between;
+}
+
+#files .file button {
+    border: none;
+}
+
+#deleteTaskButton {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+}
+
+#expandCalendar {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    top: -10px;
+    left: max(calc(50% - 450px), 0%);
+}
+
+.expanded {
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+    .calendar .day {
+        padding: 5px;
+    }
+
+    .calendar .day-number {
+        display: none;
+    }
+}

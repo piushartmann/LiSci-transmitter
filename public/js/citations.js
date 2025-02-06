@@ -30,12 +30,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     })
 });
 
-function textAreaOnInput(textarea) {
-    textarea.value = textarea.value.replace(/[\n]/g, "");
-    textarea.style.height = "";
-    textarea.style.height = textarea.scrollHeight + "px";
-}
-
 function addNewContext(first = false) {
     const newCitationBox = document.getElementById("newCitationBox");
     const baseStructure = document.getElementById("baseStructure");
@@ -57,15 +51,6 @@ function addNewContext(first = false) {
 
     newCitationBox.appendChild(sentence);
     loadLanguage(true);
-}
-
-function utf8ToBase64(str) {
-    const utf8Bytes = new TextEncoder().encode(str);
-    let binaryString = '';
-    for (let i = 0; i < utf8Bytes.length; i++) {
-        binaryString += String.fromCharCode(utf8Bytes[i]);
-    }
-    return btoa(binaryString);
 }
 
 async function loadCitations(page, callback, reloading = false) {
@@ -160,7 +145,7 @@ function buildCitation(citation) {
     let authorDiv = document.createElement("div");
     let contextDiv = document.createElement("div");
     let metaDiv = document.createElement("div");
-    if (citation.context.length > 1) {
+    if (citation.context && citation.context.length > 1) {
         contextDiv = document.createElement("div");
         contextDiv.className = "context";
         citation.context.forEach(contextItem => {
@@ -229,7 +214,7 @@ function buildCitation(citation) {
 
     metaDiv.appendChild(dateDiv);
     metaDiv.appendChild(userDiv);
-    if (citation.context.length > 1) {
+    if (citation.context && citation.context.length > 1) {
         citationContainer.appendChild(contextDiv);
     }
     citationContainer.appendChild(sectionDiv);
@@ -477,10 +462,12 @@ function getFilterSettings() {
 
     sort.forEach(sortElement => {
         if (sortElement.id === "sortDate") {
-            sortObj.time = sortElement.value;
+            const [key, value] = sortElement.value.split("-")
+            console.log(key, value);
+            sortObj[key] = value;
         }
     });
-
+    console.log(sortObj);
     return { filter, sortObj };
 }
 

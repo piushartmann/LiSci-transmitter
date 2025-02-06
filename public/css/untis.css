@@ -1,0 +1,81 @@
+.timetable {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-height: 70vh;
+}
+
+.timetable .day {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    border: black 1px solid;
+}
+
+.timetable .time {
+    display: flex;
+    flex-direction: row;
+    height: 60px;
+    border-bottom: rgb(135, 135, 135) 1px solid;
+}
+
+.timetable .lesson {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    transition: filter 0.3s;
+    user-select: none;
+    gap: 5px;
+}
+
+.timetable .lesson:hover {
+    filter: brightness(0.7);
+}
+
+.timetable .lessonData {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.timetable .lessonTeacher,
+.timetable .lessonRoom,
+.timetable .lessonSubject {
+    margin: 0;
+    font-size: max(min(2vw, 0.9em), 10px);
+}
+
+.lesson-ADDITIONAL,
+.lesson-SUBSTITUTION {
+    background-color: #bda3c7;
+}
+
+.lesson-STANDARD,
+.lesson-ROOMSUBSTITUTION {
+    background-color: #f3b862;
+}
+
+.lesson-CANCEL {
+    background-color: #c4c6c6;
+}
+
+.room-REGULAR {
+    background-color: transparent;
+}
+
+.room-SUBSTITUTED {
+    background-color: #a781b5;
+}
+
+.teacher-REGULAR {
+    background-color: transparent;
+}
+
+.teacher-SUBSTITUTED {
+    background-color: #a781b5;
+}

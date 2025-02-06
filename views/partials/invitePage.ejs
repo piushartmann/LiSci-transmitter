@@ -69,16 +69,24 @@
   const joinButton = document.getElementById('joinButton');
   joinButton.addEventListener('click', () => {
     fetch(window.location.href + '/accept', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json())
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+      }).then(response => {
+      if (response.status !== 200) {
+        console.error('Something went wrong!');
+        console.error(response);
+        return;
+      }
+      return response.json();
+      })
       .then(data => {
-        console.log(data);
-        const gameUrl = data.url;
-        if (!gameUrl) return;
-        window.location.href = gameUrl;
+      if (!data) return;
+      console.log(data);
+      const gameUrl = data.url;
+      if (!gameUrl) return;
+      window.location.href = gameUrl;
       })
   });
 </script>

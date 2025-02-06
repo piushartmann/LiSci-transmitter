@@ -8,7 +8,7 @@ const router = Router();
  * @returns {Router} The router instance.
 */
 
-module.exports = (db, gameConfigs, discoverUsers) => {
+module.exports = (db, gameConfigs, connectedUsers) => {
 
     router.get('/:inviteID', async (req, res) => {
         const inviteID = req.params.inviteID;
@@ -30,28 +30,48 @@ module.exports = (db, gameConfigs, discoverUsers) => {
         const invite = await db.getInvite(inviteID);
         if (!invite) return res.status(404).send("Invite not found");
 
-        if (invite.gameID) {
-            return res.status(200).send(JSON.stringify({ url: `/games/${invite.gameInfo.url}/${invite.gameID}` }));
+        // Create a new game if one isnt already attached to the invite
+        let gameID = invite.gameID || await createGame(invite, inviteID, gameConfigs);
+
+        const inviter = connectedUsers.find(u => {
+            return u.user.id.toString() === invite.from.toString();
+        });
+
+        // Only send if websocket is in OPEN state
+        if (inviter && inviter.ws.readyState === 1) {
+            const acceptMessage = JSON.stringify({ 
+                "type": "accept", 
+                "game": invite.gameInfo.url, 
+                "gameID": gameID 
+            });
+            
+            try {
+                inviter.ws.send(acceptMessage);
+                console.log("Message sent successfully to", inviter.user.username);
+            } catch (err) {
+                console.error("Failed to send message:", err);
+            }
+        } else {
+            console.log("Inviter not found or websocket not ready:", 
+                inviter ? `WS State: ${inviter.ws.readyState}` : "Inviter not found");
         }
-        console.log("Accepting invite " + inviteID);
-
-        const gameConfig = gameConfigs.find(g => g.url === invite.gameInfo.url);
-        const gameID = await gameConfig.logicInstance.newGame(db, [invite.from, inviteID]);
-        if (!gameID) return res.status(500).send("Failed to create game");
-
-        await db.setInviteGameID(inviteID, gameID);
-
-        const player = discoverUsers.find(u => u.user.id === invite.from.toString());
-        if (!player) return res.status(404).send("Inviting Player not found");
-        player.ws.send(JSON.stringify({ "type": "accept", "game": invite.gameInfo.url, "gameID": gameID }));
 
         if (!req.session.userID) {
             req.session.inviteID = inviteID;
             req.session.inviteGameID = gameID;
         }
 
+        console.log("Successfully accepted invite " + inviteID);
         return res.status(200).send(JSON.stringify({ url: `/games/${invite.gameInfo.url}/${gameID}` }));
     });
+
+    async function createGame(invite, inviteID, gameConfigs) {
+        const gameConfig = gameConfigs.find(g => g.url === invite.gameInfo.url);
+        const gameID = gameConfig.logicInstance.newGame(db, [invite.from, inviteID]);
+        if (!gameID) return null;
+        await db.setInviteGameID(invite._id, gameID);
+        return gameID;
+    }
 
     return router;
 };

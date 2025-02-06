@@ -31,21 +31,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const newsPushCheckbox = document.getElementById('newsPushCheckbox');
-    newsPushCheckbox.addEventListener('change', () => {
-        changePushPreference('newsNotifications', newsPushCheckbox.checked);
-    });
-    const postsPushCheckbox = document.getElementById('postsPushCheckbox');
-    postsPushCheckbox.addEventListener('change', () => {
-        changePushPreference('postNotifications', postsPushCheckbox.checked);
-    });
-    const citationPushCheckbox = document.getElementById('citationsPushCheckbox');
-    citationPushCheckbox.addEventListener('change', () => {
-        changePushPreference('citationNotifications', citationPushCheckbox.checked);
-    });
-    const commentPushCheckbox = document.getElementById('commentsPushCheckbox');
-    commentPushCheckbox.addEventListener('change', () => {
-        changePushPreference('commentNotifications', commentPushCheckbox.checked);
-    });
+    if (newsPushCheckbox) {
+        newsPushCheckbox.addEventListener('change', () => {
+            changePushPreference('newsNotifications', newsPushCheckbox.checked);
+        });
+        const postsPushCheckbox = document.getElementById('postsPushCheckbox');
+        postsPushCheckbox.addEventListener('change', () => {
+            changePushPreference('postNotifications', postsPushCheckbox.checked);
+        });
+        const citationPushCheckbox = document.getElementById('citationsPushCheckbox');
+        citationPushCheckbox.addEventListener('change', () => {
+            changePushPreference('citationNotifications', citationPushCheckbox.checked);
+        });
+        const commentPushCheckbox = document.getElementById('commentsPushCheckbox');
+        commentPushCheckbox.addEventListener('change', () => {
+            changePushPreference('commentNotifications', commentPushCheckbox.checked);
+        });
+    }
 
     const languageSelect = document.getElementById('language');
     languageSelect.addEventListener('change', async () => {
@@ -99,11 +101,14 @@ async function enablePush() {
     }
 }
 
+let newProfilePictureFile = null;
 function onProfilePictureChange(element) {
+    const modal = getModal('profilePictureModal')
     console.log('profilePicture changed');
     const file = element.files[0];
+    newProfilePictureFile = file;
     const localUrl = URL.createObjectURL(file);
-    const preview = document.getElementById('profilePicturePreview');
+    const preview = modal.querySelector('#profilePicturePreview');
     preview.src = localUrl;
     preview.classList.remove('hidden');
     preview.addEventListener('load', () => {
@@ -121,7 +126,7 @@ function onProfilePictureChange(element) {
         preview.dataset.originalTop = preview.offsetTop;
         preview.dataset.maxScale = Math.max(preview.naturalWidth / preview.clientWidth, preview.naturalHeight / preview.clientHeight) * 4;
         preview.dataset.scale = 1;
-        document.getElementById('scaleSlider').max = preview.dataset.maxScale;
+        modal.querySelector('#scaleSlider').max = preview.dataset.maxScale;
         scalePreview(preview, 1);
         computeBounds(element.parentElement, preview);
         if (debug === true) drawDebugRect();
@@ -136,8 +141,9 @@ function computeBounds(parent, preview, imgScale = 1) {
 }
 
 function onScaleChange(element) {
+    const modal = getModal('profilePictureModal')
     const scale = element.value;
-    const preview = document.getElementById('profilePicturePreview');
+    const preview = modal.querySelector('#profilePicturePreview');
     const parent = preview.parentElement.children[0];
     scalePreview(preview, scale);
     preview.dataset.scale = scale;
@@ -180,8 +186,10 @@ function scalePreview(preview, scale) {
  */
 
 function debugSetScale(scale) {
-    document.getElementById('scaleSlider').value = scale;
-    onScaleChange(document.getElementById('scaleSlider'));
+    const modal = getModal('profilePictureModal')
+    const scaleSlider = modal.querySelector('#scaleSlider')
+    scaleSlider.value = scale;
+    onScaleChange(scaleSlider);
 }
 
 function draggable(element, constraints = { top: null, left: null, right: null, bottom: null }) {
@@ -270,7 +278,8 @@ function draggable(element, constraints = { top: null, left: null, right: null, 
 }
 
 function getPositionOfPreviewWithoutScale() {
-    const preview = document.getElementById('profilePicturePreview');
+    const modal = getModal('profilePictureModal')
+    const preview = modal.querySelector('#profilePicturePreview');
     let relativeX = Math.abs(preview.dataset.originalLeft - preview.offsetLeft) / preview.dataset.originalWidth / preview.dataset.scale;
     let relativeY = Math.abs(preview.dataset.originalTop - preview.offsetTop) / preview.dataset.originalHeight / preview.dataset.scale;
     if (relativeX < 0) relativeX = 0;
@@ -280,14 +289,15 @@ function getPositionOfPreviewWithoutScale() {
 }
 
 function drawDebugRect() {
-    const preview = document.getElementById('profilePicturePreview');
+    const modal = getModal('profilePictureModal')
+    const preview = modal.querySelector('#profilePicturePreview');
 
     const x = preview.dataset.originalLeft - preview.offsetLeft / preview.dataset.scale;
     const y = preview.dataset.originalTop - preview.offsetTop / preview.dataset.scale;
     const scale = preview.dataset.scale;
 
-    if (document.getElementById('debugCanvas')) {
-        document.getElementById('debugCanvas').remove();
+    if (modal.querySelector('#debugCanvas')) {
+        modal.querySelector('#debugCanvas').remove();
     }
     const canvas = document.createElement('canvas');
     canvas.id = 'debugCanvas';
@@ -301,8 +311,8 @@ function drawDebugRect() {
     canvas.style.zIndex = 1000;
     document.body.appendChild(canvas);
 
-    if (document.getElementById('debugCanvas2')) {
-        document.getElementById('debugCanvas2').remove();
+    if (modal.querySelector('#debugCanvas2')) {
+        modal.querySelector('#debugCanvas2').remove();
     }
     const canvas2 = document.createElement('canvas');
     canvas2.id = 'debugCanvas2';
@@ -319,6 +329,11 @@ function drawDebugRect() {
 
 function submitProfilePicture() {
     const { x, y, scale } = getPositionOfPreviewWithoutScale();
+    const modal = getModal('profilePictureModal')
+    if (newProfilePictureFile === null) {
+        console.error("No file selected");
+        return;
+    }
 
     console.log(x, y, scale);
 
@@ -326,7 +341,7 @@ function submitProfilePicture() {
     formData.append('x', x);
     formData.append('y', y);
     formData.append('scale', scale);
-    formData.append('file', document.getElementById('profilePicture').files[0]);
+    formData.append('file', newProfilePictureFile);
 
     fetch('internal/uploadProfilePicture', {
         method: 'post',
@@ -340,7 +355,7 @@ function submitProfilePicture() {
 }
 
 function resetProfilePicture() {
-    const preview = document.getElementById('profilePicturePreview');
+    const preview = modal.querySelector('#profilePicturePreview');
     preview.classList.add('hidden');
     preview.src = '';
     preview.style.width = '';
@@ -355,5 +370,22 @@ function resetProfilePicture() {
         window.location.reload();
     }).catch((error) => {
         console.error("Error resetting profile picture:", error);
+    });
+}
+
+function setUntisClasses() {
+    const classesString = document.getElementById('WebUntisClasses').value;
+    const classes = classesString.split(',').map((className) => className.trim());
+    fetch('internal/settings/setUntisClasses', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ classes }),
+    }).then(() => {
+        console.log("Untis classes set");
+        window.location.reload();
+    }).catch((error) => {
+        console.error("Error setting Untis classes:", error);
     });
 }

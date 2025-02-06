@@ -58,10 +58,10 @@
       <img class="profilePicture" src="https://storage.liscitransmitter.live/<%= profilePic.content %>">
       <% } %>
 
-      <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('', 'profilePictureModal')">Pick Profile Picture</button>
+      <button id="selectPicture" class="online-only button" data-lang-content="settings pick_profile_picture" onclick="openModal('profilePictureModal')">Pick Profile Picture</button>
     </div>
 
-    <div class="modal" id="profilePictureModal">
+    <div class="modal-template" id="profilePictureModal">
       <h1 id="title" data-lang-content="settings pick_profile_picture_modal title">Pick Profile Picture</h1>
 
       <div class="pickPicture">
@@ -95,6 +95,12 @@
         <option value="<%= languages[i] %>" <%= preferences.find(p => p.key === 'language')?.value === languages[i] ? 'selected' : '' %> data-lang-content="languages <%= languages[i] %>"><%= languages[i] %></option>
         <% } %>
       </select>
+    </div>
+
+    <div class="WebUntisClasses settings">
+      <label for="WebUntisClasses" data-lang-content="settings untis_classes">Untis Classes</label>
+      <input type="text" value="<%= untisClasses %>" id="WebUntisClasses">
+      <button id="WebUntisClassesSubmit" class="online-only" data-lang-content="interaction save" type="button" onclick="setUntisClasses()">Save</button>
     </div>
 
 

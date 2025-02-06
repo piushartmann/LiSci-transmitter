@@ -229,44 +229,58 @@ function iosPWASplash(t, e = "white") {
         }
 }
 
-let gamesWS;
+let ws;
 function makeDiscoverable() {
-    gamesWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/games/discover`);
-    gamesWS.onopen = () => {
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/websocket`);
+    ws.onopen = () => {
         console.log('Connected to server');
     }
-    gamesWS.onmessage = (event) => {
+    ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        if (data.type === 'invite') {
-            console.log('Game invite received');
-            document.body.appendChild(buildGameRequest(gamesWS, data.game, data.user, data.username));
-            loadLanguage();
+
+        switch (data.type) {
+            case 'invite':
+                console.log('Game invite received');
+                document.body.appendChild(buildGameRequest(ws, data.game, data.user, data.username));
+                loadLanguage();
+                break;
+            case 'uninvite':
+                console.log('Game uninvite received');
+                const gameRequests = Array.from(document.getElementsByClassName('game-request'));
+                for (let i = 0; i < gameRequests.length; i++) {
+                    gameRequests[i].remove();
+                }
+                break;
+            case 'accept':
+                console.log('Game accept received');
+                window.location.href = `/games/${data.game}/${data.gameID}`;
+                break;
+            case 'decline':
+                console.log('Game decline received');
+                if (typeof inviteDeclined === 'function') {
+                    inviteDeclined(data.user);
+                }
+                break;
+            case 'discover':
+                discoveredUsers = data.users;
+                if (typeof buildDiscoveryList === 'function') {
+                    if (getModal('multiplayerModal')) {
+                        buildDiscoveryList(data.users, data.game);
+                    }
+                }
+                break;
+            case 'reload':
+                console.log("Realod because of ws 'reload' message")
+                window.location.reload();
+            case 'reloadContent':
+                if (typeof reloadContent === 'function') {
+                    reloadContent();
+                }
+                break;
         }
-        else if (data.type === 'uninvite') {
-            console.log('Game uninvite received');
-            const gameRequests = Array.from(document.getElementsByClassName('game-request'));
-            for (let i = 0; i < gameRequests.length; i++) {
-                gameRequests[i].remove();
-            }
-        }
-        else if (data.type === 'accept') {
-            console.log('Game accept received');
-            console.log(data);
-            window.location.href = `/games/${data.game}/${data.gameID}`;
-        }
-        else if (data.type === 'decline') {
-            console.log('Game decline received');
-            if (typeof inviteDeclined === 'function') {
-                inviteDeclined(data.user);
-            }
-        }
-        else if (data.type === 'discover') {
-            if (typeof buildDiscoveryList === 'function') {
-                buildDiscoveryList(data.users, data.game);
-            }
-        }
+
     }
-    gamesWS.onclose = () => {
+    ws.onclose = () => {
         console.log('Disconnected from server. Reconnecting in 5 seconds');
         setTimeout(() => {
             makeDiscoverable();
@@ -324,7 +338,7 @@ function makeDiscoverable() {
         return gameRequest;
     }
 
-    return gamesWS;
+    return ws;
 }
 
 function addPWABar() {
@@ -338,20 +352,88 @@ function addPWABar() {
     });
 }
 
-function hideModal() {
-    const modal = document.getElementById('modal');
-    modal.style.display = 'none';
+function hideModal(id) {
+    if (id) {
+        const modal = document.getElementById(id + "-modal");
+        if (modal) modal.style.display = 'none';
+    }
+    else {
+        const modals = Array.from(document.getElementsByClassName('modal'));
+        for (let i = 0; i < modals.length; i++) {
+            modals[i].style.display = 'none';
+        }
+    }
 }
 
-function openModal(content, id = "modal") {
-    if (content === "" || !content) content = document.getElementById(id);
-    const modal = document.getElementById('modal');
-    const modalContent = document.querySelector('#modal .modal-content');
-    if (typeof content === 'object') content = content.innerHTML;
-    modalContent.innerHTML = content;
-    modal.style.display = 'block';
+function buildModal(id) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    // modal.style.display = 'block';
+    modal.id = id + "-modal";
+
+    const modalClose = document.createElement('span');
+    modalClose.id = 'modalClose';
+    modalClose.className = 'close';
+    modalClose.title = 'Close Modal';
+    modalClose.textContent = '×';
+
+    const modalContent = document.createElement('form');
+    modalContent.className = 'modal-content animate';
+
+    let content = document.getElementById(id);
+    modalContent.innerHTML = content.innerHTML;
+
+    modal.appendChild(modalClose);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    window.addEventListener("click", (event) => {
+        if (event.target == modal) {
+            hideModal(id);
+        }
+    });
+
+    window.addEventListener("touchstart", (event) => {
+        if (event.target == modal) {
+            hideModal(id);
+        }
+    }, { passive: true });
+
+    modalClose.addEventListener("click", () => {
+        hideModal(id);
+    });
+
     return modal;
 }
+
+function openModal(id, clear = true) {
+    let modal;
+    if (clear && document.getElementById(id + "-modal")) {
+        document.getElementById(id + "-modal").remove();
+    }
+
+    modal = loadModal(id);
+    modal.style.display = 'block';
+
+    return modal;
+}
+
+function loadModal(id) {
+    if (document.getElementById(id + "-modal")) {
+
+        modal = document.getElementById(id + "-modal");
+    }
+    else {
+        modal = buildModal(id);
+    }
+
+    return modal;
+}
+
+function getModal(id) {
+    return loadModal(id);
+}
+
 /**
  * Call this whenever you add some html with a language key to the DOM.
  * @param {boolean} update - Whether to update the language file if it is already loaded. Should almost always be false.
@@ -370,12 +452,14 @@ function loadLanguage(update = false) {
     }
 }
 
+let languageFile = null;
 function fetchLanguageFile(language, redraw = false) {
     //console.log('Loading language file for ' + language);
-    const languageFile = `/languages/${language}.json`;
-    fetch(languageFile)
+    const languageURL = `/languages/${language}.json`;
+    fetch(languageURL)
         .then(response => response.json())
         .then(data => {
+            languageFile = data;
             if (redraw && (localStorage.getItem('languageFile') != JSON.stringify(data))) {
                 console.log('Language file changed. Redrawing');
                 applyLanguage(data, true);
@@ -407,7 +491,7 @@ function fetchLanguageFile(language, redraw = false) {
             }
         })
         .catch(error => {
-            console.log('Could not load requested language file ' + languageFile);
+            console.log('Could not load requested language file ' + languageURL);
             console.error(error);
             console.log("Loading default language file");
             if (language !== 'de') {
@@ -496,27 +580,13 @@ function resolveLanguageContent(key) {
 const isInStandaloneMode = () =>
     (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 
-function setupModal() {
-    var modal = document.getElementById('modal');
-
-    if (modal) {
-
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                hideModal();
-            }
-        }
-
-        window.ontouchstart = function (event) {
-            if (event.target == modal) {
-                hideModal();
-            }
-        }
-
-        document.getElementById("modalClose").addEventListener("click", () => {
-            hideModal();
-        });
+function utf8ToBase64(str) {
+    const utf8Bytes = new TextEncoder().encode(str);
+    let binaryString = '';
+    for (let i = 0; i < utf8Bytes.length; i++) {
+        binaryString += String.fromCharCode(utf8Bytes[i]);
     }
+    return btoa(binaryString);
 }
 
 function registerServiceWorker() {
@@ -536,7 +606,8 @@ function registerServiceWorker() {
                         registration.update();
                         registration.onupdatefound = () => {
                             console.log('Service Worker updating');
-                            location.reload();
+                            console.log("Reloading because of Service worker update")
+                            //location.reload();
                             return;
                         };
                         if (loggedIn === true) {
@@ -556,8 +627,7 @@ function registerServiceWorker() {
                         reloadContent();
                     }
                     else {
-                        console.warn('No content reload function found');
-                        window.location.reload();
+                        console.warn('No content reload function found.');
                     }
                 }
             });
@@ -582,19 +652,7 @@ function checkVersion() {
     }
 }
 
-function cacheBust() {
-    console.log('Busting cache');
-    caches.keys().then(function (names) {
-        for (let name of names) caches.delete(name);
-    });
-}
-
 function checkOnline() {
-    //dont go offline when testing on localhost
-    if (window.location.hostname == "localhost") {
-        return;
-    }
-
     if (navigator.onLine) {
         document.body.classList.remove('offline');
     } else {
@@ -613,8 +671,7 @@ function checkOnline() {
     });
 }
 
-console.groupCollapsed('First Load');
-console.time('Page load time');
+console.time('Base JS load time');
 document.addEventListener('DOMContentLoaded', async () => {
     checkOnline();
     checkVersion();
@@ -626,15 +683,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (loggedIn) makeDiscoverable();
     registerServiceWorker();
 
-    setupModal();
-
     //iosPWASplash('/images/splashScreen.png', '#ffffff');
-    console.timeEnd('Page load time');
-    console.groupEnd();
+    console.timeEnd('Base JS load time');
 });
 
 window.addEventListener("focus", () => {
-    if (typeof gamesWS !== 'undefined' && gamesWS.readyState === WebSocket.CLOSED) {
+    if (typeof ws !== 'undefined' && ws.readyState === WebSocket.CLOSED) {
         if (loggedIn) makeDiscoverable();
     }
 });
@@ -646,4 +700,10 @@ function toggleVisibility(id, setVis = null) {
     } else {
         element.style.display = setVis ? element.style.display = '' : element.style.display = 'none'
     }
+}
+
+function textAreaOnInput(textarea, multiline = false) {
+    if (!multiline) textarea.value = textarea.value.replace(/[\n]/g, "");
+    textarea.style.height = "";
+    textarea.style.height = textarea.scrollHeight + "px";
 }

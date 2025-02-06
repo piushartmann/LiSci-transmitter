@@ -84,5 +84,24 @@ module.exports = (db) => {
         return res.status(200).send("Success");
     });
 
+    router.post('/setUntisClasses', async (req, res) => {
+        if (!req.session.userID) return res.status(401).send("Not logged in");
+
+        const { classes } = req.body;
+
+        classes.map((element) => {
+            if (typeof element !== "string") return res.status(400).send("Invalid parameters");
+            element = sanitizeHtml(element);
+        });
+
+        console.log(classes);
+
+        if (typeof classes == "undefined") return res.status(400).send("Missing parameters");
+        if (!Array.isArray(classes)) return res.status(400).send("Invalid parameters");
+
+        await db.setPreference(req.session.userID, "untisClasses", classes);
+        return res.status(200).send("Success");
+    });
+
     return router;
 };
