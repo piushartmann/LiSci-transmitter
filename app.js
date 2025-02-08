@@ -16,13 +16,15 @@ const RateLimit = require('express-rate-limit');
 
 //set up subdomains
 app.use(subdomains);
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const oneDay = 24 * 3600 * 1000;
 
 let addReloadCallback = () => { };
 let version;
+let dbname = process.env.DB_NAME || "transmitter";
 
-if (process.env.TERM_PROGRAM === "vscode") {
+if (!process.env.NODE_ENV === "production") {
     console.log("Running in dev mode");
     addReloadCallback = require('./dev_browser_reload');
     version = Math.random().toString(36);
@@ -34,7 +36,6 @@ if (process.env.TERM_PROGRAM === "vscode") {
 }
 
 //set up environment variables
-dotenv.config({ path: path.join(__dirname, '.env') });
 
 const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
 const port = 8080;
@@ -90,7 +91,7 @@ app.use(session({
     saveUninitialized: false,
     store: MongoDBStore.create({
         mongoUrl: connectionString,
-        dbName: 'transmitter',
+        dbName: dbname,
         collectionName: 'sessions'
     })
 }));
@@ -114,7 +115,7 @@ webpush.setVapidDetails(
 );
 
 //connect to db
-const db = new MongoConnector("transmitter", connectionString, webpush);
+const db = new MongoConnector(dbname, connectionString, webpush);
 
 //store connected users for websocket. This is a global variable and will be kept updated by the websocket route
 let connectedUsers = [];
