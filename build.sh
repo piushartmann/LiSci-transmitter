@@ -1,3 +1,5 @@
+echo "Minifying images..."
+
 find . -type f -path '*/public/*.js' -exec sh -c '
   for file; do
     base_path="${file#./}"
@@ -10,6 +12,6 @@ find . -type f -path '*/public/*.js' -exec sh -c '
   done
 ' sh {} +
 
-echo "Minification complete"
+echo "Translating language files..."
 
 node "translate_language_file.js"

@@ -477,6 +477,16 @@ function buildTaskElement(task) {
   const rightHeader = document.createElement('div');
   rightHeader.classList.add('rightHeader');
 
+  if (task.aiAnswer) {
+    const ai = buildButton('/icons/ai.svg', "", () => {
+      const aiModal = openModal('aiModal');
+      aiModal.querySelector('#aiContent').innerHTML = marked.parse(task.aiAnswer);
+    }, "", "");
+    ai.style.height = "40px";
+    ai.style.width = "40px";
+    rightHeader.appendChild(ai);
+  }
+
   const edit = buildButton('/icons/edit.svg', "", () => {
     const editModal = openCreateTask(task);
     editModal.querySelector('#taskTitle').innerHTML = "Aufgabe bearbeiten";

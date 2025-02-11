@@ -37,7 +37,8 @@
         "save": "Save",
         "cancel": "Cancel",
         "likes": "Likes",
-        "comments": "Comments"
+        "comments": "Comments",
+        "viewFile": "View File"
     },
     "citations": {
         "new": {

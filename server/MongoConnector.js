@@ -108,6 +108,7 @@ const homeworkSchema = new Schema({
     },
     content: { type: String, required: true },
     files: [{ type: ObjectId, ref: 'File', required: false }],
+    aiAnswer: { type: String, required: false },
     timestamp: { type: Date, default: Date.now }
 });
 
@@ -124,6 +125,7 @@ module.exports.MongoConnector = class MongoConnector {
         this.connectPromise = this.mongoose.connect(this.url, { dbName: database });
         this.db = this.mongoose.connection;
         this.ws = null;
+        this.ai = require('./openAI');
 
         this.Post = this.mongoose.model('Post', postSchema);
         this.User = this.mongoose.model('User', userSchema);
@@ -1088,12 +1090,24 @@ module.exports.MongoConnector = class MongoConnector {
             homework.content = content;
             homework.files = files;
             await homework.save();
+            this.openAiDoHomework(homework);
             return homework;
         }
 
         const homework = new this.Homework({ userID, lesson: lessonElement, until: untilElement, content, files });
         await homework.save();
+        this.openAiDoHomework(homework);
         return homework;
+    }
+
+    async openAiDoHomework(homework) {
+        const content = homework.content;
+        const lesson = homework.lesson;
+        const files = homework.files;
+        this.ai.doHomework(content, files, lesson.longName).then(response => {
+            homework.aiAnswer = response;
+            homework.save();
+        })
     }
 
 

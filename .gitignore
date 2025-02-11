@@ -3,3 +3,4 @@ adminConsole.js
 .env
 .DS_Store
 coverage
+eng.traineddata

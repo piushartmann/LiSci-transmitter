@@ -1,30 +1,19 @@
 const OpenAI = require("openai");
-const { extractText, getDocumentProxy } = require("unpdf");
 const z = require("zod");
 const { zodResponseFormat } = require("openai/helpers/zod");
-
 //for .env file in development
 const dotenv = require('dotenv');
 dotenv.config({ path: ".env" });
+const { extractTextFromPDF, extractText } = require('./extractText');
 
-const openAI = new OpenAI(process.env.OPENAI_API_KEY);
+const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
 const config = require('../config.json');
 
-function isValidURL(url) {
-    const allowedDomains = ["https://storage.liscitransmitter.live"];
-    try {
-        const parsedURL = new URL(url);
-        return allowedDomains.includes(parsedURL.origin);
-    } catch (e) {
-        return false;
-    }
-}
-
 
 async function summarizeText(text) {
-    const completion = await openAI.chat.completions.create({
-        model: "gpt-4o",
+    const completion = await openai.chat.completions.create({
+        model: "o3-mini",
         messages: [
             { role: "system", content: config.openAISummarizeTextPrompt },
             {
@@ -39,8 +28,8 @@ async function summarizeText(text) {
 }
 
 async function createTitle(text) {
-    const completion = await openAI.chat.completions.create({
-        model: "gpt-4o",
+    const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
         messages: [
             { role: "system", content: config.openAICreateTitlePrompt },
             {
@@ -57,19 +46,6 @@ async function createTitle(text) {
 async function summarizePDF(pdfURL) {
     const text = await extractTextFromPDF(pdfURL);
     return await summarizeText(text);
-}
-
-async function extractTextFromPDF(pdfURL) {
-    if (!isValidURL(pdfURL)) {
-        throw new Error("Invalid URL");
-    }
-    const buffer = await fetch(pdfURL).then((res) => res.arrayBuffer());
-
-    const pdf = await getDocumentProxy(new Uint8Array(buffer));
-
-    const { pages, text } = await extractText(pdf, { mergePages: true });
-
-    return text;
 }
 
 async function extractTextFromAllNewsArticles(db) {
@@ -99,7 +75,7 @@ const CrosswordReturn = z.object({
 });
 
 async function generateCrosswordWords(newsText) {
-    const completion = await openAI.chat.completions.create({
+    const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
             { role: "system", content: config.openAIGenerateCrosswordWordsPrompt },
@@ -115,10 +91,84 @@ async function generateCrosswordWords(newsText) {
     return words;
 }
 
+async function doHomework(content, files, lessonName) {
+
+    //make files objects
+    files = await Promise.all(files.map(async file => {
+        const response = await fetch("https://storage.liscitransmitter.live/" + file.path);
+        console.log(response.headers.get("content-type"));
+        return {
+            filename: file.filename,
+            mimetype: response.headers.get("content-type"),
+            path: file.path,
+            blob: () => {
+                return response.blob();
+            },
+            buffer: () => {
+                return response.arrayBuffer();
+            }
+        };
+    }));
+
+    //extract text from files
+    files = await Promise.all(files.map(async files => await extractText(files)));
+    const texts = files.map(file => file.text);
+    const images = files.map(file => file.images);
+
+    console.log(files)
+
+    //craft prompt
+    let prompt = `You are a student doing Homework for the lesson "${lessonName}".\n
+    The Task is: ${content}\n
+    Refer the required language from the Lesson Name and the language of the content you have provided and answer with that language.\n
+    There may be files attached to this message. Please refer to them if necessary.\n
+    If there are any here is a text transcription of the files, but Images are additionally appended to the message for you to view:\n
+    ${texts.join("\n")}
+    Please complete the task.
+    Dont repeat the task in your answer.
+    Dont mention that you are an AI but try to complete the task as a student would.
+    You cannot ask for help from the teacher or other students.
+    If you have not enough information to complete the task, you can say so, but try to complete it as much as possible.
+    Format your answer using Markdown.
+    Strictly adhere to the instructions given in the task.`;
+
+    let imageContent = [];
+
+    images.forEach(imageFile => {
+        imageFile.forEach(image => {
+            imageContent.push({
+                "type": "image_url",
+                "image_url": {
+                    "url": `data:image/png;base64,${image.toString("base64")}`
+                }
+            });
+        });
+    });
+
+    const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+            {
+                role: "user", content: [
+                    {
+                        "type": "text",
+                        "text": prompt
+                    },
+                    ...imageContent
+                ]
+            },
+        ],
+    });
+
+    const response = completion.choices[0].message.content;
+    console.log("AI Response done.");
+    return response;
+}
+
 module.exports = {
     summarizeText,
-    extractTextFromPDF,
     createTitle,
     extractTextFromAllNewsArticles,
-    generateCrosswordWords
+    generateCrosswordWords,
+    doHomework
 };
