@@ -15,7 +15,6 @@ async function extractTextFromPDF(buffer) {
         const extractionSucceded = (!text || text === "\n" || text === "" || text.length === 1)
 
         for (let i = 1; i <= totalPages; i++) {
-            console.log("Rendering page", i);
             const originalConsoleLog = console.log;
             console.log = function (...args) {
                 if (typeof args[0] === "string" && args[0].includes("decodeScan - unexpected MCU data, current marker is: ffff")) {

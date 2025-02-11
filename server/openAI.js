@@ -92,11 +92,11 @@ async function generateCrosswordWords(newsText) {
 }
 
 async function doHomework(content, files, lessonName) {
-
+    
+    console.log("Starting AI Response... " + content);
     //make files objects
     files = await Promise.all(files.map(async file => {
         const response = await fetch("https://storage.liscitransmitter.live/" + file.path);
-        console.log(response.headers.get("content-type"));
         return {
             filename: file.filename,
             mimetype: response.headers.get("content-type"),
@@ -105,7 +105,7 @@ async function doHomework(content, files, lessonName) {
                 return response.blob();
             },
             buffer: () => {
-                return response.arrayBuffer();
+                return response.clone().arrayBuffer();
             }
         };
     }));
@@ -114,8 +114,6 @@ async function doHomework(content, files, lessonName) {
     files = await Promise.all(files.map(async files => await extractText(files)));
     const texts = files.map(file => file.text);
     const images = files.map(file => file.images);
-
-    console.log(files)
 
     //craft prompt
     let prompt = `You are a student doing Homework for the lesson "${lessonName}".\n
