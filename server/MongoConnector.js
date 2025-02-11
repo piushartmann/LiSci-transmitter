@@ -1080,9 +1080,9 @@ module.exports.MongoConnector = class MongoConnector {
             return null;
         }
 
+        //if editing existing homework entry
         if (id) {
             const homework = await this.Homework.findById(id);
-            homework.userID = userID;
             homework.lesson = lessonElement;
             homework.until = untilElement;
             homework.content = content;

@@ -22,5 +22,9 @@ module.exports = (db) => {
         });
     });
 
+    router.get('/', async (req, res) => {
+        return res.render('untis_init');
+    });
+
     return router;
 };

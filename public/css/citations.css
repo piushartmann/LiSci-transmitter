@@ -6,7 +6,6 @@
     border-radius: 8px;
     background-color: var(--post-background-color);
     padding-top: 15px;
-    overflow: hidden;
 }
 
 .citation .content {

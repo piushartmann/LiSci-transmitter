@@ -9,20 +9,44 @@
 
 <body>
 
+  <p>Form</p>
+  <form id="downloadForm" action="https://storage.webuntis.com/untis-sts-prod/2272700/feab7a19-1583-4ff5-999c-a6552817998e?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250208T213637Z&X-Amz-SignedHeaders=host%3Bx-amz-server-side-encryption-customer-algorithm%3Bx-amz-server-side-encryption-customer-key%3Bx-amz-server-side-encryption-customer-key-md5&X-Amz-Credential=X17QCZ27OUXDS5TWGSK7%2F20250208%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=6c15e328e9d9b4759e02e4528827ca4649bf854176661eb044aa0c16d839c9d7" method="GET">
+    <input type="hidden" name="x-amz-server-side-encryption-customer-key" value="N5CuQ7hCfdnU2VRSrPtMitFAXorcVHX39QMiHWr7m9Q=">
+    <input type="hidden" name="x-amz-server-side-encryption-customer-key-md5" value="3tJCaZ9R0nIsTnlQ5mZDoA==">
+    <input type="hidden" name="host" value="storage.webuntis.com">
+    <input type="hidden" name="x-amz-server-side-encryption-customer-algorithm" value="AES256">
+    <input type="hidden" name="referer" value="https://ikarus.webuntis.com/messages/drafts">
+    <button type="submit">Download</button>
+  </form>
+  <p>JS</p>
+  <button id="downloadButton" type="button">Download</button>
+  <script>
+    document.getElementById('downloadButton').addEventListener('click', function(e) {
+      e.preventDefault();
+      const headers = {
+        'x-amz-server-side-encryption-customer-key': 'N5CuQ7hCfdnU2VRSrPtMitFAXorcVHX39QMiHWr7m9Q=',
+        'x-amz-server-side-encryption-customer-key-md5': '3tJCaZ9R0nIsTnlQ5mZDoA==',
+        'host': 'storage.webuntis.com',
+        'x-amz-server-side-encryption-customer-algorithm': 'AES256',
+        'referer': 'https://ikarus.webuntis.com/messages/drafts'
+      };
+
+      fetch("https://storage.webuntis.com/untis-sts-prod/2272700/feab7a19-1583-4ff5-999c-a6552817998e?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250208T213637Z&X-Amz-SignedHeaders=host%3Bx-amz-server-side-encryption-customer-algorithm%3Bx-amz-server-side-encryption-customer-key%3Bx-amz-server-side-encryption-customer-key-md5&X-Amz-Credential=X17QCZ27OUXDS5TWGSK7%2F20250208%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Expires=600&X-Amz-Signature=6c15e328e9d9b4759e02e4528827ca4649bf854176661eb044aa0c16d839c9d7", {
+        headers,
+        mode: 'no-cors'
+      }).then(response => response.blob()).then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'file.txt';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
+
+    });
+  </script>
+
 </body>
 
 </html>
-
-<script>
-  const url = `https://storage.webuntis.com/WebUntis/api/rest/view/v1/messages/bde00e20-22bd-4d51-827b-df6adab76df5/attachmentstorageurl`
-  fetch(url, {
-    method: 'GET',
-    credentials: 'include',
-    mode: 'no-cors',
-  }).then(response => {
-    return response.blob();
-  }).then(blob => {
-    const bloburl = URL.createObjectURL(blob);
-    console.log(bloburl);
-  })
-</script>
