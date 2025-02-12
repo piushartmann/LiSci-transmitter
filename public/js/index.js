@@ -2,7 +2,7 @@ async function loadPosts(page, filter, headers = {}) {
     if (filter == "all") {
         return await fetch(`internal/getPosts?p=${page}`, { headers });
     }
-    return await fetch(`internal/getPosts?p=${page}&f=${utf8ToBase64(JSON.stringify({"type": "news"}))}`, { headers });
+    return await fetch(`internal/getPosts?p=${page}&f=${utf8ToBase64(JSON.stringify({ "type": "news" }))}`, { headers });
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -37,6 +37,12 @@ const reloadContent = async () => {
     const selectedPosts = onlyNewsFilter ? news : posts;
     renderPosts(selectedPosts);
 };
+
+function cachesMatched(url) {
+    if (url === "/internal/getPosts") {
+        setSpinnerVisibility(false);
+    }
+}
 
 async function renderPosts(selectedPosts) {
     const postBox = document.getElementById("postBox");
@@ -73,6 +79,7 @@ function buildPageSelector(page, totalPages, newsPages, postsPages) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    setSpinnerVisibility(true);
     const onlyNewsFilter = urlParams.get('onlyNews') == "true" || false;
     const onlyNewsCheckbox = document.getElementById("onlyNews");
 

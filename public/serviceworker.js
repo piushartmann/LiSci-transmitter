@@ -7,9 +7,9 @@ const sitesToPreload = [
 ];
 
 const requestsToCache = [
-    "/internal/getPosts?page=1&filter=all",
-    "/internal/getPosts?page=1&filter=news",
-    "/internal/getCitations?page=1",
+    "/internal/getPosts?p=1",
+    "/internal/getPosts?p=1&f=eyJ0eXBlIjoibmV3cyJ9",
+    "/internal/getCitations?page=1&f=eyJ0ZXh0IjoiIiwiZnJvbURhdGUiOiIiLCJ0b0RhdGUiOiIifQ==&s=eyJ0aW1lIjoiZGVzYyJ9",
     "/internal/getPreviousAuthors"
 ];
 
@@ -131,6 +131,14 @@ function SWreloadSite() {
     });
 }
 
+function SWCachesMatched(url) {
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+        for (let client of windowClients) {
+            client.postMessage({ type: 'cachesMatched', url: url.pathname });
+        }
+    });
+}
+
 self.addEventListener('fetch', function (event) {
     const url = new URL(event.request.url);
 
@@ -172,11 +180,12 @@ async function updateCache(url, callback) {
 
         await cache.put(url, fetchResponse.clone());
 
+        const cacheMatchText = await cacheMatch.text();
+        const fetchResponseText = await fetchResponse.clone().text();
         if (cacheMatch) {
-            const cacheMatchText = await cacheMatch.text();
-            const fetchResponseText = await fetchResponse.clone().text();
             if (cacheMatchText === fetchResponseText) {
-                console.log('Cache and fetch response are identical for:', url.pathname + url.search);
+                // console.log('Cache and fetch response are identical for:', url.pathname + url.search);
+                SWCachesMatched(url);
                 return;
             }
         }

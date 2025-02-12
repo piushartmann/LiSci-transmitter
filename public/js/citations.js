@@ -53,6 +53,12 @@ function addNewContext(first = false) {
     loadLanguage(true);
 }
 
+function cachesMatched(url) {
+    if (url === "/internal/getCitations") {
+        setSpinnerVisibility(false);
+    }
+}
+
 async function loadCitations(page, callback, reloading = false) {
 
     let { filter, sortObj } = getFilterSettings();
@@ -67,9 +73,17 @@ async function loadCitations(page, callback, reloading = false) {
         }
     }
 
-    let response = await fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`, {
+    const responsePromise = fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`, {
         headers: headers
     });
+
+    setSpinnerVisibility(true);
+    
+    let response = await responsePromise;
+
+    if (reloading === true) {
+        setSpinnerVisibility(false);
+    }
 
     response = await response.json()
     const citationData = response.citations;

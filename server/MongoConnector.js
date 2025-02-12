@@ -746,7 +746,7 @@ module.exports.MongoConnector = class MongoConnector {
             { $group: { _id: "$context.author", count: { $sum: 1 } } },
             { $match: { count: { $gt: 1 } } },
             { $project: { _id: 0, author: "$_id", count: 1 } },
-            { $sort: { count: -1 } }
+            { $sort: { count: -1, author: 1 } }
         ]);
         return authors.map(author => author.author);
     }

@@ -270,8 +270,9 @@ function makeDiscoverable() {
                 }
                 break;
             case 'reload':
-                console.log("Realod because of ws 'reload' message")
+                console.log("Reload because of ws 'reload' message")
                 window.location.reload();
+                break;
             case 'reloadContent':
                 if (typeof reloadContent === 'function') {
                     reloadContent();
@@ -630,6 +631,12 @@ function registerServiceWorker() {
                         console.warn('No content reload function found.');
                     }
                 }
+                else if (event.data.type === 'cachesMatched') {
+                    const url = event.data.url;
+                    if (typeof cachesMatched === 'function') {
+                        cachesMatched(url);
+                    }
+                }
             });
         }
         else {
@@ -706,4 +713,9 @@ function textAreaOnInput(textarea, multiline = false) {
     if (!multiline) textarea.value = textarea.value.replace(/[\n]/g, "");
     textarea.style.height = "";
     textarea.style.height = textarea.scrollHeight + "px";
+}
+
+function setSpinnerVisibility(visible) {
+    const spinner = document.getElementById("spinner");
+    spinner.style.display = visible ? "flex" : "none";
 }

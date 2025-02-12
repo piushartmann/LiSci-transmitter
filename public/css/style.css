@@ -414,6 +414,11 @@ textarea {
     }
 }
 
+.spinner {
+    display: flex;
+    justify-content: center;
+}
+
 
 .pwaBar {
     display: none;
