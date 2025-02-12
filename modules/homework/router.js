@@ -28,11 +28,12 @@ module.exports = (db) => {
     });
 
     router.get('/internal/getCloseLessons', async (req, res) => {
-        const filter = await db.getPreference(req.session.userID, 'untisClasses');
+        let filter = await db.getPreference(req.session.userID, 'untisClasses');
+        if (filter.length == 1 && filter[0] == "") filter = null;
 
         const timetable = await untis.getTimetable(0, "day");
         const now = Date.now();
-        //const now = new Date("2025-01-22T09:00:00.000Z").getTime();
+        // const now = new Date("2025-02-12T09:00:00.000Z").getTime();
         let closeLessons = timetable.filter(l => {
             if (!(l.subjects && l.subjects[0])) return false;
             return (Math.abs(l.start.getTime() - now) < 1000 * 60 * 60 || Math.abs(l.end.getTime() - now) < 1000 * 60 * 60)

@@ -82,7 +82,7 @@ async function getTimetable(offset, timeSpan = "week") {
         }
     }
     const now = Date.now();
-    //const now = new Date("2025-01-22T09:00:00.000Z").getTime();
+    // const now = new Date("2025-01-22T09:00:00.000Z").getTime();
     const day = 1000 * 60 * 60 * 24;
     const currentWeek = new Date(now).getWeek();
     const filteredTimetable = timetableCache.filter(lesson => {

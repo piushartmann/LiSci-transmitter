@@ -78,7 +78,7 @@ function removeAllEmptySections() {
 }
 
 
-async function submitPost(save = false) {
+async function submitPost(submitButton, save = false) {
     const title = document.getElementById('title').value;
     const teachersafe = document.getElementById('teachersafe').checked;
 
@@ -95,6 +95,8 @@ async function submitPost(save = false) {
         alert('Please add at least one section');
         return;
     }
+
+    submitButton.disabled = true;
 
     await uploadAllFiles();
     await handleAllInlineImages();
@@ -122,7 +124,8 @@ async function submitPost(save = false) {
             enctype: 'multipart/x-www-form-urlencoded',
         });
     }
-
+    
+    submitButton.disabled = false;
     window.location.href = '/';
 }
 

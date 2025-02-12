@@ -78,7 +78,7 @@ async function loadCitations(page, callback, reloading = false) {
     });
 
     setSpinnerVisibility(true);
-    
+
     let response = await responsePromise;
 
     if (reloading === true) {
@@ -210,7 +210,9 @@ function buildCitation(citation) {
 
     if (citation.canEdit) {
         let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "interaction delete", "");
+        deleteButton.classList.add("online-only");
         let editButton = buildButton("/icons/edit.svg", "Edit", () => editCitation(citation._id), "interaction edit", "");
+        editButton.classList.add("online-only");
 
         interactionButtons.appendChild(deleteButton);
         interactionButtons.appendChild(editButton);
@@ -285,7 +287,7 @@ function updateCitations() {
     endReached = false;
 }
 
-function submitCitation() {
+function submitCitation(button) {
     console.log("Submit citation");
     const authorElements = Array.from(document.querySelectorAll(".sentenceStructure .author textarea"));
     const contentElements = Array.from(document.querySelectorAll(".sentenceStructure .content textarea"));
@@ -315,6 +317,8 @@ function submitCitation() {
         }
     });
 
+    button.disabled = true;
+    setSpinnerVisibility(true);
     fetch('internal/createCitation', {
         method: 'POST',
         headers: {
@@ -330,21 +334,37 @@ function submitCitation() {
                 citationBox.innerHTML = "";
                 addNewContext(true);
                 updateCitations();
+                button.disabled = true;
+                setSpinnerVisibility(false);
             }
         });
 }
 
 function deleteCitation(id) {
     if (confirm("Bist du sicher, dass du dieses Zitat löschen möchtest?")) {
+        const citationBox = document.getElementById("citationBox");
+        const citation = loadedCitations.find(citation => citation._id === id);
+        if (!citation) return;
+        if (!citation.canEdit) return;
+        setSpinnerVisibility(true);
+
         fetch('internal/deleteCitation', {
             method: 'POST',
             body: new URLSearchParams({ citationID: id }),
             enctype: 'x-www-form-urlencoded',
         })
             .then(response => {
-                if (response.status === 200) {
-                    updateCitations();
+                setSpinnerVisibility(false);
+                if (!response.status == 200) {
+                    alert("Fehler beim Löschen des Zitats");
+                    return;
                 }
+                delete citation;
+                citationBox.querySelector(`[data-id="${id}"]`).remove();
+            })
+            .catch(error => {
+                setSpinnerVisibility(false);
+                alert("Fehler beim Löschen des Zitats");
             });
     }
 }
@@ -377,6 +397,7 @@ function editCitation(id) {
 
         const deleteButton = buildButton("/icons/delete.svg", "", () => sentence.remove());
         deleteButton.style.border = "none";
+        deleteButton.classList.add("online-only");
         sentence.appendChild(deleteButton);
 
         citationBox.appendChild(sentence);
