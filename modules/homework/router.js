@@ -29,7 +29,8 @@ module.exports = (db) => {
 
     router.get('/internal/getCloseLessons', async (req, res) => {
         let filter = await db.getPreference(req.session.userID, 'untisClasses');
-        if (filter.length == 1 && filter[0] == "") filter = null;
+        if (!filter) filter = null;
+        else if (filter.length == 1 && filter[0] == "") filter = null;
 
         const timetable = await untis.getTimetable(0, "day");
         const now = Date.now();

@@ -8,6 +8,7 @@
         "home": "Startseite",
         "citations": "Zitate",
         "games": "Spiele",
+        "homework": "Hausaufgaben",
         "about": "About",
         "create": "Neuer Post",
         "settings": "Einstellungen",
@@ -39,7 +40,8 @@
         "likes": "Likes",
         "comments": "Kommentare",
         "viewFile": "Datei anzeigen",
-        "submit": "Absenden"
+        "submit": "Absenden",
+        "select": "Auswählen"
     },
     "citations": {
         "new": {
@@ -156,7 +158,18 @@
         }
     },
     "homework": {
-        "title": "Hausaufgaben"
+        "title": "Hausaufgaben",
+        "task_on_this_day": "Aufgaben sind an diesm Tag fällig.",
+        "select_lesson": "Wähle die Stunde aus",
+        "taskModal": {
+            "title": "Neue Aufgabe eintragen",
+            "delete": "Hausaufgabe löschen"
+        },
+        "loading": "Laden...",
+        "select_subject": "Wähle das Fach aus",
+        "files": "Dateien:",
+        "files_add": "Datei hinzufügen",
+        "create_task": "Neue Hausaufgabe"
     },
     "charts": {
         "title": "Graphen"
@@ -172,6 +185,7 @@
         "wurstwasser": "Wurstwasser"
     },
     "days": {
+        "today": "Heute",
         "sunday": "Sonntag",
         "monday": "Montag",
         "tuesday": "Dienstag",

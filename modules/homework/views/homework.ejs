@@ -20,7 +20,7 @@
   <%- include('./partials/base.ejs') %>
 
 
-  <button type="button" class="online-only" id="taskSubmit" onclick="openCreateTask()">Create Task</button>
+  <button type="button" class="online-only" id="taskSubmit" onclick="openCreateTask()" data-lang-content="homework create_task">Create Task</button>
 
   <div class="calendar" id="calendar">
     <!-- Calendar days will be dynamically generated -->
@@ -37,7 +37,7 @@
     </div>
     <div class="taskCount">
       <p class="count" id="dayTaskCount">5</p>
-      <p>Aufgaben sind an diesm Tag fällig.</p>
+      <p data-lang-content="homework task_on_this_day">Aufgaben sind an diesm Tag fällig.</p>
     </div>
   </div>
 
@@ -49,41 +49,41 @@
   <div class="modal-template" id="timeTableModal">
     <button type="button" onclick="untisPreviousWeek()"><</button>
         <button type="button" onclick="untisNextWeek()">></button>
-        <button type="button" onclick="thisWeek()">Today</button>
-        <h1>Wähle die Stunde aus</h1>
+        <button type="button" onclick="thisWeek()" data-lang-content="days today">Today</button>
+        <h1 data-lang-content="homework select_lesson">Wähle die Stunde aus</h1>
         <div class="timetable"></div>
   </div>
 
   <div class="modal-template" id="taskModal">
-    <h1 id="taskTitle">Neue Aufgabe eintragen</h1>
+    <h1 id="taskTitle" data-lang-content="homework taskModal title">Neue Aufgabe eintragen</h1>
 
     <div id="deleteTaskButton" style="display: none;">
       <button type="button" class="button" onclick="deleteTask()">
         <img class="icon" src="/icons/delete.svg" alt="file">
-        <label class="label" for="file">Hausaufgabe löschen</label>
+        <label class="label" for="file" data-lang-content="homework taskModal delete">Hausaufgabe löschen</label>
       </button>
     </div>
 
     <select id="classSelector" class="online-only" required>
-      <option selected="selected">Loading...</option>
+      <option selected="selected" data-lang-content="homework loading">Loading...</option>
     </select>
 
-    <button id="other_select_button" class="hidden" type="button" onclick="showUntisModal()">select</button>
+    <button id="other_select_button" class="hidden" type="button" onclick="showUntisModal()" data-lang-content="interaction select">select</button>
 
     <select id="untilSelector" class="online-only" required disabled>
-      <option>Please select a Subject</option>
+      <option data-lang-content="homework select_subject">Please select a Subject</option>
     </select>
     <textarea type="text" name="content" id="content" class="online-only" placeholder="Aufgabenbeschreibung" oninput="textAreaOnInput(this, true)" required></textarea>
 
-    <label for="files">Files:</label>
+    <label for="files" data-lang-content="homework files">Files:</label>
     <div id="files">
       <!-- Files will appear here -->
       <button type="button" class="button newFile" id="newFile" onclick="addFileInput()">
         <img class="icon" src="/icons/file-added.svg" alt="file">
-        <label class="label short-label" for="file">Datei hinzufügen</label>
+        <label class="label short-label" for="file" data-lang-content="homework files_add">Datei hinzufügen</label>
       </button>
     </div>
-    <button type="button" name="Submit" onclick="submitTask()">Submit</button>
+    <button type="button" name="Submit" onclick="submitTask()" data-lang-content="interaction submit">Submit</button>
   </div>
 
   <div class="modal-template" id="aiModal">

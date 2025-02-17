@@ -17,7 +17,7 @@
       <% if (loggedIn) { %>
       <% for( let i = 0; i < modules.length; i++ ) { %>
       <% if (modules[i].visible == true && modules[i].access.every(i => usertype.includes(i))) { %>
-      <li><a href="/<%= modules[i].url %>" data-lang-content="<%= modules[i].name %>"><%= modules[i].name %></a></li>
+      <li><a href="/<%= modules[i].url %>" data-lang-content="header <%= modules[i].url %>"><%= modules[i].name %></a></li>
       <% } %>
       <% } %>
       <% } %>
@@ -92,7 +92,7 @@
 
     <% for( let i = 0; i < modules.length; i++ ) { %>
     <% if (modules[i].visible == true && modules[i].access.every(i => usertype.includes(i))) { %>
-    <li><a href="/<%= modules[i].url %>" data-lang-content="<%= modules[i].name %>"><%= modules[i].name %></a></li>
+    <li><a href="/<%= modules[i].url %>" data-lang-content="header <%= modules[i].url %>"><%= modules[i].name %></a></li>
     <% } %>
     <% } %>
 

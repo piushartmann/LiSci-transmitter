@@ -8,6 +8,7 @@
         "home": "Home",
         "citations": "Citations",
         "games": "Games",
+        "homework": "Homework",
         "about": "About",
         "create": "New Post",
         "settings": "Settings",
@@ -39,7 +40,8 @@
         "likes": "Likes",
         "comments": "Comments",
         "viewFile": "View File",
-        "submit": "Submit"
+        "submit": "Submit",
+        "select": "Select"
     },
     "citations": {
         "new": {
@@ -156,7 +158,18 @@
         }
     },
     "homework": {
-        "title": "Homework"
+        "title": "Homework",
+        "task_on_this_day": "tasks on this day.",
+        "select_lesson": "Select the lesson",
+        "taskModal": {
+            "title": "Add new Homework",
+            "delete": "Delete Homework"
+        },
+        "loading": "Loading...",
+        "select_subject": "Select the subject",
+        "files": "Files:",
+        "files_add": "Add a file",
+        "create_task": "Create Homework"
     },
     "charts": {
         "title": "Charts"
@@ -172,6 +185,7 @@
         "wurstwasser": "Sausage Water"
     },
     "days": {
+        "today": "Heute",
         "monday": "Monday",
         "tuesday": "Tuesday",
         "wednesday": "Wednesday",
