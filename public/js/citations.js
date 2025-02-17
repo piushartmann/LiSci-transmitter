@@ -39,9 +39,7 @@ function addNewContext(first = false) {
     sentence.innerHTML = baseStructure.innerHTML;
 
     const author = sentence.querySelector(".author textarea");
-    autocomplete(author, previousAuthors, () => {
-        textAreaOnInput(author, true);
-    });
+    autocomplete(author, previousAuthors);
 
     if (!first) {
         const deleteButton = buildButton("/icons/delete.svg", "", () => sentence.remove());
@@ -391,7 +389,8 @@ function editCitation(id) {
 
         const author = sentence.querySelector(".author textarea");
         author.value = context.author;
-
+        autocomplete(author, previousAuthors);
+        
         const content = sentence.querySelector(".content textarea");
         content.value = context.content;
 
@@ -401,6 +400,10 @@ function editCitation(id) {
         sentence.appendChild(deleteButton);
 
         citationBox.appendChild(sentence);
+
+        //update size of textareas after adding to DOM
+        textAreaOnInput(author);
+        textAreaOnInput(content);
     });
 
     const submitButton = document.getElementById('citationSubmit');

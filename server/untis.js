@@ -76,7 +76,7 @@ Date.prototype.getWeek = function () {
 async function getTimetable(offset, timeSpan = "week") {
     if (!timetableCache) {
         await fetchTimetable()
-        if (!timetableCache){
+        if (!timetableCache) {
             console.error("Error while fetching timetable")
             return [];
         }
@@ -101,7 +101,43 @@ async function getTimetable(offset, timeSpan = "week") {
 
 }
 
+async function getUntisClassesForUser(username, password) {
+    try {
+        const untis = new WebUntis(config.untis.schoolID, username, password, config.untis.url);
+
+        const today = new Date();
+        // Calculate Monday of the current week (assuming week starts on Monday)
+        const dayOfWeek = today.getDay();
+        const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;  // Adjust if today is Sunday
+        const rangeStart = new Date(today);
+        rangeStart.setDate(today.getDate() - diff);
+
+        // Calculate Sunday of the next week: Monday + 13 days
+        const rangeEnd = new Date(rangeStart);
+        rangeEnd.setDate(rangeStart.getDate() + 13);
+
+        await untis.login();
+        const classes = await untis.getOwnTimetableForRange(rangeStart, rangeEnd);
+        await untis.logout();
+
+        const classNames = classes.filter(cls => cls.su && cls.su[0] && cls.su[0].name).map(cls => cls.su[0].name);
+        const uniqueClassNames = [...new Set(classNames)];
+
+        return uniqueClassNames;
+    }
+    catch (error) {
+        if (error.message.split('{')[0] === 'Failed to login. ')
+        {
+            console.error("Someone tried to login with invalid untis credentials");
+            return null;
+        }
+        console.error(error.message);
+        return null;
+    }
+}
+
 
 module.exports = {
-    getTimetable
+    getTimetable,
+    getUntisClassesForUser
 }

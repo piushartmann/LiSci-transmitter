@@ -389,3 +389,26 @@ function setUntisClasses() {
         console.error("Error setting Untis classes:", error);
     });
 }
+
+async function getUntisClasses() {
+    try {
+        const modal = getModal('getUntisClasses');
+        const username = modal.querySelector('#username').value;
+        const password = modal.querySelector('#password').value;
+        await fetch('internal/settings/getOwnTimetable', {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password }),
+        }).then((res) => {
+            if (res.status !== 200) throw new Error("Error getting Untis classes");
+            console.log("Untis classes updated");
+            window.location.reload();
+        });
+    }
+    catch (error) {
+        console.error("Error getting Untis classes:", error);
+        alert("Falsche Untis zugangsdaten");
+    }
+}

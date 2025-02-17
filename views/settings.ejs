@@ -97,11 +97,42 @@
       </select>
     </div>
 
+    <% if (usertype.includes("classmate")) { %>
+
     <div class="WebUntisClasses settings">
       <label for="WebUntisClasses" data-lang-content="settings untis_classes">Untis Classes</label>
-      <input type="text" value="<%= untisClasses %>" id="WebUntisClasses">
+      <input type="text" value="<%= untisClasses %>" id="WebUntisClasses"></input>
       <button id="WebUntisClassesSubmit" class="online-only" data-lang-content="interaction save" type="button" onclick="setUntisClasses()">Save</button>
+      <button id="getClassesButton" data-lang-content="settings untis_classes_get" type="button" onclick="openModal('getUntisClasses')">Wie fülle ich das aus?</button>
     </div>
+
+    <div class="modal-template" id="getUntisClasses">
+      <h1 id="title" data-lang-content="settings untis_classes_get">Wie fülle ich das aus?</h1>
+      <span>Du kannst hier deine WebUntis zugangsdaten eintragen um die Fächer automatisch von deinem Konto zu holen.</span>
+      <p>
+        <span>Deine Zugangsdaten werden niemals irgendwo gespeichert!</span>
+        <br>
+        <a href="https://github.com/piushartmann/LiSci-transmitter/blob/main/routes/internal/settings.js#L122" target="_blank" rel="noopener noreferrer">Hier</a> <span>ist der router code,</span>
+        <br>
+        <a href="https://github.com/piushartmann/LiSci-transmitter/blob/main/server/untis.js#L104" target="_blank" rel="noopener noreferrer">hier</a> <span>der server Code und</span>
+        <br>
+        <a href="https://www.npmjs.com/package/webuntis" target="_blank" rel="noopener noreferrer">hier</a> <span>das npm package</span>
+      </p>
+      <span>Alternativ kannst auch natürlich deine Fächer aus deiner WebUntis app selbst abschreiben. Beispiel:</span>
+      <br>
+      <code>DEU5,Eng1,MAT5,Inf1,BIO P3,CHE P3,Wir1,Rel2,Mus1,Spo4,Pgw P3</code>
+
+      <div id="getUntisClassesForm">
+        <label for="username" data-lang-content="settings untis_classes_username">Username</label>
+        <input type="text" id="username" required autocomplete="off">
+        <br>
+        <label for="password" data-lang-content="settings untis_classes_password">Password</label>
+        <input type="text" id="password" required autocomplete="off">
+        <br>
+        <button id="getUntisClassesSubmit" data-lang-content="interaction submit" type="button" onclick="getUntisClasses()">Submit</button>
+      </div>
+    </div>
+    <% } %>
 
 
     <% if (isAdmin) { %>

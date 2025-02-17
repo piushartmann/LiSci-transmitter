@@ -98,6 +98,16 @@ label {
     touch-action: manipulation;
 }
 
+#getUntisClassesForm {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+#getUntisClassesForm input {
+    max-width: 250px;
+}
+
 @media (max-width: 768px) {
     .setting {
         width: 100%;

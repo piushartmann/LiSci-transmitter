@@ -38,7 +38,8 @@
         "cancel": "Cancel",
         "likes": "Likes",
         "comments": "Comments",
-        "viewFile": "View File"
+        "viewFile": "View File",
+        "submit": "Submit"
     },
     "citations": {
         "new": {

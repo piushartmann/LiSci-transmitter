@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { MongoConnector } = require('../../server/MongoConnector');
+const untis = require('../../server/untis');
 const sanitizeHtml = require('sanitize-html');
 const router = Router();
 
@@ -100,6 +101,40 @@ module.exports = (db) => {
         if (!Array.isArray(classes)) return res.status(400).send("Invalid parameters");
 
         await db.setPreference(req.session.userID, "untisClasses", classes);
+        return res.status(200).send("Success");
+    });
+
+    /**
+     * @name POST/internal/settings/getOwnTimetable
+     * @description Set the own timetable as preference
+     * @path {POST} /internal/settings/getOwnTimetable
+     * @body {string} username - The username of the user.
+     * @body {string} password - The password of the user.
+     * @response {string} 200 - Success
+     * @response {string} 400 - Invalid parameters
+     * @response {string} 401 - Not logged in
+     * @response {string} 500 - Internal server error
+     * @example {
+     *     "username": "username",
+     *    "password": "password"
+     * }
+     */
+    router.post('/getOwnTimetable', async (req, res) => {
+        // get arguments from request
+        const {username, password} = req.body;
+        // check if arguments are valid
+        if (!username || !password) return res.status(400).send("Invalid parameters");
+        if (typeof username !== "string" || typeof password !== "string") return res.status(400).send("Invalid parameters");
+        // get timetable from server/untis.js -> webuntis library
+        const classes = await untis.getUntisClassesForUser(username, password);
+        // check if classes are valid
+        if (!classes) return res.status(500).send("Internal server error");
+        if (!Array.isArray(classes)) return res.status(500).send("Internal server error");
+        // if user is valid, set classes as preference
+        const userID = req.session.userID;
+        if (!userID) return res.status(401).send("Not logged in");
+        await db.setPreference(userID, "untisClasses", classes);
+        // return success
         return res.status(200).send("Success");
     });
 
