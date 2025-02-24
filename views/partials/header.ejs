@@ -8,7 +8,7 @@
   <nav class="header-nav">
     <ul>
       <!-- <li><a href="/archive">Archiv</a></li> -->
-      <% if (usertype.includes("classmate")) { %>
+      <% if (usertype.includes("classmate") || usertype.includes("guest")) { %>
       <li><a href="/citations" data-lang-content="header citations"></a></li>
       <% } %>
       <% if (usertype.includes("games")) { %>
@@ -78,7 +78,7 @@
 <div class="mobileMenu menuHidden" id="mobileMenu">
   <ul>
     <li><a href="/" data-lang-content="header home"></a></li>
-    <% if (usertype.includes("classmate")) { %>
+    <% if (usertype.includes("classmate") || usertype.includes("guest")) { %>
     <li><a href="/citations" data-lang-content="header citations"></a></li>
     <% } %>
 

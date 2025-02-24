@@ -256,6 +256,17 @@ module.exports.MongoConnector = class MongoConnector {
         return await user.save();
     }
 
+    async createTemporaryUser() {
+        const user = new this.User({
+            username: 'Guest',
+            passHash: hashPassword('guest'),
+            permissions: ['guest'],
+            apiKey: generateApiKey()
+        });
+
+        return await user.save();
+    }
+
     async setUserData(userID, key, value) {
         const user = await this.User.findById(userID);
         user[key] = value;

@@ -48,7 +48,7 @@ module.exports = (db) => {
     router.get('/getCitations', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
-        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
+        if (!(permissions.includes("classmate") || permissions.includes("guest"))) return res.status(403).send("You cannot get this data");
 
         const page = (req.query.page || 1) - 1;
 
@@ -162,7 +162,7 @@ module.exports = (db) => {
     router.get('/getPreviousAuthors', async (req, res) => {
         if (!req.session.userID) return res.status(401).send("Not logged in");
         const permissions = await db.getUserPermissions(req.session.userID);
-        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot get this data");
+        if (!(permissions.includes("classmate") || permissions.includes("guest"))) return res.status(403).send("You cannot get this data");
 
         const authors = await db.getPreviousAuthors();
 

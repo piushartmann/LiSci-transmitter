@@ -68,7 +68,7 @@ module.exports = (db) => {
         const permissions = await db.getUserPermissions(req.session.userID);
         const currentPage = req.query.page || 1;
         const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
-        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
+        if (!(permissions.includes("classmate") || permissions.includes("guest"))) return res.status(403).send("You cannot view this page");
 
         return res.render('citations', {
             currentPage: currentPage, pages: pages

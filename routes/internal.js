@@ -26,6 +26,22 @@ module.exports = (db, s3Client) => {
         res.status(200).send("OK");
     });
 
+    router.get('/login/guest/:referer', async (req, res) => {
+        const guest = await db.createTemporaryUser();
+        const auth = req.query.authCode;
+        console.log(auth);
+        if (auth !== process.env.GUEST_AUTH_CODE) {
+            return res.status(401).send('Unauthorized');
+        }
+        const pfp = generateRandomProfilePic();
+        req.session.username = "Guest";
+        req.session.userID = guest._id;
+        req.session.cookie.expires = new Date(Date.now() + oneDay * 1);
+        req.session.profilePic = pfp;
+        await db.setPreference(guest._id, 'profilePic', pfp);
+        return res.redirect("/" + req.params.referer);
+    });
+
     router.post('/login', async (req, res) => {
         const { username, password } = req.body;
         const user = await db.checkLogin(username, password);
