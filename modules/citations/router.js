@@ -14,9 +14,16 @@ module.exports = (db) => {
     const config = require('../../config.json');
     const citationsPageSize = config.citationsPageSize;
 
-    router.post('/createCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    router.get('/', async (req, res) => {
+        const currentPage = req.query.page || 1;
+        const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
 
+        return res.render('citations', {
+            currentPage: currentPage, pages: pages
+        });
+    });
+
+    router.post('/internal/createCitation', async (req, res) => {
         const { context } = req.body;
 
         if (!context) return res.status(400).send("Missing parameters");
@@ -45,11 +52,10 @@ module.exports = (db) => {
         return Buffer.from(base64, 'base64').toString('utf8');
     }
 
-    router.get('/getCitations', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    router.get('/internal/getCitations', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
-        if (!(permissions.includes("classmate") || permissions.includes("guest"))) return res.status(403).send("You cannot get this data");
-
+        
+        
         const page = (req.query.page || 1) - 1;
 
         let filter = req.query.f;
@@ -100,9 +106,7 @@ module.exports = (db) => {
         return res.status(200).send(JSON.stringify({ citations: filteredCitations, totalCitations }));
     });
 
-    router.post('/likeCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-
+    router.post('/internal/likeCitation', async (req, res) => {
         const { id } = req.body;
 
         if (!id) return res.status(400).send("Missing parameters");
@@ -113,8 +117,7 @@ module.exports = (db) => {
         return res.status(200).send("Success");
     });
 
-    router.post('/deleteCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    router.post('/internal/deleteCitation', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
         const { citationID } = req.body;
@@ -131,8 +134,7 @@ module.exports = (db) => {
         return res.status(200).send("Success");
     });
 
-    router.post('/updateCitation', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
+    router.post('/internal/updateCitation', async (req, res) => {
         const permissions = await db.getUserPermissions(req.session.userID);
 
         const { citationID, context } = req.body;
@@ -159,13 +161,8 @@ module.exports = (db) => {
         return res.status(200).send("Success");
     });
 
-    router.get('/getPreviousAuthors', async (req, res) => {
-        if (!req.session.userID) return res.status(401).send("Not logged in");
-        const permissions = await db.getUserPermissions(req.session.userID);
-        if (!(permissions.includes("classmate") || permissions.includes("guest"))) return res.status(403).send("You cannot get this data");
-
+    router.get('/internal/getPreviousAuthors', async (req, res) => {
         const authors = await db.getPreviousAuthors();
-
         return res.status(200).send(authors);
     });
 

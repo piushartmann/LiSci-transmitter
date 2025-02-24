@@ -46,7 +46,8 @@ const userSchema = new Schema({
     pushSubscription: { type: Object, required: false },
     permissions: [{ type: String, required: true, enum: config.permissions }],
     apiKey: { type: String, required: true },
-    preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }]
+    preferences: [{ key: { type: String, required: true }, value: { type: Object, required: true } }],
+    expiration: { type: Date, required: false }
 });
 
 const citationContextSchema = new Schema({
@@ -111,6 +112,9 @@ const homeworkSchema = new Schema({
     aiAnswer: { type: String, required: false },
     timestamp: { type: Date, default: Date.now }
 });
+
+// auto delete expired temporary users
+userSchema.index({ "expiration": 1 }, { expireAfterSeconds: 0 });
 
 function hashPassword(password) {
     const hash = crypto.createHash('sha256');
@@ -261,7 +265,8 @@ module.exports.MongoConnector = class MongoConnector {
             username: 'Guest',
             passHash: hashPassword('guest'),
             permissions: ['guest'],
-            apiKey: generateApiKey()
+            apiKey: generateApiKey(),
+            expiration: Date.now() + 1000 * 60 * 60 * 24 // 24 hours
         });
 
         return await user.save();

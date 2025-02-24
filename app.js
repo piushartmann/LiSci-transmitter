@@ -144,10 +144,11 @@ db.connectPromise.then(() => {
         const router = express.Router();
 
         router.use(async (req, res, next) => {
+            if (config.access === "public") return next();
+            if (!req.session.userID) return res.redirect("/");
             if (!config.access || config.access.length === 0) return next();
-            if (!req.session.userID) return res.render('notLoggedIn');
             const permissions = await db.getUserPermissions(req.session.userID);
-            const hasPermission = config.access.every(access => permissions.includes(access));
+            const hasPermission = config.access.some(access => permissions.includes(access));
             if (!hasPermission) return res.status(403).render('error', { code: 403, message: "You do not have permission to access this module" });
             next();
         });

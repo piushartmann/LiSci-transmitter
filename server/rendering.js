@@ -19,10 +19,11 @@ function middleware(db, viewDirs, publicDirs, moduleConfigs) {
                 const ips = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
                 const ip = ips.split(",")[0];
                 const modules = moduleConfigs || [];
-        
+                const isGuest = req.session.username == "Guest";
+
                 const isInSchool = ip == config.schoolIP;
                 let options = {
-                    loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {}, isInSchool, modules,
+                    loggedIn: typeof req.session.username != "undefined", username: req.session.username, usertype: permissions || [], profilePic: profilePic, version: version, prefetches: res.locals.additionalPrefetches, preferences: preferences || {}, isInSchool, modules, isGuest,
                     ...additionalOptions
                 };
                 render.call(this, view, options, (err, html) => {
@@ -46,7 +47,11 @@ function middleware(db, viewDirs, publicDirs, moduleConfigs) {
                 try {
                     let file;
                     for (const viewPath of publicDirs) {
-                        file = path.join(viewPath, prefetchURL);
+                        fileURL = prefetchURL;
+                        moduleConfigs.forEach(config => {
+                            fileURL = fileURL.replace(config.url + "/", '');
+                        });
+                        file = path.join(viewPath, fileURL);
                         if (fs.existsSync(file)) {
                             break;
                         }

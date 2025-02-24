@@ -1,0 +1,5 @@
+{
+    "name": "citations",
+    "access": ["classmate", "guest"],
+    "visible": true
+}

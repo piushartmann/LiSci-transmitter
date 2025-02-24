@@ -26,7 +26,7 @@ module.exports = (db, s3Client) => {
         res.status(200).send("OK");
     });
 
-    router.get('/login/guest/:referer', async (req, res) => {
+    router.get('/login/guest', async (req, res) => {
         const guest = await db.createTemporaryUser();
         const auth = req.query.authCode;
         console.log(auth);
@@ -39,7 +39,7 @@ module.exports = (db, s3Client) => {
         req.session.cookie.expires = new Date(Date.now() + oneDay * 1);
         req.session.profilePic = pfp;
         await db.setPreference(guest._id, 'profilePic', pfp);
-        return res.redirect("/" + req.params.referer);
+        return res.redirect("/");
     });
 
     router.post('/login', async (req, res) => {
@@ -72,7 +72,6 @@ module.exports = (db, s3Client) => {
 
     //include all internal routes
     router.use('/', require('./internal/interactions')(db));
-    router.use('/', require('./internal/citations')(db));
     router.use('/', require('./internal/posts')(db));
     router.use('/', require('./internal/uploads')(db, s3Client));
     router.use('/', require('./internal/users')(db));

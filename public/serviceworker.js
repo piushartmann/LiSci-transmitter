@@ -3,14 +3,15 @@ const sitesToPreload = [
     "/citations",
     "/games",
     "/settings",
+    "/homework",
     "/create"
 ];
 
 const requestsToCache = [
     "/internal/getPosts?p=1",
     "/internal/getPosts?p=1&f=eyJ0eXBlIjoibmV3cyJ9",
-    "/internal/getCitations?page=1&f=eyJ0ZXh0IjoiIiwiZnJvbURhdGUiOiIiLCJ0b0RhdGUiOiIifQ==&s=eyJ0aW1lIjoiZGVzYyJ9",
-    "/internal/getPreviousAuthors"
+    "/citations/internal/getCitations?page=1&f=eyJ0ZXh0IjoiIiwiZnJvbURhdGUiOiIiLCJ0b0RhdGUiOiIifQ==&s=eyJ0aW1lIjoiZGVzYyJ9",
+    "/citations/internal/getPreviousAuthors"
 ];
 
 const maxAge = 3600;
@@ -34,10 +35,14 @@ async function preloadSites() {
                 }
             }
         }
-        await cache.add(new Request(url, {
-            cache: 'reload',
-            headers: { 'Cache-Control': 'max-age=' + maxAge }
-        }));
+        try {
+            await cache.add(new Request(url, {
+                cache: 'reload',
+                headers: { 'Cache-Control': 'max-age=' + maxAge }
+            }));
+        } catch (error) {
+            console.warn('Failed to add to cache for url:', url, error);
+        }
     }));
 
     sitesToPreload.forEach(async url => {
@@ -145,6 +150,7 @@ self.addEventListener('fetch', function (event) {
     event.respondWith(
         caches.match(url.pathname + url.search).then(async function (response) {
             if (response) {
+                response = new Response(response.body, response);
                 console.log('Page: ', url.pathname, ' served from cache');
                 reloadType = event.request.headers.get('reloadType') || sitesToPreload.includes(url.pathname + url.search) === true ? 'refreshSite' : 'refreshContent';
 
@@ -163,7 +169,7 @@ self.addEventListener('fetch', function (event) {
                 return response;
             }
             else {
-                return fetch(event.request);
+                return fetch(event.request, { redirect: 'follow' });
             }
         })
     );
@@ -173,7 +179,7 @@ self.addEventListener('fetch', function (event) {
 async function updateCache(url, callback) {
     try {
         console.log('Updating cache of:', url.pathname + url.search);
-        const fetchRequest = fetch(url)
+        const fetchRequest = fetch(url, { redirect: 'follow' });
         const cache = await caches.open('preload');
         const cacheMatch = await cache.match(url);
         const fetchResponse = await fetchRequest;

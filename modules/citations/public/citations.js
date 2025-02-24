@@ -16,8 +16,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     currentPage = 1;
 
-    previousAuthors = await loadPreviousAuthors();
-    addNewContext(true);
+    if (!isGuest) {
+        previousAuthors = await loadPreviousAuthors();
+        addNewContext(true);
+    }
 
     document.addEventListener('keydown', async (e) => {
         if (e.ctrlKey && (e.keyCode == 70 || e.keyCode == 102)) {
@@ -52,7 +54,8 @@ function addNewContext(first = false) {
 }
 
 function cachesMatched(url) {
-    if (url === "/internal/getCitations") {
+    console.log("Caches matched", url);
+    if (url === "/citations/internal/getCitations") {
         setSpinnerVisibility(false);
     }
 }
@@ -71,7 +74,7 @@ async function loadCitations(page, callback, reloading = false) {
         }
     }
 
-    const responsePromise = fetch(`internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`, {
+    const responsePromise = fetch(`/citations/internal/getCitations?page=${page}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`, {
         headers: headers
     });
 
@@ -138,7 +141,7 @@ const reloadContent = async () => {
 };
 
 async function loadPreviousAuthors() {
-    const previousAuthors = await fetch('internal/getPreviousAuthors')
+    const previousAuthors = await fetch('/citations/internal/getPreviousAuthors')
     return await previousAuthors.json();
 }
 
@@ -204,7 +207,7 @@ function buildCitation(citation) {
     let interactionButtons = document.createElement("div");
     interactionButtons.className = "interaction-buttons";
 
-    interactionButtons.appendChild(buildLikeButton("/internal/likeCitation", citation._id, citation.liked, citation.likes.length));
+    if (!isGuest) interactionButtons.appendChild(buildLikeButton("/citations/internal/likeCitation", citation._id, citation.liked, citation.likes.length));
 
     if (citation.canEdit) {
         let deleteButton = buildButton("/icons/delete.svg", "Delete", () => deleteCitation(citation._id), "interaction delete", "");
@@ -278,7 +281,7 @@ function updateCitations() {
     filterBase64 = utf8ToBase64(JSON.stringify(filter));
     sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
 
-    const url = `internal/getCitations?page=${1}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`
+    const url = `/citations/internal/getCitations?page=${1}&f=${filterBase64 || {}}&s=${sortBase64 || {}}`
 
     updateCache(url, "reloadContent");
 
@@ -303,7 +306,7 @@ function submitCitation(button) {
         while (checkChar(content.charAt(0))) {
             content = content.substring(1);
         }
-        
+
         while (checkChar(content.charAt(content.length - 1))) {
             content = content.substring(0, content.length - 1);
         }
@@ -318,7 +321,7 @@ function submitCitation(button) {
 
     button.disabled = true;
     setSpinnerVisibility(true);
-    fetch('internal/createCitation', {
+    fetch('/citations/internal/createCitation', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -347,7 +350,7 @@ function deleteCitation(id) {
         if (!citation.canEdit) return;
         setSpinnerVisibility(true);
 
-        fetch('internal/deleteCitation', {
+        fetch('/citations/internal/deleteCitation', {
             method: 'POST',
             body: new URLSearchParams({ citationID: id }),
             enctype: 'x-www-form-urlencoded',
@@ -435,7 +438,7 @@ function saveCitation(id) {
         return { author: context.author.value, content: context.content.value };
     });
 
-    fetch('internal/updateCitation', {
+    fetch('/citations/internal/updateCitation', {
         method: 'POST',
         body: JSON.stringify({ citationID: id, context: newContext }),
         headers: {

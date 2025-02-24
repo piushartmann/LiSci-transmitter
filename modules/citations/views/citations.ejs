@@ -4,8 +4,8 @@
 <head>
   <%- include("./partials/baseHead.ejs") %>
 
-  <link rel="stylesheet" href="/css/citations.css">
-  <script src="/js/citations.js"></script>
+  <link rel="stylesheet" href="/citations/citations.css">
+  <script src="/citations/citations.js"></script>
   <script src="/js/partials/autocomplete.js"></script>
   <link rel="stylesheet" href="/css/autocomplete.css">
   <title data-lang-content="citations title">Zitate</title>
@@ -14,6 +14,7 @@
 <body>
   <%- include('./partials/base.ejs') %>
 
+  <% if (!isGuest) { %>
   <h1 data-lang-content="citations new title">Ein neues Zitat einreichen</h1>
   <div class="newCitationBox" id="newCitationBox">
     <!-- all new citation contexts will be here -->
@@ -29,6 +30,7 @@
       <button id="citationSave" class="online-only citationSubmit" onclick="submitCitation()" data-lang-content="interaction save">Save</button>
     </div>
   </div>
+  <% } %>
 
   <h1 data-lang-content="citations title">Zitate</h1>
   <%- include('./partials/filter.ejs') %>

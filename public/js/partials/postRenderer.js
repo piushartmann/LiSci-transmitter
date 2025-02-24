@@ -51,7 +51,7 @@ function buildPost(post) {
         }
         sectionContainer.appendChild(sectionDiv);
     });
-    postContainer.appendChild(footer);
+    if (!isGuest) postContainer.appendChild(footer);
     postBox.appendChild(postContainer);
 }
 
