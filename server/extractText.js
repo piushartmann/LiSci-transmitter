@@ -35,7 +35,7 @@ async function extractTextFromPDF(buffer) {
             }
         }
 
-        return { text, [] };
+        return { text, images: [] };
     }
     catch (e) {
         console.log(e);
