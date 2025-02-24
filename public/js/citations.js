@@ -291,7 +291,7 @@ function submitCitation(button) {
     const contentElements = Array.from(document.querySelectorAll(".sentenceStructure .content textarea"));
 
     function checkChar(char) {
-        bannedChars = ['"', '„', '“']
+        bannedChars = ['"', '„', '“', ' ']
         return bannedChars.includes(char);
     }
 
@@ -300,12 +300,15 @@ function submitCitation(button) {
     const context = authorElements.map((authorElement, index) => {
         let content = contentElements[index].value;
         let author = authorElement.value;
+	while(checkChat(content.charAt(0) || checkChar(content.chatAt(content.length - 1))) {
+	
         if (checkChar(content.charAt(0))) {
             content = content.substring(1);
         }
         if (checkChar(content.charAt(content.length - 1))) {
             content = content.substring(0, content.length - 1);
         }
+	}
 
         if (content.length === 0 || author.length === 0) return;
 
