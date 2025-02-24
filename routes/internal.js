@@ -34,6 +34,9 @@ module.exports = (db, s3Client) => {
             return res.status(401).send('Unauthorized');
         }
         const pfp = generateRandomProfilePic();
+
+        res.set('Clear-Site-Data', '"cache", "storage", "executionContexts"');
+
         req.session.username = "Guest";
         req.session.userID = guest._id;
         req.session.cookie.expires = new Date(Date.now() + oneDay * 1);
