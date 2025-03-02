@@ -230,18 +230,18 @@ function iosPWASplash(t, e = "white") {
 }
 
 let ws;
-function makeDiscoverable() {
-    blockBlastWS = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/websocket`);
-    blockBlastWS.onopen = () => {
+function setupWebsocket() {
+    ws = new WebSocket(window.location.origin.replace(/^http/, 'ws') + `/websocket`);
+    ws.onopen = () => {
         console.log('Connected to server');
     }
-    blockBlastWS.onmessage = (event) => {
+    ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
         switch (data.type) {
             case 'invite':
                 console.log('Game invite received');
-                document.body.appendChild(buildGameRequest(blockBlastWS, data.game, data.user, data.username));
+                document.body.appendChild(buildGameRequest(ws, data.game, data.user, data.username));
                 loadLanguage();
                 break;
             case 'uninvite':
@@ -281,10 +281,10 @@ function makeDiscoverable() {
         }
 
     }
-    blockBlastWS.onclose = () => {
+    ws.onclose = () => {
         console.log('Disconnected from server. Reconnecting in 5 seconds');
         setTimeout(() => {
-            makeDiscoverable();
+            setupWebsocket();
         }, 5000);
     }
 
@@ -339,7 +339,7 @@ function makeDiscoverable() {
         return gameRequest;
     }
 
-    return blockBlastWS;
+    return ws;
 }
 
 function addPWABar() {
@@ -687,7 +687,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addPWABar();
     }
 
-    if (loggedIn) makeDiscoverable();
+    if (loggedIn) setupWebsocket();
     registerServiceWorker();
 
     //iosPWASplash('/images/splashScreen.png', '#ffffff');
@@ -695,8 +695,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.addEventListener("focus", () => {
-    if (typeof blockBlastWS !== 'undefined' && blockBlastWS.readyState === WebSocket.CLOSED) {
-        if (loggedIn) makeDiscoverable();
+    if (typeof ws !== 'undefined' && ws.readyState === WebSocket.CLOSED) {
+        if (loggedIn) setupWebsocket();
     }
 });
 

@@ -83,10 +83,12 @@
       </div>
     </div>
 
+    <% if (usertype.includes("apiAccess")) {%>
     <div class="apiKeysContainer setting">
       <label for="apiKeys" data-lang-content="settings api_key">API Key</label>
       <input type="text" value="<%= apiKey %>" id="apiKey">
     </div>
+    <% } %>
 
     <div class="languageContainer setting">
       <label for="language" data-lang-content="settings language">Language</label>

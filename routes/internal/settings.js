@@ -47,7 +47,7 @@ module.exports = (db) => {
         if (!permissions.includes("admin")) return res.status(403).send("You cannot create a user");
 
         const { username, password } = req.body;
-        
+
         if (!username || !password) return res.status(400).send("Missing parameters");
         if (typeof username !== "string" || typeof password !== "string") return res.status(400).send("Invalid parameters");
 
@@ -121,7 +121,7 @@ module.exports = (db) => {
      */
     router.post('/getOwnTimetable', async (req, res) => {
         // get arguments from request
-        const {username, password} = req.body;
+        const { username, password } = req.body;
         // check if arguments are valid
         if (!username || !password) return res.status(400).send("Invalid parameters");
         if (typeof username !== "string" || typeof password !== "string") return res.status(400).send("Invalid parameters");

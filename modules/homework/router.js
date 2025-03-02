@@ -90,6 +90,7 @@ module.exports = (db) => {
         //filter the timetable to only include relevant lessons
         const nextLesson = timetable.filter(l => {
             if (!(l.subjects && l.subjects[0])) return false; //filter out events (no subjects)
+            if (!selectedLesson.subjects[0]) return false; //filter out events (no subjects)
             if (!(l.subjects[0].element.displayname === selectedLesson.subjects[0].element.displayname)) return false; //filter lessons that have the same subject
             if (lessonIsCanceled(l)) return false; //filter out canceled lessons
             if (!(l.start.getTime() > selectedLesson.end.getTime())) return false; //filter out lessons that are before the selected lesson
