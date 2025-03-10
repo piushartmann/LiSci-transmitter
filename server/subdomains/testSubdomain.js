@@ -5,7 +5,7 @@ const app = express();
 expressWs(app);
 
 const port = 3000;
-const subdomain = 'dev';
+const subdomain = 'rss';
 const routerModule = require(path.join(__dirname, subdomain, 'router.js'));
 const router = routerModule();
 app.use("/", router);

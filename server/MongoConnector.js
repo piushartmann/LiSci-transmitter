@@ -6,6 +6,7 @@ const { generateApiKey } = require('generate-api-key');
 const config = require('../config.json');
 const pushLib = require('./pushNotifications.js');
 
+const apiKeyOptions = { method: 'string', pool: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"}
 
 const likeSchema = new Schema({
     userID: { type: ObjectId, ref: 'User', required: true, index: true },
@@ -256,7 +257,7 @@ module.exports.MongoConnector = class MongoConnector {
 
     async createUser(username, password, permissions) {
         const passHash = hashPassword(password);
-        const user = new this.User({ username, passHash, permissions: permissions, apiKey: generateApiKey() });
+        const user = new this.User({ username, passHash, permissions: permissions, apiKey: generateApiKey(apiKeyOptions) });
         return await user.save();
     }
 
@@ -265,7 +266,7 @@ module.exports.MongoConnector = class MongoConnector {
             username: 'Guest',
             passHash: hashPassword('guest'),
             permissions: ['guest'],
-            apiKey: generateApiKey(),
+            apiKey: generateApiKey(apiKeyOptions),
             expiration: Date.now() + 1000 * 60 * 60 * 24 // 24 hours
         });
 
@@ -613,7 +614,7 @@ module.exports.MongoConnector = class MongoConnector {
         pipeline.push({ $match: filterObject });
         pipeline = pipeline.concat([
             { $skip: offset },
-            { $limit: limit },
+            ...(limit >= 0 ? [{ $limit: limit }] : []),
             { $project: { _id: 1, userID: 1, author: 1, content: 1, context: 1, timestamp: 1, likes: 1, comments: 1 } }
         ]);
 

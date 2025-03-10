@@ -122,6 +122,7 @@ let connectedUsers = [];
 
 //run all subsequent code after connecting to the database
 db.connectPromise.then(() => {
+    app.db = db;
     //set up custom renderer
     app.use(rendering(db, views, publicDirs, moduleConfigs));
 
