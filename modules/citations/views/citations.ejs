@@ -33,7 +33,12 @@
   <% } %>
 
   <h1 data-lang-content="citations title">Zitate</h1>
-  <%- include('./partials/filter.ejs') %>
+  <div id="citationsHeader">
+    <%- include('./partials/filter.ejs') %>
+    <button class="button online-only" type="button" onclick="window.location.href = '/statistics/'">
+      <img class="icon" src="/icons/statistics.svg" alt="Statistics">
+    </button>
+  </div>
 
   <div id="spinner" class="spinner" style="display: none;">
     <img src="/icons/spinner.svg" alt="Loading">

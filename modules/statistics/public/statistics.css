@@ -8,5 +8,10 @@
 
 .chart {
     width: 50%;
-    min-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .chart {
+        width: 100%;
+    }
 }
