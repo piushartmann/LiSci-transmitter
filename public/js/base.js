@@ -719,3 +719,18 @@ function setSpinnerVisibility(visible) {
     const spinner = document.getElementById("spinner");
     spinner.style.display = visible ? "flex" : "none";
 }
+
+function copyFromID(elementID) {
+    const element = document.getElementById(elementID);
+    copyFromElement(element);
+}
+
+function copyFromElement(element) {
+    element.select();
+    element.setSelectionRange(0, 99999);
+
+    navigator.clipboard.writeText(element.value);
+    document.execCommand('copy');
+
+    element.blur();
+}

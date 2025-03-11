@@ -86,7 +86,8 @@
     <% if (usertype.includes("apiAccess")) {%>
     <div class="apiKeysContainer setting">
       <label for="apiKeys" data-lang-content="settings api_key">API Key</label>
-      <input type="text" value="<%= apiKey %>" id="apiKey">
+      <input id = "apiKey" type="text" value="<%= apiKey %>" id="apiKey">
+      <button id="copyApiKey" data-lang-content="settings copy_api_key" type="button" onclick="copyFromID('apiKey')">Copy</button>
     </div>
     <% } %>
 
