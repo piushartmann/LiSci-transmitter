@@ -114,9 +114,19 @@ function makePostsXML(req, posts) {
 const auth = process.env.RSS_AUTH_CODE;
 console.log("RSS auth code is", auth);
 
-function authenticate(req) {
-    const key = req.query.key;
-    return key === auth;
+async function authenticate(req) {
+    keyHeader = req.query.key;
+    if (!keyHeader) {
+        return null;
+    }
+    const user = await db.getUserByAPIKey(keyHeader);
+    if (!user) {
+        return null;
+    }
+    if (user.permissions.includes("apiAccess")) {
+        return user;
+    }
+    return null;
 }
 
 
