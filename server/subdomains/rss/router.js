@@ -111,9 +111,6 @@ function makePostsXML(req, posts) {
     return xml;
 };
 
-const auth = process.env.RSS_AUTH_CODE;
-console.log("RSS auth code is", auth);
-
 async function authenticate(req) {
     keyHeader = req.query.key;
     if (!keyHeader) {
