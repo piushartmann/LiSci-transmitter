@@ -3,15 +3,26 @@
 
 <input type="checkbox" id="filterCheckbox" style="display: none;" />
 <div id="filterSurrounding">
-  <button class="filterButton button" onclick="const checkbox = document.getElementById('filterCheckbox'); checkbox.checked = !checkbox.checked; toggleVisibility('filterBody');">
-    <span data-lang-content="filter search">Suchen</span>
-  </button>
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <button class="filterButton button" onclick="const checkbox = document.getElementById('filterCheckbox'); checkbox.checked = !checkbox.checked; toggleVisibility('filterBody');">
+      <span data-lang-content="filter search">Suchen</span>
+    </button>
+    <button class="resetFilterButton button" onclick="resetFilter()" title="Zurücksetzen" style="margin-left: auto;">
+      &#x21bb;
+    </button>
+  </div>
 
   <div class="filterBody" style="display: none;" id="filterBody">
     <div class="filterBox">
-      <div class="filter">
-        <label for="author" data-lang-content="filter searchTerm">Suchbegriff</label>
-        <input type="text" name="author" placeholder="Suchen" id="filterAuthor" oninput="updateFilter()" />
+      <div class="searchTermBox">
+        <div class="filter">
+          <label for="author" data-lang-content="filter searchTerm">Suchbegriff</label>
+          <input type="text" name="author" placeholder="Suchen" id="filterAuthor" oninput="updateFilter()" />
+        </div>
+        <div class="filter">
+          <label for="context" data-lang-content="filter negativeSearchTerm">Negativer Suchbegriff</label>
+          <input type="text" name="context" placeholder="Suchen" id="negFilterAuthor" oninput="updateFilter()" />
+        </div>
       </div>
       <div class="filter">
         <label for="dateFrom" data-lang-content="filter from">Vom</label>

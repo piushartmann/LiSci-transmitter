@@ -63,18 +63,6 @@ module.exports = (db) => {
         });
     });
 
-    router.get('/citations', async (req, res) => {
-        if (!req.session.userID) return res.render('notLoggedIn');
-        const permissions = await db.getUserPermissions(req.session.userID);
-        const currentPage = req.query.page || 1;
-        const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
-        if (!(permissions.includes("classmate"))) return res.status(403).send("You cannot view this page");
-
-        return res.render('citations', {
-            currentPage: currentPage, pages: pages
-        });
-    });
-
     router.get('/settings', async (req, res) => {
         if (!req.session.userID) return res.render('notLoggedIn');
         const permissions = await db.getUserPermissions(req.session.userID);

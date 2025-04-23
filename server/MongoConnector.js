@@ -584,6 +584,19 @@ module.exports.MongoConnector = class MongoConnector {
                         { 'context.content': { $regex: new RegExp(filter[key], 'i') } }
                     ];
                 }
+                if (key === 'negText') {
+                    // Exclude citations where author, content, context.author, or context.content matches negText
+                    const negRegex = new RegExp(filter[key], 'i');
+                    filterObject.$and = filterObject.$and || [];
+                    filterObject.$and.push({
+                        $nor: [
+                            { author: { $regex: negRegex } },
+                            { content: { $regex: negRegex } },
+                            { 'context.author': { $regex: negRegex } },
+                            { 'context.content': { $regex: negRegex } }
+                        ]
+                    });
+                }
                 else if (key === 'fromDate') {
                     filterObject.timestamp = filterObject.timestamp || {};
                     filterObject.timestamp.$gte = new Date(filter[key]);

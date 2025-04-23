@@ -14,13 +14,8 @@ module.exports = (db) => {
     const config = require('../../config.json');
     const citationsPageSize = config.citationsPageSize;
 
-    router.get('/', async (req, res) => {
-        const currentPage = req.query.page || 1;
-        const pages = Math.ceil(await db.getCitationNumber() / citationsPageSize);
-
-        return res.render('citations', {
-            currentPage: currentPage, pages: pages
-        });
+    router.get("/", async (req, res) => {
+        return res.render('citations');
     });
 
     router.post('/internal/createCitation', async (req, res) => {

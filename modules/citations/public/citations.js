@@ -4,13 +4,7 @@ let endReached = false;
 let loadedCitations = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    let query = urlParams.get('q');
-
-    if (query) {
-        const filterAuthor = document.getElementById("filterAuthor");
-        filterAuthor.value = query;
-    }
+    setFilterSettings()
 
     loadCitations(1);
 
@@ -23,11 +17,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     document.addEventListener('keydown', async (e) => {
         if (e.ctrlKey && (e.keyCode == 70 || e.keyCode == 102)) {
-            e.preventDefault();
-            const checkbox = document.getElementById('filterCheckbox');
-            checkbox.checked = true;
-            toggleVisibility('filterBody', true);
-            document.getElementById('filterAuthor').select();
+            if (document.getElementById('filterAuthor') !== document.activeElement) {
+                e.preventDefault();
+                const checkbox = document.getElementById('filterCheckbox');
+                checkbox.checked = true;
+                toggleVisibility('filterBody', true);
+                document.getElementById('filterAuthor').select();
+            }
+            else {
+                const checkbox = document.getElementById('filterCheckbox');
+                checkbox.checked = false;
+                toggleVisibility('filterBody', false);
+            }
         }
     })
 });
@@ -64,8 +65,39 @@ async function loadCitations(page, callback, reloading = false) {
 
     let { filter, sortObj } = getFilterSettings();
 
+    console.log(sortObj);
+
     filterBase64 = utf8ToBase64(JSON.stringify(filter));
     sortBase64 = utf8ToBase64(JSON.stringify(sortObj));
+
+    searchParams = new URLSearchParams();
+    if (filter.text) {
+        searchParams.set('q', filter.text);
+    }
+
+    if (filter.negText) {
+        searchParams.set('neg', filter.negText);
+    }
+
+    if (filter.fromDate) {
+        searchParams.set('fromDate', filter.fromDate);
+    }
+
+    if (filter.toDate) {
+        searchParams.set('toDate', filter.toDate);
+    }
+
+    sortKey = Object.keys(sortObj)[0];
+    if (sortKey + "-" + sortObj[sortKey] !== "time-desc") {
+        searchParams.set('sort', sortKey + "-" + sortObj[sortKey]);
+    }
+
+    if (searchParams.toString() !== "") {
+        history.replaceState({}, '', `${location.pathname}?${searchParams}`);
+    }
+    else {
+        history.replaceState({}, '', `${location.pathname}`);
+    }
 
     let headers = {};
     if (reloading) {
@@ -82,9 +114,7 @@ async function loadCitations(page, callback, reloading = false) {
 
     let response = await responsePromise;
 
-    if (reloading === true) {
-        setSpinnerVisibility(false);
-    }
+    setSpinnerVisibility(false);
 
     response = await response.json()
     const citationData = response.citations;
@@ -336,7 +366,7 @@ function submitCitation(button) {
                 citationBox.innerHTML = "";
                 addNewContext(true);
                 updateCitations();
-                button.disabled = true;
+                button.disabled = false;
                 setSpinnerVisibility(false);
             }
         });
@@ -494,6 +524,9 @@ function getFilterSettings() {
         if (filterElement.id === "filterAuthor") {
             filter.text = filterElement.value;
         }
+        if (filterElement.id === "negFilterAuthor") {
+            filter.negText = filterElement.value;
+        }
         else if (filterElement.id === "filterDateFrom") {
             filter.fromDate = filterElement.value;
         }
@@ -511,6 +544,28 @@ function getFilterSettings() {
     });
     console.log(sortObj);
     return { filter, sortObj };
+}
+
+
+function setFilterSettings() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.toString() === "") return;
+
+    const checkbox = document.getElementById('filterCheckbox');
+    checkbox.checked = true;
+    toggleVisibility('filterBody', true);
+
+    const filterAuthor = document.getElementById("filterAuthor");
+    const negFilterAuthor = document.getElementById("negFilterAuthor");
+    const fromDate = document.getElementById("filterDateFrom");
+    const toDate = document.getElementById("filterDateTo");
+    const sortDate = document.getElementById("sortDate");
+
+    filterAuthor.value = params.get('q') || "";
+    negFilterAuthor.value = params.get('neg') || "";
+    fromDate.value = params.get('fromDate') || "";
+    toDate.value = params.get('toDate') || "";
+    sortDate.value = params.get('sort') || "time-desc";
 }
 
 function updateFilter() {

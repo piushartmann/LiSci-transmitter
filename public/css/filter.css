@@ -13,6 +13,13 @@
     align-items:end;
 }
 
+.searchTermBox {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items:end;
+}
+
 .sortBox {
     display: flex;
     flex-direction: row;
@@ -46,7 +53,7 @@
     transform: rotate(180deg);
 }
 
-#filterAuthor {
+#filterAuthor, #negFilterAuthor {
     padding: 10px;
     border-radius: 8px;
     box-sizing: border-box;
@@ -97,7 +104,23 @@
     text-align: center;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
     gap: 5px;
+}
+
+.resetFilterButton {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: rgb(143, 66, 66);
+    cursor: pointer;
+    padding: 0 10px;
+    transition: color 0.2s;
+}
+
+.resetFilterButton:hover {
+    color: #ff0000;
 }
 
 @media (max-width: 768px) {
@@ -116,7 +139,7 @@
         align-items: flex-start;
     }
 
-    #filterAuthor {
+    #filterAuthor, #negFilterAuthor {
         width: 100%;
     }
 }

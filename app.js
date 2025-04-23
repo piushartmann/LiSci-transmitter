@@ -151,10 +151,11 @@ db.connectPromise.then(() => {
             const permissions = await db.getUserPermissions(req.session.userID);
             const hasPermission = config.access.some(access => permissions.includes(access));
             if (!hasPermission) return res.status(403).render('error', { code: 403, message: "You do not have permission to access this module" });
+
             next();
         });
 
-        router.use("/", routerInstance);
+        router.use(routerInstance);
 
         app.use("/" + config.url, router);
     });

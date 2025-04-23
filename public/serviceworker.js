@@ -169,7 +169,8 @@ self.addEventListener('fetch', function (event) {
                 return response;
             }
             else {
-                return fetch(event.request, { redirect: 'follow' });
+                console.log('Page: ', event.request.url, ' not in cache, fetching from network');
+                return fetch(event.request);
             }
         })
     );
@@ -179,7 +180,7 @@ self.addEventListener('fetch', function (event) {
 async function updateCache(url, callback) {
     try {
         console.log('Updating cache of:', url.pathname + url.search);
-        const fetchRequest = fetch(url, { redirect: 'follow' });
+        const fetchRequest = fetch(url);
         const cache = await caches.open('preload');
         const cacheMatch = await cache.match(url);
         const fetchResponse = await fetchRequest;
