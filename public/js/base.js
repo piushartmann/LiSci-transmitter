@@ -715,9 +715,20 @@ function textAreaOnInput(textarea, multiline = false) {
     textarea.style.height = textarea.scrollHeight + "px";
 }
 
+let spinnerTimeout;
 function setSpinnerVisibility(visible) {
     const spinner = document.getElementById("spinner");
-    spinner.style.display = visible ? "flex" : "none";
+    if (visible) {
+        if (!spinnerTimeout) {
+            spinnerTimeout = setTimeout(() => {
+                spinner.style.visibility = "visible";
+            }, 500);
+        }
+    } else {
+        clearTimeout(spinnerTimeout);
+        spinnerTimeout = null;
+        spinner.style.visibility = "hidden";
+    }
 }
 
 function copyFromID(elementID) {
