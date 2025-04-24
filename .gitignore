@@ -4,3 +4,4 @@ adminConsole.js
 .DS_Store
 coverage
 eng.traineddata
+.vscode/mcp.json

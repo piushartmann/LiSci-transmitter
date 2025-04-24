@@ -4,7 +4,8 @@ let endReached = false;
 let loadedCitations = [];
 
 document.addEventListener("DOMContentLoaded", async function () {
-    setFilterSettings()
+    setFilterSettings();
+    checkAndToggleResetButton();
 
     loadCitations(1);
 
@@ -30,7 +31,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 toggleVisibility('filterBody', false);
             }
         }
-    })
+    });
+
+    document.querySelectorAll(".filter input, .filter select, .sortBox input, .sortBox select")
+        .forEach(el => {
+            el.addEventListener("input", checkAndToggleResetButton);
+            el.addEventListener("change", checkAndToggleResetButton);
+        });
 });
 
 function addNewContext(first = false) {
@@ -546,6 +553,21 @@ function getFilterSettings() {
     return { filter, sortObj };
 }
 
+function checkAndToggleResetButton() {
+    const { filter, sortObj } = getFilterSettings();
+    const isFilterActive =
+        (filter.text && filter.text.trim() !== "") ||
+        (filter.negText && filter.negText.trim() !== "") ||
+        (filter.fromDate && filter.fromDate.trim() !== "") ||
+        (filter.toDate && filter.toDate.trim() !== "") ||
+        (sortObj.time && sortObj.time !== "desc") ||
+        (sortObj.likes && sortObj.likes !== undefined);
+
+    const resetBtn = document.getElementById("resetFilterButton");
+    if (resetBtn) {
+        resetBtn.style.display = isFilterActive ? "inline-block" : "none";
+    }
+}
 
 function setFilterSettings() {
     const params = new URLSearchParams(window.location.search);
@@ -572,3 +594,15 @@ function updateFilter() {
     endReached = false;
     reloadContent();
 }
+
+function resetFilter() {
+    document.getElementById('filterAuthor').value = '';
+    document.getElementById('negFilterAuthor').value = '';
+    document.getElementById('filterDateFrom').value = '';
+    document.getElementById('filterDateTo').value = '';
+    document.getElementById('sortDate').value = 'time-desc';
+    updateFilter();
+    checkAndToggleResetButton();
+}
+
+window.resetFilter = resetFilter;

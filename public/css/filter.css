@@ -1,145 +1,145 @@
-.filterBody {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 10px;
-    margin-top: 0;
-}
-
-.filterBox {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    align-items:end;
-}
-
-.searchTermBox {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items:end;
-}
-
-.sortBox {
-    display: flex;
-    flex-direction: row;
-    align-items: end;
-}
-
-.filterButton {
-    padding: 10px 20px;
-    margin-right: 0;
-    border: none;
-
-}
-
-.filterButton span {
-    color: black;
-    text-align: left;
-}
-
-.filterButton::after {
-    content: "^";
-    font-weight: bold;
-    color: black;
-    float: right;
-    font-size: 1.5em;
-    margin-left: 5px;
-    transform: rotate(0deg);
-    transition: 0.1s;
-}
-
-#filterCheckbox:checked+#filterSurrounding>.filterButton::after {
-    transform: rotate(180deg);
-}
-
-#filterAuthor, #negFilterAuthor {
-    padding: 10px;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 1em;
-    resize: none;
-    height: 40px;
-    overflow: hidden;
-    border: 1px solid rgb(118, 118, 118);
-    width: 30vw;
-}
-
-#filterSurrounding {
-    border: 1px solid rgb(118, 118, 118);
-    border-radius: 16px;
-    width: min-content;
-    transform: translate(10px);
-    margin: 10px;
-    margin-left: 0;
-}
-
-#filterCheckbox:checked+#filterSurrounding {
-    width: calc(100% - 20px);
-}
-
-#filterCheckbox:checked+#filterSurrounding>.filterButton {
-    width: 100%;
-}
-
-.filterBox input[type="date"] {
-    padding: 10px;
-    border-radius: 8px;
-    box-sizing: border-box;
-    font-size: 1em;
-    resize: none;
-    height: 40px;
-    overflow: hidden;
-    border: 1px solid rgb(118, 118, 118);
-}
-
-.filter {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.totalElements {
-    height: 50%;
-    text-align: center;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: center;
-    gap: 5px;
-}
-
-.resetFilterButton {
-    background: none;
-    border: none;
-    font-size: 1.5em;
-    color: rgb(143, 66, 66);
-    cursor: pointer;
-    padding: 0 10px;
-    transition: color 0.2s;
-}
-
-.resetFilterButton:hover {
-    color: #ff0000;
-}
-
-@media (max-width: 768px) {
     .filterBody {
-        flex-direction: column;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 10px;
+        margin-top: 0;
     }
 
     .filterBox {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        align-items:end;
+    }
+
+    .searchTermBox {
+        display: flex;
         flex-direction: column;
-        margin-bottom: 10px;
-        align-items: flex-start;
+        gap: 10px;
+        align-items:end;
     }
 
     .sortBox {
-        flex-direction: column;
-        align-items: flex-start;
+        display: flex;
+        flex-direction: row;
+        align-items: end;
+    }
+
+    .filterButton {
+        padding: 10px 20px;
+        margin-right: 0;
+        border: none;
+
+    }
+
+    .filterButton span {
+        color: black;
+        text-align: left;
+    }
+
+    .filterButton::after {
+        content: "^";
+        font-weight: bold;
+        color: black;
+        float: right;
+        font-size: 1.5em;
+        margin-left: 5px;
+        transform: rotate(0deg);
+        transition: 0.1s;
+    }
+
+    #filterCheckbox:checked+#filterSurrounding>.filterButton::after {
+        transform: rotate(180deg);
     }
 
     #filterAuthor, #negFilterAuthor {
+        padding: 10px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1em;
+        resize: none;
+        height: 40px;
+        overflow: hidden;
+        border: 1px solid rgb(118, 118, 118);
+        width: 30vw;
+    }
+
+    #filterSurrounding {
+        border: 1px solid rgb(118, 118, 118);
+        border-radius: 16px;
+        width: min-content;
+        transform: translate(10px);
+        margin: 10px;
+        margin-left: 0;
+    }
+
+    #filterCheckbox:checked+#filterSurrounding {
+        width: calc(100% - 20px);
+    }
+
+    #filterCheckbox:checked+#filterSurrounding>.filterButton {
         width: 100%;
     }
-}
+
+    .filterBox input[type="date"] {
+        padding: 10px;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1em;
+        resize: none;
+        height: 40px;
+        overflow: hidden;
+        border: 1px solid rgb(118, 118, 118);
+    }
+
+    .filter {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .totalElements {
+        height: 50%;
+        text-align: center;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: center;
+        gap: 5px;
+    }
+
+    .resetFilterButton {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        color: rgb(143, 66, 66);
+        cursor: pointer;
+        padding: 0 10px;
+        transition: color 0.2s;
+    }
+
+    .resetFilterButton:hover {
+        color: #ff0000;
+    }
+
+    @media (max-width: 768px) {
+        .filterBody {
+            flex-direction: column;
+        }
+
+        .filterBox {
+            flex-direction: column;
+            margin-bottom: 10px;
+            align-items: flex-start;
+        }
+
+        .sortBox {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #filterAuthor, #negFilterAuthor {
+            width: 100%;
+        }
+    }
