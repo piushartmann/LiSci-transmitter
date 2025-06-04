@@ -10,7 +10,7 @@ const router = Router();
 module.exports = (db) => {
 
     router.get('/', async (req, res) => {
-        return res.render('mcmap');
+        return res.redirect('http://64.226.114.49:8100/')
     });
 
     return router;
