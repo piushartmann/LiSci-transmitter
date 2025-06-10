@@ -35,6 +35,7 @@
   "scripts": {
     "start": "node app.js",
     "build:digitalocean": "sh ./build.sh",
+    "build": "sh ./build.sh",
     "test": "jest"
   },
   "devDependencies": {
