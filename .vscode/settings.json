@@ -18,5 +18,6 @@
     "todo-tree.filtering.excludeGlobs": [
         "**/node_modules/*/**",
         "**/.vscode/*/**",
-    ]
+    ],
+    "testing.automaticallyOpenTestResults": "neverOpen"
 }
