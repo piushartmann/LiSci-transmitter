@@ -30,9 +30,14 @@ if (!process.env.NODE_ENV === "production") {
     version = Math.random().toString(36);
 } else {
     console.log("Running in production mode");
-    version = require('child_process')
-        .execSync('git rev-parse HEAD')
-        .toString().trim();
+    try {
+        version = require('child_process')
+            .execSync('git rev-parse HEAD')
+            .toString().trim();
+    } catch (error) {
+        console.warn('Git not available, using fallback version');
+        version = 'production-' + Date.now();
+    }
 }
 
 //set up environment variables
