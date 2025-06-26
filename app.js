@@ -119,6 +119,11 @@ webpush.setVapidDetails(
     process.env.VAPID_PRIVATE_KEY
 );
 
+//setup rickroll
+app.get('/fuesse', (req, res) => {
+    res.send('<script>window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";</script>');
+});
+
 //connect to db
 const db = new MongoConnector(dbname, connectionString, webpush);
 
