@@ -19,8 +19,16 @@ async function translate(text, fromLanguage, toLanguage) {
         return { translation: "wurstwasser"};
     }
 
-    const translation = await bingTranslate(text, fromLanguage, toLanguage);
-    return translation;
+    try {
+        const translation = await bingTranslate(text, fromLanguage, toLanguage);
+        if (!translation || !translation.translation) {
+            return { translation: text };
+        }
+        return translation;
+    } catch (err) {
+        console.error(`Translation error from ${fromLanguage} to ${toLanguage}:`, err);
+        return { translation: text };
+    }
 }
 
 function transcribeElvish(text) {
@@ -128,6 +136,8 @@ function translateFiles(targetLanguage) {
         }
         console.log(`Writing ${targetLanguage} translation file`);
         fs.writeFileSync(path.join(__dirname, 'public', 'languages', targetLanguage + '.json'), JSON.stringify(translation, null, 4));
+    }).catch(err => {
+        console.error(`Failed to translate file for ${targetLanguage}:`, err);
     });
 }
 
