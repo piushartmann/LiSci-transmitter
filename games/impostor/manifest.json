@@ -1,0 +1,9 @@
+{
+    "url": "impostor",
+    "name": "Impostor",
+    "description": "Findet den Betrüger unter euch",
+    "singleplayer": false,
+    "multiplayer": true,
+    "priority": 10,
+    "enabled": true
+}
