@@ -15,7 +15,7 @@ const subdomains = require('./server/subdomainManager');
 const RateLimit = require('express-rate-limit');
 
 //set up subdomains
-app.use(subdomains);
+//app.use(subdomains); //cant use anymore since domain expired
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const oneDay = 24 * 3600 * 1000;
