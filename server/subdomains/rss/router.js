@@ -93,7 +93,7 @@ function makePostsXML(req, posts) {
         let fileLink = `<link>https://liscitransmitter?post=${post._id}</link>`;
         if (fileSection) {
             // Ensure URL is properly formed with full https:// prefix
-            const fileUrl = `https://transmitterstorage.fra1.digitaloceanspaces.com${fileSection.content}`;
+            const fileUrl = `https://transmitterstorage.fra1.digitaloceanspaces.com/${fileSection.content}`;
             fileLink = `<enclosure url="${fileUrl}" type="application/pdf" />
         <link>${fileUrl}</link>`;
         }
