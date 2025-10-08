@@ -28,14 +28,14 @@ function buildPost(post) {
                 break;
             case "file":
                 let titleFallback = resolveLanguageContent("interaction viewFile") || "View File";
-                const fileButton = buildButton("/icons/view.svg", titleFallback, () => window.open(`https://storage.liscitransmitter.live/${section.content}`, '_blank'));
+                const fileButton = buildButton("/icons/view.svg", titleFallback, () => window.open(`https://transmitterstorage.fra1.digitaloceanspaces.com${section.content}`, '_blank'));
                 fileButton.label.classList.add("file-label");
                 sectionDiv.appendChild(fileButton);
                 break;
             case "img":
                 const img = document.createElement("img");
                 img.className = "post-image";
-                img.src = `https://storage.liscitransmitter.live/${section.content}`;
+                img.src = `https://transmitterstorage.fra1.digitaloceanspaces.com${section.content}`;
                 img.alt = post.title;
                 img.style = `max-width: 100%; height: ${section.size * document.documentElement.clientWidth + "px" || "auto"}`;
                 sectionDiv.appendChild(img);

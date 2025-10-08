@@ -43,7 +43,7 @@ if (!process.env.NODE_ENV === "production") {
 //set up environment variables
 
 const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 console.log(`Running version ${version}`);
 

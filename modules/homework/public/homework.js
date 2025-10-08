@@ -261,7 +261,7 @@ function appendFile(filename, file) {
 
   const fileButton = buildButton('/icons/file.svg', filename, () => {
     if (!file.new) {
-      const url = "https://storage.liscitransmitter.live/" + file;
+      const url = "https://transmitterstorage.fra1.digitaloceanspaces.com" + file;
       window.open(url, '_blank');
     }
     else {
@@ -520,7 +520,7 @@ function buildTaskElement(task) {
     taskFiles.classList.add('files');
     task.files.forEach(file => {
       taskFiles.appendChild(buildButton('/icons/view.svg', file.name, () => {
-        const url = "https://storage.liscitransmitter.live/" + file.path;
+        const url = "https://transmitterstorage.fra1.digitaloceanspaces.com" + file.path;
         download(url, file.name);
       }))
     });

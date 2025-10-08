@@ -33,7 +33,7 @@ async function handleInlineImages(imageSource) {
         const extension = mimeString.split('/')[1];
 
         const result = await uploadFile(blob, `image.${extension}`, "/uploadImage");
-        return `https://storage.liscitransmitter.live/${result}`;
+        return `https://transmitterstorage.fra1.digitaloceanspaces.com${result}`;
     }
     else {
         return imageSource;
@@ -408,7 +408,7 @@ function loadPost(post) {
             case 'img':
                 newSection = addImageSection(true);
                 const img = newSection.querySelector('img');
-                img.src = 'https://storage.liscitransmitter.live/' + section.content;
+                img.src = 'https://transmitterstorage.fra1.digitaloceanspaces.com' + section.content;
                 img.style.display = 'block';
                 img.style.height = section.size + 'px';
                 sections[newSection.id].content = section.content;
