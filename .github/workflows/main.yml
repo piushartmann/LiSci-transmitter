@@ -1,4 +1,4 @@
-name: Deploy Caddy (git pull + compose up)
+name: Deploy App
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
         run: |
           ssh-keyscan -H "${{ secrets.HETZNER_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Pull latest and restart Caddy
+      - name: Deploy App via SSH
         env:
           HOST: ${{ secrets.HETZNER_HOST }}
           USER: ${{ secrets.HETZNER_USER }}
