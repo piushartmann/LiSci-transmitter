@@ -9,8 +9,8 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
-    ports:
-      - "3000:8080"
+    expose:
+      - "8080"
     networks:
       - web
 
