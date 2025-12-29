@@ -27,5 +27,6 @@ jobs:
             set -euo pipefail
             cd "$APP_DIR"
             git pull --ff-only
+            docker compose build --no-cache
             docker compose up -d
           EOF
