@@ -15,7 +15,7 @@ const subdomains = require('./server/subdomainManager');
 const RateLimit = require('express-rate-limit');
 
 //set up subdomains
-app.use(subdomains);
+//app.use(subdomains); //cant use anymore since domain expired
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const oneDay = 24 * 3600 * 1000;
@@ -43,7 +43,7 @@ if (!process.env.NODE_ENV === "production") {
 //set up environment variables
 
 const connectionString = process.env.DATABASE_URL || "mongodb://localhost:27017";
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 console.log(`Running version ${version}`);
 

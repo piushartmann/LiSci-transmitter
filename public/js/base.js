@@ -111,7 +111,7 @@ function buildProfilePic(profilePic, username, short = false) {
 
         let authorProfilePic = document.createElement("img");
         authorProfilePic.className = "profilePicture image";
-        authorProfilePic.src = `https://storage.liscitransmitter.live/${profilePic.content}`;
+        authorProfilePic.src = `https://transmitterstorage.fra1.digitaloceanspaces.com/${profilePic.content}`;
         authorProfilePic.alt = username;
 
         authorProfilePicWrapper.appendChild(authorProfilePic);
