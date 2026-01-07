@@ -53,7 +53,7 @@ async function extractTextFromAllNewsArticles(db) {
     const text = (await Promise.all(news.posts.map(async (article) => (await Promise.all(article.sections.map(async (section) => {
         if (section.type === "file") {
             try {
-                return await extractTextFromPDF("https://transmitterstorage.fra1.digitaloceanspaces.com/" + section.content);
+                return await extractTextFromPDF("https://storage.liscitransmitter.de/transmitterstorage/" + section.content);
             }
             catch (error) {
                 console.error(error);
@@ -96,7 +96,7 @@ async function doHomework(content, files, lessonName) {
     console.log("Starting AI Response... " + content);
     //make files objects
     files = await Promise.all(files.map(async file => {
-        const response = await fetch("https://transmitterstorage.fra1.digitaloceanspaces.com/" + file.path);
+        const response = await fetch("https://storage.liscitransmitter.de/transmitterstorage/" + file.path);
         return {
             filename: file.filename,
             mimetype: response.headers.get("content-type"),

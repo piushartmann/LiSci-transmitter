@@ -109,7 +109,7 @@ module.exports = (db) => {
                 const fileType = section.content.split('.').pop();
                 let text;
                 if (fileType === "pdf") {
-                    text = await openAI.extractTextFromPDF("https://transmitterstorage.fra1.digitaloceanspaces.com/" + section.content);
+                    text = await openAI.extractTextFromPDF("https://storage.liscitransmitter.de/transmitterstorage/" + section.content);
                 }
 
                 if (text) {
