@@ -104,13 +104,11 @@ module.exports = (db) => {
     })
 
     function summarizeSections(sections, postID) {
+        return;
         sections.forEach(async section => {
             if (section.type === "file") {
                 const fileType = section.content.split('.').pop();
                 let text;
-                if (fileType === "pdf") {
-                    text = await openAI.extractTextFromPDF("https://storage.liscitransmitter.de/transmitterstorage/" + section.content);
-                }
 
                 if (text) {
                     if (!section.summary) {
