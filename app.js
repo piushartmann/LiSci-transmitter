@@ -103,13 +103,13 @@ app.use(session({
 
 //connect to storage bucket
 const s3Client = new S3Client({
-    region: "fra1",
-    endpoint: "https://fra1.digitaloceanspaces.com",
+    region: "us-east-1",
+    endpoint: "https://storage.liscitransmitter.de",
     credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
-    forcePathStyle: false,
+    forcePathStyle: true,
 });
 
 //set up webpush
