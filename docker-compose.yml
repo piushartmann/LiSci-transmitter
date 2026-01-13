@@ -13,8 +13,8 @@ services:
     expose:
       - "8080"
     networks:
-      - web
+      - internal
 
 networks:
-  web:
+  internal:
     external: true
