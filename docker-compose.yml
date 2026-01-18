@@ -14,7 +14,10 @@ services:
       - "8080"
     networks:
       - internal
+      - web
 
 networks:
   internal:
+    external: true
+  web:
     external: true
