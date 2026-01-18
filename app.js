@@ -104,6 +104,8 @@ app.use(session({
 //log all ips
 app.use((req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.ip;
+    if (req.originalUrl.startsWith('/internal')) return next(); //skip internal routes
+    if (req.originalUrl.startsWith('/websocket')) return next(); //skip websocket routes
     console.log(`IP: ${ip} - ${req.method} ${req.originalUrl}`);
     next();
 });
