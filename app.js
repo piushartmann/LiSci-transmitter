@@ -103,9 +103,11 @@ app.use(session({
 
 //log all ips
 app.use((req, res, next) => {
-    console.log(`IP: ${req.ip} - ${req.method} ${req.originalUrl}`);
+    const ip = req.headers['x-forwarded-for'] || req.ip;
+    console.log(`IP: ${ip} - ${req.method} ${req.originalUrl}`);
     next();
 });
+
 
 //connect to storage bucket
 const s3Client = new S3Client({
