@@ -101,6 +101,12 @@ app.use(session({
     })
 }));
 
+//log all ips
+app.use((req, res, next) => {
+    console.log(`IP: ${req.ip} - ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 //connect to storage bucket
 const s3Client = new S3Client({
     region: "us-east-1",
