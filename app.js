@@ -18,6 +18,9 @@ const RateLimit = require('express-rate-limit');
 //app.use(subdomains); //cant use anymore since domain expired
 dotenv.config({ path: path.join(__dirname, '.env') });
 
+// Trust the first proxy (reverse proxy)
+app.set('trust proxy', 1);
+
 const oneDay = 24 * 3600 * 1000;
 
 let addReloadCallback = () => { };
