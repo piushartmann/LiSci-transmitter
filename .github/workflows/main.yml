@@ -28,4 +28,6 @@ jobs:
             cd "$APP_DIR"
             git pull --ff-only
             docker build -t piushartmann/liscitransmitter .
+            cd /opt/stacks/liscitransmitter
+            docker compose up -d --force-recreate
           EOF
